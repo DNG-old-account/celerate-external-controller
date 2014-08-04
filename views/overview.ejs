@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <% include header.ejs %>
+
+    <style>
+      #map-canvas {
+        margin: 0;
+        padding: 0;
+        height: 450px;
+        width: 100%;
+        z-index:3;
+        position: relative;
+      }
+    </style>
+
+    <!-- Google maps -->
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry"></script>
+
+    <script>
+// Returns a point fraction of the distance from the from LatLng towards the to
+// LatLng.
+function interpolate(from, to, fraction) {
+  var lat = (from.lat() * (1.0 - fraction)) + (to.lat() * fraction);
+  var lng = (from.lng() * (1.0 - fraction)) + (to.lng() * fraction);
+  return new google.maps.LatLng(lat, lng);
+}
+
+function initialize() {
+  google.maps.visualRefresh=true;
+  var mapOptions = {
+    zoom: 15,
+    center: new google.maps.LatLng(37.8717, -122.2728),
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  };
+
+  var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+  // Draw markers for nodes.
+  var nodemarkers = {};
+  <% for (var n in nodemap) { %>
+  nodemarkers['<%= n %>'] = new google.maps.Marker({
+    position : new google.maps.LatLng(<%= nodemap[n].location.lat %>, <%= nodemap[n].location.lng %>),
+    title : '<%= nodemap[n].nickname %> (<%= nodemap[n].hardware %>)',
+    map : map
+  });
+  <% } %>
+
+  var edges = {};
+  var edgeInfoBoxes = {};
+  <% for (var edge in topology) { %>
+  <% var edgeColor = '#428bca'; if (topology[edge].from < topology[edge].to) { edgeColor = '#5bc0de'; } %>
+  edges['<%- edge %>'] = new google.maps.Polyline({
+    path : [ nodemarkers['<%= topology[edge].from %>'].position,
+    interpolate(nodemarkers['<%= topology[edge].from %>'].position, nodemarkers['<%= topology[edge].to %>'].position, 0.5) ],
+    strokeColor: '<%- edgeColor %>',
+    strokeOpacity: 1.0,
+    strokeWeight : 7,
+    map : map
+  });
+
+  infoText = "<h5><%- edge %>(<%- topology[edge].type %>)</h5>";
+  <% if (topology[edge].type == 'wireless') { %>
+    infoText += "<b>TX Freq:</b> <%- topology[edge].tx_freq %><br><b>RX Freq:</b> <%- topology[edge].rx_freq %></div>";
+  <% } %>
+
+  // Create an info box, and add listeners to show and hide it when the user
+  // hovers over the associated edge polyline.
+  edgeInfoBoxes['<%- edge %>'] = new google.maps.InfoWindow({ content : infoText });
+
+  var edgeTimeout = {};
+  google.maps.event.addListener(edges['<%- edge %>'], 'mouseover', function() {
+    edgeInfoBoxes['<%- edge %>'].setPosition(interpolate(
+      nodemarkers['<%- topology[edge].from %>'].position,
+      nodemarkers['<%- topology[edge].to %>'].position,
+      0.25
+      ));
+      if (edgeTimeout['<%- edge %>']) {
+        clearTimeout(edgeTimeout['<%- edge %>']);
+        delete edgeTimeout['<%- edge %>'];
+      }
+    edgeInfoBoxes['<%- edge %>'].open(map);
+  });
+
+  google.maps.event.addListener(edges['<%- edge %>'], 'mouseout', function() {
+    edgeTimeout['<%- edge %>'] = setTimeout(function() {
+      edgeInfoBoxes['<%- edge %>'].close(map)
+    }, 1000);
+  });
+  <% } %>
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </head>
+
+  <body>
+    <% include navbar.ejs %>
+
+    <div class="container-fluid">
+      <div class="row">
+        <% var activeSidebar = 'overview'; %>
+        <% include sidebar.ejs %>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header"><%- title %> Map</h1>
+
+          <div class="google-map-canvas" id="map-canvas"> </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+  </body>
+</html>

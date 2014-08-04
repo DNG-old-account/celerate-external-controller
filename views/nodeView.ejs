@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <% include header.ejs %>
+  </head>
+
+  <body>
+    <% include navbar.ejs %>
+
+    <div class="container-fluid">
+      <div class="row">
+        <% var activeSidebar = 'nodeView'; %>
+        <% include sidebar.ejs %>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header"><%- title %></h1>
+<!-- Grab the various form variables to avoid many in-line if statements. -->
+<%
+var locationLat = ('location' in node && 'lat' in node['location']) ? node['location']['lat'] : "";
+var locationLng = ('location' in node && 'lng' in node['location']) ? node['location']['lng'] : "";
+var mac = ('mac' in node) ? node['mac'] : "";
+var hardware = ('hardware' in node) ? node['hardware'] : "";
+var nickname = ('nickname' in node) ? node['nickname'] : "";
+var type = ('type' in node) ? node['type'] : "";
+%>
+          <form id="updateForm" class="form-horizontal" role="form">
+            <div class="form-group">
+              <label for="nickname" class="col-sm-2 control-label">Nickname</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="nickname" value="<%- nickname %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="type" class="col-sm-2 control-label">Type</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="type" value="<%- type %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="hardware" class="col-sm-2 control-label">Hardware</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="hardware" value="<%- hardware %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="mac" class="col-sm-2 control-label">MAC</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="mac" value="<%- mac %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="locationLat" class="col-sm-2 control-label">Location Lat</label>
+              <div class="col-sm-2">
+              <input type="text" class="form-control" id="locationLat" value="<%- locationLat %>">
+              </div>
+              <label for="locationLng" class="col-sm-2 control-label">Location Lng</label>
+              <div class="col-sm-2">
+                <input type="text" class="form-control" id="locationLng" value="<%- locationLng %>">
+              </div>
+            <button type="button" id="getLocationButton" class="btn btn-primary">Get Current Location</button><br>
+            </div>
+
+            <button type="submit" class="btn btn-primary pull-right">Save</button><br>
+          </form>
+
+          <hr>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead><tr><th>Photo</th><th>Description</th></tr></thead>
+              <tbody>
+              <% for (p in photos) { %>
+              <tr>
+                <td><a href="/photo?photokey=<%- photos[p]['photokey'] %>"><img src="/photo?photokey=<%- photos[p]['photokey'] %>" class="img-responsive img-thumbnail"></a></td>
+                <td><%- photos[p]['text'] %></td>
+              </tr>
+              <% } %>
+              </tbody>
+            </table>
+          </div>
+
+          <hr>
+          <h3>Node Photo Upload</h3>
+          <div class="span2 well">
+            <form id="uploadPhoto" class="dropzone" action="/upload/nodePhoto"></form>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="/javascripts/dropzone.js"></script>
+    <script>
+    Dropzone.options.uploadPhoto = {
+      headers: { nodekey: "<%- node['_key'] %>" },
+      maxFilesize: 20, // MB
+      uploadMultiple: false,
+      acceptedFiles: 'image/*',
+      init: function() {
+        this.on("error", function(file, errorMessage, xhr) {
+          alert("Error uploading: " + errorMessage);
+          window.location.reload();
+        });
+        this.on("success", function(file, response) {
+          alert("Upload success.");
+          window.location.reload();
+        });
+        this.on("sending", function(file, xhr, formData) {
+          formData.append('phototext', window.prompt("Describe the photo","[description here]"));
+        });
+      }
+    };
+
+    // Get the current browser's location and fill it in the form.
+    $("#getLocationButton").click(function(event) {
+      function setCurrentLocation(location) {
+        if ('latitude' in location.coords && 'longitude' in location.coords) {
+          lat = location.coords.latitude;
+          lng = location.coords.longitude;
+          $("#locationLat").val(lat);
+          $("#locationLng").val(lng);
+        }
+      }
+
+      navigator.geolocation.getCurrentPosition(setCurrentLocation);
+    });
+
+    // Save the changes to the form.
+    $("#updateForm").submit(function(event) {
+      event.preventDefault();
+ 
+      // Construct POST message for update.
+      update = {};
+      update['_id'] = '<%- node['_id'] %>';
+      if (!('location' in update)) {
+        update['location'] = {}
+      }
+      update['location']['lat'] = $("#locationLat").val();
+      update['location']['lng'] = $("#locationLng").val();
+      update['mac'] = $("#mac").val();
+      update['hardware'] = $("#hardware").val();
+      update['nickname'] = $("#nickname").val();
+      update['type'] = $("#type").val();
+
+      $.post(
+        "/node/update",
+        update,
+        function(response) {
+          if ('result' in response && response['result'] == 'ok') {
+            window.alert("Saved.");
+            window.location.reload();
+          } else {
+            window.alert("Couldn't save.");
+          }
+        },
+        "json"
+      );
+    });
+
+    </script>
+  </body>
+</html>

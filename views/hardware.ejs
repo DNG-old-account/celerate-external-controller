@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <% include header.ejs %>
+  </head>
+
+  <body>
+    <% include navbar.ejs %>
+
+    <div class="container-fluid">
+      <div class="row">
+        <% var activeSidebar = 'hardware'; %>
+        <% include sidebar.ejs %>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header"><%- title %></h1>
+          <p class="bg-success"><h3><span class="label label-success">Hardware</span></h3></p>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead><tr><th>Name</th><th>Make</th><th>Model</th><th>Features</th><th class="col-sm-1"></th></tr></thead>
+              <tbody>
+              <% for (h in hardware) { %>
+              <tr>
+                <td><%- hardware[h]['name'] %></td>
+                <td><%- hardware[h]['make'] %></td>
+                <td><%- hardware[h]['model'] %></td>
+                <td><% if ('features' in hardware[h]) { %><%- hardware[h]['features'] %> <% } %></td>
+                <td><a href="/hardware/view?key=<%- hardware[h]['_key'] %>">view/edit</a></td>
+              </tr>
+              <% } %>
+              </tbody>
+            </table>
+            <a href="#" id="addHardware" class="btn btn-primary btn-sm pull-right" role="button">Add Hardware</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script>
+    $("#addHardware").click(function() {
+      $.post(
+        "/hardware/newhardware",
+        {
+          'full name' : 'New User',
+          'subscribed' : false
+        },
+        function(response) {
+          window.location.reload();
+        },
+        "json"
+      );
+    });
+    </script>
+  </body>
+</html>

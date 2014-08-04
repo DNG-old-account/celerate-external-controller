@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html ng-app='celerate'>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <script src="/javascripts/bower_components/angular/angular.js"></script>
+    <script src="/javascripts/bower_components/angular-animate/angular-animate.js"></script>
+    <script src="/javascripts/bower_components/angular-strap/dist/angular-strap.min.js"></script>
+    <script src="/javascripts/bower_components/angular-strap/dist/angular-strap.tpl.min.js"></script>
+    <script src="/javascripts/angular-components.js"></script>
+
+    <title>Celerate Rural Broadband Internet</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/stylesheets/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/stylesheets/jumbotron-narrow.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body ng-controller="MainCtrl">
+
+    <div class="container" ng-controller="TypeaheadCtrl">
+      <div class="header">
+        <ul class="nav nav-pills pull-right">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+        <h3 class="text-muted">Celerate</h3>
+      </div>
+
+      <div class="jumbotron">
+        <h1>Rural Broadband Internet</h1>
+        <p class="lead">The Celerate project is bringing affordable broadband Internet
+        access to underserved and unserved communities across Northern and
+        Central California.</p>
+
+        <form class="form-inline" role="form" ng-submit="lookupAddress()">
+          <div class="form-group">
+            <input type="text" size=70 class="form-control" id="fullAddress" ng-model="address"
+            data-animation="am-flip-x"
+            ng-options="address.formatted_address as address.formatted_address
+            for address in getAddress($viewValue)" placeholder="Enter your address to check availability" bs-typeahead>
+          </div>
+          <div ng-hide="hide_lookup_button"><p><button class="btn btn-lg btn-primary" type="submit">Check Availability</button></div>
+          <div ng-hide="hide_address_alert">
+            <p>
+            <div class="alert alert-warning"><strong>Oops!</strong>&nbsp;We can only look up specific street addresses.  Please try again.</div>
+            </p>
+          </div>
+        </form>
+
+        <div ng-hide="hide_signup_button">
+          <p class="lead">Celerate may be available in your area!</p>  Please enter your name and contact info and we'll get in touch with you shortly to schedule an appointment.
+          <form id="signupForm" class="form-horizontal" role="form">
+            <div class="form-group">
+              <label for="fullName" class="col-sm-2 control-label">Full Name</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="fullName" value="">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="mobile" class="col-sm-2 control-label">Phone</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="mobile" value="">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="email" class="col-sm-2 control-label">Email (optional)</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="email" value="">
+              </div>
+            </div>
+            <div class="form-group" hidden>
+              <label for="streetAddress" class="col-sm-2 control-label">Street Address</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="streetAddress" value="">
+              </div>
+            </div>
+            <div class="form-group" hidden>
+              <label for="city" class="col-sm-2 control-label">City</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="city" value="">
+              </div>
+            </div>
+            <div class="form-group" hidden>
+              <label for="state" class="col-sm-2 control-label">State</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="state" value="">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-lg btn-success">Sign up today</button><br>
+          </form>
+        </div>
+
+        <div ng-hide="hide_unavailable">
+          <p class="lead">Celerate appears to be unavailable in your area at
+          this time.  If you'd like to be notified if and when it becomes
+          available, type your email below.</p>
+          <form class="form-inline" role="form" ng-submit="unavailableSubmit()">
+            <input type="text" class="form-control" size=40 ng-model="email">
+            <button class="btn btn-lg btn-info" type=submit>Notify Me</button>
+          </form>
+        </div>
+
+      </div>
+
+      <div class="row marketing">
+        <div class="col-lg-6">
+          <h4>Celerate, a Project of De Novo Group</h4>
+          <p><a href="http://www.denovogroup.org">De Novo Group</a> is a bay area nonprofit organization dedicated to
+          spreading the reach of Internet access.</p>
+
+          <h4>Supported by Google.org</h4>
+          <p>The initial rollout of Celerate in Northern California is in part funded by
+          a grant from <a href="http://google.org">Google.org</a>.</p>
+
+          <h4>Some other text here</h4>
+          <p>Say more about Celerate.</p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>&copy; De Novo Group 2014</p>
+      </div>
+
+    </div> <!-- /container -->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script>
+    $("#signupForm").submit(function(event) {
+      $.post(
+        "/subscriber/newlead",
+        {
+          'full name' : $("#fullName").val(),
+          'location' : { 
+            'street address' : $("#streetAddress").val(),
+            'city' : $("#city").val(),
+            'state' : $("#state").val(),
+          },
+          'subscribed' : false
+        },
+        function(response) {
+          window.alert("Thanks! " + JSON.stringify(response));
+        },
+        "json"
+      );
+    });
+    </script>
+
+  </body>
+</html>

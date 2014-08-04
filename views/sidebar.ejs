@@ -1,0 +1,18 @@
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li<% if (activeSidebar == 'overview') { %> class="active"<%}%>> <a href="/overview">Overview</a></li>
+            <li<% if (activeSidebar == 'subscriber') { %> class="active"<%}%>> <a href="/subscriber">Subscribers / Leads</a></li>
+            <li<% if (activeSidebar == 'node') { %> class="active"<%}%>> <a href="/node">Nodes</a></li>
+            <li<% if (activeSidebar == 'hardware') { %> class="active"<%}%>> <a href="/hardware">Hardware</a></li>
+            <li><a href="#">Export</a></li>
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li><a href="">Analytics</a></li>
+            <li><a href="">Billing</a></li>
+            <li><a href="">Logs</a></li>
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li><a href="">Authentication</a></li>
+          </ul>
+        </div>
+

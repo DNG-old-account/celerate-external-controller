@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <% include header.ejs %>
+  </head>
+
+  <body>
+    <% include navbar.ejs %>
+
+    <div class="container-fluid">
+      <div class="row">
+        <% var activeSidebar = 'subscriberView'; %>
+        <% include sidebar.ejs %>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header"><%- title %></h1>
+<!-- Grab the various form variables to avoid many in-line if statements. -->
+<%
+var fullName = ('full name' in subscriber) ? subscriber['full name'] : "";
+var streetAddress = ('location' in subscriber && 'street address' in subscriber['location']) ? subscriber['location']['street address'] : "";
+var city = ('location' in subscriber && 'city' in subscriber['location']) ? subscriber['location']['city'] : "";
+var state = ('location' in subscriber && 'state' in subscriber['location']) ? subscriber['location']['state'] : "";
+var country = ('location' in subscriber && 'country' in subscriber['location']) ? subscriber['location']['country'] : "";
+var postalCode = ('location' in subscriber && 'postal code' in subscriber['location']) ? subscriber['location']['postal code'] : "";
+var locationNotes = ('location' in subscriber && 'notes' in subscriber['location']) ? subscriber['location']['notes'] : "";
+var locationLat = ('location' in subscriber && 'lat' in subscriber['location']) ? subscriber['location']['lat'] : "";
+var locationLng = ('location' in subscriber && 'lng' in subscriber['location']) ? subscriber['location']['lng'] : "";
+var email = ('contact' in subscriber && 'email' in subscriber['contact']) ? subscriber['contact']['email'] : "";
+var mobile = ('contact' in subscriber && 'mobile' in subscriber['contact']) ? subscriber['contact']['mobile'] : "";
+var subscribed = ('subscribed' in subscriber) ? subscriber['subscribed'] : "";
+var profile = ('profile' in subscriber) ? subscriber['profile'] : "";
+var username = ('username' in subscriber) ? subscriber['username'] : "";
+var plan = ('plan' in subscriber) ? subscriber['plan'] : "";
+var cpemac = ('cpemac' in subscriber) ? subscriber['cpemac'] : "";
+var apmac = ('apmac' in subscriber) ? subscriber['apmac'] : "";
+%>
+          <form id="updateForm" class="form-horizontal" role="form">
+            <div class="form-group">
+              <label for="fullName" class="col-sm-2 control-label">Full Name</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="fullName" value="<%- fullName %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="streetAddress" class="col-sm-2 control-label">Street Address</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="streetAddress" value="<%- streetAddress %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="city" class="col-sm-2 control-label">City</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="city" value="<%- city %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="state" class="col-sm-2 control-label">State</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="state" value="<%- state %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="country" class="col-sm-2 control-label">Country</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="country" value="<%- country %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="postalCode" class="col-sm-2 control-label">Postal Code</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="postalCode" value="<%- postalCode %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="locationNotes" class="col-sm-2 control-label">Location Notes</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="locationNotes" value="<%- locationNotes %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="locationLat" class="col-sm-2 control-label">Location Lat</label>
+              <div class="col-sm-2">
+              <input type="text" class="form-control" id="locationLat" value="<%- locationLat %>">
+              </div>
+              <label for="locationLng" class="col-sm-2 control-label">Location Lng</label>
+              <div class="col-sm-2">
+                <input type="text" class="form-control" id="locationLng" value="<%- locationLng %>">
+              </div>
+            <button type="button" id="getLocationButton" class="btn btn-primary">Get Current Location</button><br>
+            </div>
+
+            <div class="form-group">
+              <label for="email" class="col-sm-2 control-label">Alternative Email</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="email" value="<%- email %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="mobile" class="col-sm-2 control-label">Mobile</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="mobile" value="<%- mobile %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+              <div class="checkbox">
+                <label> <input type="checkbox" id="subscribed" <% if (subscribed) { %>checked<% } %>> Subscribed </label>
+              </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="profile" class="col-sm-2 control-label">Profile</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="profile" value="<%- profile %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="username" class="col-sm-2 control-label">User Name</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="username" value="<%- username %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="plan" class="col-sm-2 control-label">Plan</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="plan" value="<%- plan %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="cpemac" class="col-sm-2 control-label">CPE MAC</label>
+                <div class="col-sm-9">
+                  <select class="form-control" style="width:200px" id="cpemac">
+                  <% for (c in cpenodes) { %>
+                    <option value="<%- cpenodes[c].mac %>"><%- cpenodes[c].mac %></option>
+                  <% } %>
+                  </select>
+                </div>
+            </div>
+            <div class="form-group">
+              <label for="apmac" class="col-sm-2 control-label">AP MAC</label>
+                <div class="col-sm-9">
+                  <select class="form-control" style="width:200px" id="apmac">
+                  <% for (a in apnodes) { %>
+                    <option value="<%- apnodes[a].mac %>"><%- apnodes[a].mac %></option>
+                  <% } %>
+                  </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary pull-right">Save</button><br>
+          </form>
+          <hr>
+          <h1 class="page-header">User Signup Actions</h1>
+          <button type="button" class="btn btn-info" id="userGoogleAccountButton">User Google Account Setup</button><br><br>
+          <button type="button" class="btn btn-success" id="userBillingSignupButton">User Billing Signup</button><br>
+          
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script>
+    // Get the current browser's location and fill it in the form.
+    $("#getLocationButton").click(function(event) {
+      function setCurrentLocation(location) {
+        if ('latitude' in location.coords && 'longitude' in location.coords) {
+          lat = location.coords.latitude;
+          lng = location.coords.longitude;
+          $("#locationLat").val(lat);
+          $("#locationLng").val(lng);
+        }
+      }
+
+      navigator.geolocation.getCurrentPosition(setCurrentLocation);
+    });
+
+    // Save the changes to the form.
+    $("#updateForm").submit(function(event) {
+      event.preventDefault();
+ 
+      // Construct POST message for update.
+      update = {};
+      update['_id'] = '<%- subscriber['_id'] %>';
+      update['full name'] = $("#fullName").val();
+      if (!('location' in update)) {
+        update['location'] = {}
+      }
+      update['location']['street address'] = $("#streetAddress").val();
+      update['location']['city'] = $("#city").val();
+      update['location']['state'] = $("#state").val();
+      update['location']['country'] = $("#country").val();
+      update['location']['postal code'] = $("#postalCode").val();
+      update['location']['notes'] = $("#locationNotes").val();
+      update['location']['lat'] = $("#locationLat").val();
+      update['location']['lng'] = $("#locationLng").val();
+      if (!('contact' in update)) {
+        update['contact'] = {}
+      }
+      update['contact']['email'] = $("#email").val();
+      update['contact']['mobile'] = $("#mobile").val();
+      update['subscribed'] = $("#subscribed").prop('checked');
+      update['profile'] = $("#profile").val();
+      update['username'] = $("#username").val();
+      update['plan'] = $("#plan").val();
+      update['cpemac'] = $("#cpemac option:selected").val();
+      update['apmac'] = $("#apmac option:selected").val();
+
+      $.post(
+        "/subscriber/update",
+        update,
+        function(response) {
+          if ('result' in response && response['result'] == 'ok') {
+            window.alert("Saved.");
+            window.location.reload();
+          } else {
+            window.alert("Couldn't save.");
+          }
+        },
+        "json"
+      );
+    });
+
+    // Open a new window for setting up the user's Google account.
+    $("#userGoogleAccountButton").click(function(event) {
+      window.alert("Set up google account functionality.");
+    });
+
+    // Open a new window to set up the user's billing.
+    $("#userBillingSignupButton").click(function(event) {
+      var baseurl = { "ultra" : "https://furtherreach.chargify.com/h/3408194/subscriptions/new",
+        "high" : "https://furtherreach.chargify.com/h/3408195/subscriptions/new",
+        "basic" : "https://furtherreach.chargify.com/h/3408196/subscriptions/new",
+        "limited" : "https://furtherreach.chargify.com/h/3408198/subscriptions/new",
+      };
+
+      // Check that we have some username for the user.
+      if ($("#username").val().length == 0) {
+        window.alert("Must have a username for the user before setting up billing.");
+        return;
+      }
+
+      // Check that we know about the plan.
+      if (!($("#plan").val() in baseurl)) {
+        window.alert("Can't sign up user with unknown plan: " + $("#plan").val());
+        return;
+      }
+      var url = baseurl[$("#plan").val()] + "?email=" + $("#username").val() + "@furtherreach.net";
+      window.open(url);
+    });
+    </script>
+  </body>
+</html>

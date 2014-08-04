@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <% include header.ejs %>
+  </head>
+
+  <body>
+    <% include navbar.ejs %>
+
+    <div class="container-fluid">
+      <div class="row">
+        <% var activeSidebar = 'node'; %>
+        <% include sidebar.ejs %>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header"><%- title %></h1>
+          <p class="bg-success"><h3><span class="label label-success">Core Nodes</span></h3></p>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead><tr><th>Nickname</th><th>Type</th><th>Hardware</th><th>Location</th><th class="col-sm-1"></th></tr></thead>
+              <tbody>
+              <% for (n in corenodes) { %>
+              <tr>
+                <td><%- corenodes[n]['nickname'] %></td>
+                <td><%- corenodes[n]['type'] %></td>
+                <td><%- corenodes[n]['hardware'] %></td>
+                <td>(<%- corenodes[n]['location']['lat'] %>, <%- corenodes[n]['location']['lng'] %>)</td>
+                <td><a href="/node/view?key=<%- corenodes[n]['_key'] %>">view/edit</a></td>
+              </tr>
+              <% } %>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="bg-success"><h3><span class="label label-success">CPE Nodes</span></h3></p>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead><tr><th>Nickname</th><th>Type</th><th>Hardware</th><th>Location</th><th class="col-sm-1"></th></tr></thead>
+              <tbody>
+              <% for (n in cpenodes) { %>
+              <tr>
+                <td><%- cpenodes[n]['nickname'] %></td>
+                <td><%- cpenodes[n]['type'] %></td>
+                <td><%- cpenodes[n]['hardware'] %></td>
+                <td>(<%- cpenodes[n]['location']['lat'] %>, <%- cpenodes[n]['location']['lng'] %>)</td>
+                <td><a href="/node/view?key=<%- cpenodes[n]['_key'] %>">view/edit</a></td>
+              </tr>
+              <% } %>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="bg-success"><h3><span class="label label-success">AP Nodes</span></h3></p>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead><tr><th>Nickname</th><th>Type</th><th>Hardware</th><th>Location</th><th class="col-sm-1"></th></tr></thead>
+              <tbody>
+              <% for (n in apnodes) { %>
+              <tr>
+                <td><%- apnodes[n]['nickname'] %></td>
+                <td><%- apnodes[n]['type'] %></td>
+                <td><%- apnodes[n]['hardware'] %></td>
+                <td>(<%- apnodes[n]['location']['lat'] %>, <%- apnodes[n]['location']['lng'] %>)</td>
+                <td><a href="/node/view?key=<%- apnodes[n]['_key'] %>">view/edit</a></td>
+              </tr>
+              <% } %>
+              </tbody>
+            </table>
+          </div>
+          <br><br><h1>Add New Hardware</h1>
+          <form id="addNodeForm" class="form-horizontal" role="form">
+            <div class="form-group">
+              <div class="form-group">
+                <label for="mac" class="col-sm-1 control-label">MAC</label>
+                <div class="col-sm-9"> <input type="mac" class="form-control" id="mac" placeholder="MAC Address"> </div>
+              </div>
+              <label for="hardware" class="col-sm-1 control-label">Hardware</label>
+              <div class="form-group">
+                <div class="col-sm-9">
+                  <select class="form-control" style="width:200px" id="hardware">
+                  <% for (h in hardware) { %>
+                    <option value="<%- hardware[h].name %>"><%- hardware[h].name %></option>
+                  <% } %>
+                  </select>
+                </div>
+              </div>
+              <label for="hardware" class="col-sm-1 control-label">Type</label>
+              <div class="form-group">
+                <div class="col-sm-9">
+                  <select class="form-control" style="width:200px" id="type">
+                    <option value="core">core</option>
+                    <option value="cpe">cpe</option>
+                    <option value="ap">ap</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <button type="submit" id="addNode" class="btn btn-info pull">Add Node</button>
+          </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script>
+    $("#addNodeForm").submit(function(event) {
+      event.preventDefault();
+      $.post(
+        "/node/newnode",
+        {
+          'mac' : $("#mac").val(),
+          'hardware' : $("#hardware option:selected").val(),
+          'type' : $("#type option:selected").val(),
+          'nickname' : "",
+          'location' : { "lat" : "", "lng" : "" },
+        },
+        function(response) {
+          window.alert("Thanks! " + JSON.stringify(response));
+          window.location.reload();
+        },
+        "json"
+      );
+    });
+    </script>
+  </body>
+</html>
