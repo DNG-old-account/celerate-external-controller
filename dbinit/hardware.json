@@ -1,9 +1,14 @@
 [
-{ "name" : "linux" },
-{ "name" : "nano_loco_m2", "make" : "ubiquiti", "model" : "nanostation_loco_m2" },
-{ "name" : "mikrotik_router", "make" : "mikrotik", "model" : "XYZ" },
-{ "name" : "toughswitch_poe", "make" : "ubiquiti", "model" : "toughswitch", "features" : [ "poe" ] },
-{ "name" : "airfiber_24", "make" : "ubiquiti", "model" : "airfiber_24" },
-{ "name" : "rocket_m5_titanium", "make" : "ubiquiti", "model" : "rocket_m5_titanium" },
-{ "name" : "rocket_m5", "make" : "ubiquiti", "model" : "rocket_m5" }
+{ "name" : "airfiber_24", "make" : "Ubiquiti", "model" : "AF24", "features" : { "available_frequencies" : [["24050", "24150"], ["24150", "24250"]] }},
+{ "name" : "airfiber_5", "make" : "Ubiquiti", "model" : "AF5", "features" : { "available_frequencies" : [["5470", "5600"], ["5650", "5850"], ["5470", "5875"], ["5470", "5950"]] }},
+{ "name" : "airfiber_5u", "make" : "Ubiquiti", "model" : "AF5U", "features" : { "available_frequencies" : [["5725", "5850"], ["5725", "5875"], ["5725", "6200"]] }},
+{ "name" : "picostation_2", "make" : "Ubiquiti", "model" : "PICOM2HP", "features" : { "available_frequencies" : [["2412", "2462"]] }},
+{ "name" : "nanobeam_m5_16", "make" : "Ubiquiti", "model" : "NBE-M5-16", "features" : { "available_frequencies" : [["2412", "2462"]] }},
+{ "name" : "nanobeam_m5_19", "make" : "Ubiquiti", "model" : "NBE-M5-19", "features" : { "available_frequencies" : [["2412", "2462"]] }},
+{ "name" : "nano_loco_m2", "make" : "Ubiquiti", "model" : "locoM2", "features" : { "available_frequencies" : [["2412", "2462"]] }},
+{ "name" : "nano_loco_m5", "make" : "Ubiquiti", "model" : "locoM5", "features" : { "available_frequencies" : [["5725", "5850"]] }},
+{ "name" : "rocket_m5_titanium", "make" : "Ubiquiti", "model" : "RM5-Ti", "features" : { "available_frequencies" : [["5170", "5825"]] }},
+{ "name" : "rocket_m5", "make" : "Ubiquiti", "model" : "RM5", "features" : { "available_frequencies", [["5725", "5850"]] }},
+{ "name" : "soekris_6501", "make" : "Soekris", "model" : "net6501", "features" : { "ports" : "4", "port_speed" : "1000" }},
+{ "name" : "toughswitch_8", "make" : "Ubiquiti", "model" : "TS-8-PRO", "features" : { "ports" : "8" , "port_speed" : "1000", "poe" : "yes" }},
 ]
