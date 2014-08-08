@@ -1,2 +1,2 @@
-celerate-internal-controller
+celerate-external-controller
 ============================
