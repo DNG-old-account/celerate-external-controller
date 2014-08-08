@@ -1,0 +1,4 @@
+[
+{ "name" : "standard", "download" : 5, "upload" : 5, "qos" : "fq_codel" },
+{ "name" : "limited", "download" : 1, "upload" : 1, "qos" : "fq_codel" }
+]

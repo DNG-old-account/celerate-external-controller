@@ -1,0 +1,5 @@
+[
+{ "deployment" : "berkeley", "full name" : "Yahel Ben-David", "subscribed" : false, "location" : { "street address" : "520 Bonnie Drive", "city" : "El Cerrito", "state" : "CA", "postal code" : "94530", "country" : "USA", "notes" : "Lemon tree in front." } },
+{ "deployment" : "berkeley", "full name" : "Barath Raghavan", "username" : "barath", "subscribed" : true, "profile" : "limited", "location" : { "street address" : "2801 College Avenue", "city" : "Berkeley", "state" : "CA", "postal code" : "94705", "country" : "USA", "notes" : "Yellow apartment building." } },
+{ "deployment" : "berkeley", "full name" : "Ron Steinherz", "username" : "ron", "subscribed" : true, "profile" : "standard", "location" : { "street address" : "123 Somewhere Avenue", "city" : "San Francisco", "state" : "CA", "postal code" : "94105", "country" : "USA" } }
+]

@@ -1,0 +1,16 @@
+[
+{ "name" : "admin", "access" : [ { "node" : [ "read", "write" ] },
+                                 { "role" : [ "read", "write" ] },
+                                 { "profile" : [ "read", "write" ] },
+                                 { "user" : [ "read", "write" ] },
+                                 { "hardware" : [ "read", "write" ] },
+                                 { "topology" : [ "read", "write" ] },
+                                 { "stats" : [ "read", "write" ] } ] },
+{ "name" : "installer", "access" : [ { "node" : [ "read", "write" ] },
+                                     { "profile" : [ "read" ] },
+                                     { "user" : [ "read" ] },
+                                     { "hardware" : [ "read" ] },
+                                     { "topology" : [ "read", "write" ] } ] },
+{ "name" : "user", "access" : [ { "profile" : [ "read" ] },
+                                { "hardware" : [ "read" ] } ] }
+]

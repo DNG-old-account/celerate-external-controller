@@ -1,0 +1,9 @@
+[
+{ "name" : "linux" },
+{ "name" : "nano_loco_m2", "make" : "ubiquiti", "model" : "nanostation_loco_m2" },
+{ "name" : "mikrotik_router", "make" : "mikrotik", "model" : "XYZ" },
+{ "name" : "toughswitch_poe", "make" : "ubiquiti", "model" : "toughswitch", "features" : [ "poe" ] },
+{ "name" : "airfiber_24", "make" : "ubiquiti", "model" : "airfiber_24" },
+{ "name" : "rocket_m5_titanium", "make" : "ubiquiti", "model" : "rocket_m5_titanium" },
+{ "name" : "rocket_m5", "make" : "ubiquiti", "model" : "rocket_m5" }
+]

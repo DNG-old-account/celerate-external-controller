@@ -1,0 +1,16 @@
+[
+{ "deployment" : "berkeley", "from" : "Cory-Mikrotik", "to" : "AF24-Cory2ICSI", "type" : "wired" },
+{ "deployment" : "berkeley", "from" : "AF24-Cory2ICSI", "to" : "Cory-Mikrotik", "type" : "wired" },
+{ "deployment" : "berkeley", "from" : "AF24-Cory2ICSI", "to" : "AF24-ICSI2Cory", "type" : "wireless", "tx_freq" : "24.1 GHz", "rx_freq" : "24.2 GHz" },
+{ "deployment" : "berkeley", "from" : "AF24-ICSI2Cory", "to" : "AF24-Cory2ICSI", "type" : "wireless", "tx_freq" : "24.2 Ghz", "rx_freq" : "24.1 GHz" },
+{ "deployment" : "berkeley", "from" : "AF24-ICSI2Cory", "to" : "ICSI-ToughSW-1", "type" : "wired" },
+{ "deployment" : "berkeley", "from" : "ICSI-ToughSW-1", "to" : "AF24-ICSI2Cory", "type" : "wired" },
+{ "deployment" : "berkeley", "from" : "ICSI-R5Ti-1", "to" : "ICSI-ToughSW-1", "type" : "wired" },
+{ "deployment" : "berkeley", "from" : "ICSI-ToughSW-1", "to" : "ICSI-R5Ti-1", "type" : "wired" },
+{ "deployment" : "berkeley", "from" : "ICSI-RM5-2", "to" : "ICSI-ToughSW-1", "type" : "wired" },
+{ "deployment" : "berkeley", "from" : "ICSI-ToughSW-1", "to" : "ICSI-RM5-2", "type" : "wired" },
+{ "deployment" : "berkeley", "from" : "ICSI-RM5-3", "to" : "ICSI-ToughSW-1", "type" : "wired" },
+{ "deployment" : "berkeley", "from" : "ICSI-ToughSW-1", "to" : "ICSI-RM5-3", "type" : "wired" },
+{ "deployment" : "berkeley", "from" : "ICSI-RM5-4", "to" : "ICSI-ToughSW-1", "type" : "wired" },
+{ "deployment" : "berkeley", "from" : "ICSI-ToughSW-1", "to" : "ICSI-RM5-4", "type" : "wired" }
+]

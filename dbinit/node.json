@@ -1,0 +1,10 @@
+[
+{ "deployment" : "berkeley", "nickname" : "Cory-Mikrotik", "type" : "core", "hardware" : "mikrotik_router", "location" : { "lat" : 37.87488, "lon" : -122.25767 }, "mac" : "00:00:00:00:00:00" },
+{ "deployment" : "berkeley", "nickname" : "AF24-Cory2ICSI", "type" : "core", "hardware" : "airfiber_24", "location" : { "lat" : 37.87484, "lon" : -122.25772 }, "mac" : "00:00:00:00:00:00" },
+{ "deployment" : "berkeley", "nickname" : "AF24-ICSI2Cory", "type" : "core", "hardware" : "airfiber_24", "location" : { "lat" : 37.87016, "lon" : -122.27118 }, "mac" : "00:00:00:00:00:00" },
+{ "deployment" : "berkeley", "nickname" : "ICSI-R5Ti-1", "type" : "core", "hardware" : "rocket_m5_titanium", "location" : { "lat" : 37.87013, "lon" : -122.27128 }, "mac" : "00:00:00:00:00:00" },
+{ "deployment" : "berkeley", "nickname" : "ICSI-RM5-2", "type" : "core", "hardware" : "rocket_m5", "location" : { "lat" : 37.87012, "lon" : -122.27129 }, "mac" : "00:00:00:00:00:00" },
+{ "deployment" : "berkeley", "nickname" : "ICSI-RM5-3", "type" : "core", "hardware" : "rocket_m5", "location" : { "lat" : 37.87012, "lon" : -122.27126 }, "mac" : "00:00:00:00:00:00" },
+{ "deployment" : "berkeley", "nickname" : "ICSI-RM5-4", "type" : "core", "hardware" : "rocket_m5", "location" : { "lat" : 37.87011, "lon" : -122.27127 }, "mac" : "00:00:00:00:00:00" },
+{ "deployment" : "berkeley", "nickname" : "ICSI-ToughSW-1", "type" : "core", "hardware" : "toughswitch_poe", "location" : { "lat" : 37.87013, "lon" : -122.27133 }, "mac" : "00:00:00:00:00:00" }
+]
