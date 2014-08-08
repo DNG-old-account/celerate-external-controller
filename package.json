@@ -9,6 +9,9 @@
     "express": "3.4.8",
     "ejs": "*",
     "node-zendesk": "*",
-    "arango": "*"
+    "arango": "*",
+    "micropromise": "*",
+    "socket.io": "*",
+    "async": "*"
   }
 }
