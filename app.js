@@ -123,7 +123,11 @@ app.get('/node/view', nodeViewRoute.draw);
 app.post('/node/update', nodeUpdateInfo.handle);
 
 var hardwareRoute = require('./routes/hardware');
+var hardwareViewRoute = require('./routes/hardwareView');
+var hardwareUpdateInfo = require('./routes/hardwareUpdateInfo');
 app.get('/hardware', hardwareRoute.draw);
+app.get('/hardware/view', hardwareViewRoute.draw);
+app.post('/hardware/update', hardwareUpdateInfo.handle);
 
 var dbdumpRoute = require('./routes/dbdump');
 app.get('/dbdump', dbdumpRoute.draw);
