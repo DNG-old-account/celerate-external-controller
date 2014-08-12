@@ -6,6 +6,7 @@ var url = require('url');
 
 function handleNode(res, urlquery) {
   var corenodes = uP();
+  var bsnodes = uP();
   var cpenodes = uP();
   var apnodes = uP();
   var hardware = uP();
@@ -15,6 +16,14 @@ function handleNode(res, urlquery) {
       res.send("Corenodes Error: " + err);
     } else {
       corenodes.fulfill(result);
+    }
+  });
+
+  dblib.execQuery('FOR n IN node FILTER n.type == "bs" RETURN n', {}, function(err, result) {
+    if (err) {
+      res.send("Bsnodes Error: " + err);
+    } else {
+      bsnodes.fulfill(result);
     }
   });
 
@@ -43,8 +52,8 @@ function handleNode(res, urlquery) {
   });
 
 
-  corenodes.join([cpenodes, apnodes, hardware]).spread(function(corenodes, cpenodes, apnodes, hardware) {
-    res.render('node', { 'title' : 'Nodes', 'corenodes' : corenodes.result, 'cpenodes' : cpenodes.result, 'apnodes' : apnodes.result, 'hardware' : hardware.result });
+  corenodes.join([bsnodes, cpenodes, apnodes, hardware]).spread(function(corenodes, bsnodes, cpenodes, apnodes, hardware) {
+    res.render('node', { 'title' : 'Nodes', 'corenodes' : corenodes.result, 'bsnodes' : bsnodes.result, 'cpenodes' : cpenodes.result, 'apnodes' : apnodes.result, 'hardware' : hardware.result });
   },
   function(err) {
     console.err("Error: ", err);
