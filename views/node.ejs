@@ -66,12 +66,24 @@
               </tbody>
             </table>
           </div>
-          <br><br><h1>Add New Hardware</h1>
+          <br><br><h1>Add New Node</h1>
           <form id="addNodeForm" class="form-horizontal" role="form">
             <div class="form-group">
               <div class="form-group">
                 <label for="mac" class="col-sm-1 control-label">MAC</label>
                 <div class="col-sm-9"> <input type="mac" class="form-control" id="mac" placeholder="MAC Address"> </div>
+              </div>
+              <div class="form-group">
+                <label for="wan_ip" class="col-sm-1 control-label">WAN IP</label>
+                <div class="col-sm-9"> <input type="wan_ip" class="form-control" id="wan_ip" placeholder="WAN IP"> </div>
+              </div>
+              <div class="form-group">
+                <label for="lan_ip" class="col-sm-1 control-label">LAN IP</label>
+                <div class="col-sm-9"> <input type="lan_ip" class="form-control" id="lan_ip" placeholder="LAN IP"> </div>
+              </div>
+              <div class="form-group">
+                <label for="mgmt_ip" class="col-sm-1 control-label">Management IP</label>
+                <div class="col-sm-9"> <input type="mgmt_ip" class="form-control" id="mgmt_ip" placeholder="Management IP"> </div>
               </div>
               <label for="hardware" class="col-sm-1 control-label">Hardware</label>
               <div class="form-group">
@@ -88,6 +100,7 @@
                 <div class="col-sm-9">
                   <select class="form-control" style="width:200px" id="type">
                     <option value="core">core</option>
+                    <option value="bs">bs</option>
                     <option value="cpe">cpe</option>
                     <option value="ap">ap</option>
                   </select>
@@ -110,11 +123,13 @@
       $.post(
         "/node/newnode",
         {
-          'mac' : $("#mac").val(),
           'hardware' : $("#hardware option:selected").val(),
-          'type' : $("#type option:selected").val(),
-          'nickname' : "",
+          'ip_addresses' : { 'lan' : $("#lan_ip").val(), 'wan' : $("#wan_ip").val(), 'mgmt' : $("#mgmt_ip").val(),
           'location' : { "lat" : "", "lng" : "" },
+          'mac' : $("#mac").val(),
+          'nickname' : "",
+          'subnet' : $("#subnet").val(),
+          'type' : $("#type option:selected").val(),
         },
         function(response) {
           window.alert("Thanks! " + JSON.stringify(response));

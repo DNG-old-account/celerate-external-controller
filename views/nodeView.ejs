@@ -15,10 +15,11 @@
           <h1 class="page-header"><%- title %></h1>
 <!-- Grab the various form variables to avoid many in-line if statements. -->
 <%
+var hardware = ('hardware' in node) ? node['hardware'] : "";
 var locationLat = ('location' in node && 'lat' in node['location']) ? node['location']['lat'] : "";
 var locationLng = ('location' in node && 'lng' in node['location']) ? node['location']['lng'] : "";
 var mac = ('mac' in node) ? node['mac'] : "";
-var hardware = ('hardware' in node) ? node['hardware'] : "";
+var ip_addresses = ('ip_addresses' in node) ? node['ip_addresses'] : "";
 var nickname = ('nickname' in node) ? node['nickname'] : "";
 var type = ('type' in node) ? node['type'] : "";
 %>
@@ -45,6 +46,12 @@ var type = ('type' in node) ? node['type'] : "";
               <label for="mac" class="col-sm-2 control-label">MAC</label>
               <div class="col-sm-10">
               <input type="text" class="form-control" id="mac" value="<%- mac %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="ip_addresses" class="col-sm-2 control-label">IP addresses</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="ip_addresses" value="<%- ip_addresses %>">
               </div>
             </div>
             <div class="form-group">

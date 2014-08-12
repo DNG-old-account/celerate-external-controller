@@ -5,7 +5,6 @@ var uP = require('micropromise');
 var url = require('url');
 
 function handleNode(res, urlquery) {
-  // Get the nodes asynchronously.
   var corenodes = uP();
   var cpenodes = uP();
   var apnodes = uP();
@@ -45,11 +44,6 @@ function handleNode(res, urlquery) {
 
 
   corenodes.join([cpenodes, apnodes, hardware]).spread(function(corenodes, cpenodes, apnodes, hardware) {
-    //console.log(corenodes);
-    //console.log(cpenodes);
-    //console.log(apnodes);
-    console.log(hardware);
-
     res.render('node', { 'title' : 'Nodes', 'corenodes' : corenodes.result, 'cpenodes' : cpenodes.result, 'apnodes' : apnodes.result, 'hardware' : hardware.result });
   },
   function(err) {

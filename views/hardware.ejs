@@ -45,8 +45,10 @@
       $.post(
         "/hardware/newhardware",
         {
-          'full name' : 'New User',
-          'subscribed' : false
+          'name' : 'hardware_nickname',
+          'make' : 'Manufacturer',
+          'mode' : 'Model',
+          'features' : "{ 'ports' : '0' }",
         },
         function(response) {
           window.location.reload();

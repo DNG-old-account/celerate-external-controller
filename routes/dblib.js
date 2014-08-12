@@ -1,3 +1,5 @@
+// Basic routines for accessing ArangoDB.
+
 var async = require('async');
 var arango = require('arango');
 var uP = require('micropromise');
@@ -5,12 +7,14 @@ var db = arango.Connection("http://localhost:8529/");
 
 exports.db = db;
 
+// Executes the given query string with the given parameters, and passes in the
+// given callback for the query call.
 exports.execQuery = function(queryStr, queryParams, resultCallback) {
   db.query.string = queryStr;
   db.query.exec(queryParams, resultCallback);
 };
 
-// Given a DB collection to dump.  Calls the given resultCallback(err, result)
+// Dumps a given DB collection.  Calls the given resultCallback(err, result)
 // upon completion, with err non-null upon error.
 exports.dumpCollection = function(collectionName, resultCallback) {
   // Create a promise that will be filled in with a dump of all the docs

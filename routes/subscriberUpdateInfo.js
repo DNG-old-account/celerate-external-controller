@@ -2,7 +2,6 @@ var dblib = require('./dblib');
 var uP = require('micropromise');
 var url = require('url');
 
-// Add a new lead based upon the given request.
 function handleUpdateInfo(req, res) {
   console.log(req.body);
 

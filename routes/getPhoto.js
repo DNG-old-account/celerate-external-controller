@@ -1,3 +1,5 @@
+// Retrieves an encoded photo from the Celerate database.
+
 var dblib = require('./dblib');
 var url = require('url');
 

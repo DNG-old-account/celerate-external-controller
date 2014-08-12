@@ -11,7 +11,7 @@ function handleNewUser(req, res) {
     req.body.subscribed = true;
   }
    
-  console.log("got new user POST " + JSON.stringify(req.body));
+  console.log("Got new user POST " + JSON.stringify(req.body));
   
   dblib.db.document.create('subscriber', req.body).then(function(result) {
     console.log(req.body);

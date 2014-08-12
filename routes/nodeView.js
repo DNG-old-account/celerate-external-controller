@@ -5,7 +5,6 @@ var uP = require('micropromise');
 var url = require('url');
 
 function handleNodeView(res, urlquery) {
-  // Get the subscriber, subscriber notes, and subscription profiles, asynchronously.
   var node = uP();
   var photos = uP();
 
@@ -18,7 +17,7 @@ function handleNodeView(res, urlquery) {
     node.reject(err);
   });
 
-  dblib.execQuery('FOR p IN photo FILTER p.nodekey == "' + urlquery.key + '" RETURN {"photokey" : p._key, "text" : p.text}', {}, function(err, result) {
+  dblib.execQuery('FOR p IN photo FILTER p.nodekey == "' + urlquery.key + '" RETURN { "photokey" : p._key, "text" : p.text }', {}, function(err, result) {
     if (err) {
       res.send("Photos Error: " + err);
     } else {

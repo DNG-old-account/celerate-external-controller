@@ -5,7 +5,6 @@ var uP = require('micropromise');
 var url = require('url');
 
 function handleHardware(res, urlquery) {
-  // Get the hardware asynchronously.
   var hardware = uP();
 
   dblib.execQuery('FOR h IN hardware RETURN h', {}, function(err, result) {
@@ -23,7 +22,6 @@ function handleHardware(res, urlquery) {
   function(err) {
     console.err("Error: ", err);
   });
-
 }
 
 exports.draw = function(req, res) {
