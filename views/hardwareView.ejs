@@ -18,7 +18,8 @@
 var name = ('name' in hardware) ? hardware['name'] : "";
 var make = ('make' in hardware) ? hardware['make'] : "";
 var model = ('model' in hardware) ? hardware['model'] : "";
-var features = ('features' in hardware) ? JSON.stringify(hardware['features']) : "";
+var features = ('features' in hardware) ?  escape(JSON.stringify(hardware['features'])) : "";
+console.log("json.stringify features produced: " + features);
 %>
           <form id="updateForm" class="form-horizontal" role="form">
             <div class="form-group">
