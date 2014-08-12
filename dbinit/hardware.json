@@ -10,5 +10,5 @@
 { "name" : "rocket_m5_titanium", "make" : "Ubiquiti", "model" : "RM5-Ti", "features" : { "available_frequencies" : [["5170", "5825"]], "ports" : "1" }},
 { "name" : "rocket_m5", "make" : "Ubiquiti", "model" : "RM5", "features" : { "available_frequencies" : [["5725", "5850"]], "ports" : "1" }},
 { "name" : "soekris_6501", "make" : "Soekris", "model" : "net6501", "features" : { "ports" : "4", "port_speed" : "1000" }},
-{ "name" : "toughswitch_8", "make" : "Ubiquiti", "model" : "TS-8-PRO", "features" : { "ports" : "8" , "port_speed" : "1000", "poe" : "yes" }},
+{ "name" : "toughswitch_8", "make" : "Ubiquiti", "model" : "TS-8-PRO", "features" : { "ports" : "8" , "port_speed" : "1000", "poe" : "yes" }}
 ]
