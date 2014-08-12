@@ -23,7 +23,7 @@
                 <td><%- hardware[h]['name'] %></td>
                 <td><%- hardware[h]['make'] %></td>
                 <td><%- hardware[h]['model'] %></td>
-                <td><% if ('features' in hardware[h]) { %><%- hardware[h]['features'] %> <% } %></td>
+                <td><% if ('features' in hardware[h]) { %><%- JSON.stringify(hardware[h]['features']) %> <% } %></td>
                 <td><a href="/hardware/view?key=<%- hardware[h]['_key'] %>">view/edit</a></td>
               </tr>
               <% } %>
