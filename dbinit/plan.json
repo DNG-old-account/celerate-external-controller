@@ -1,0 +1,3 @@
+[
+{ "name" : "unlimited", "download" : 500, "upload" : 500, "burst" : "500", "qos" : "fq_codel" },
+]
