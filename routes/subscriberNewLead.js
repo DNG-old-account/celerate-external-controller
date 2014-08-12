@@ -2,14 +2,20 @@ var dblib = require('./dblib');
 var uP = require('micropromise');
 var url = require('url');
 
-var zendesk = require('node-zendesk');
+// TODO(barath): Enable this to enable creating a zendesk ticket when a lead
+//               comes in via this call.
+var enableZenDesk = false;
 
+// Set up a zendesk client.
+var zendesk = require('node-zendesk');
 var client = zendesk.createClient({
   username:  'barath@denovogroup.org',
   token:     'WNqdztarJYV7WUq9b7MSgFu8kAk0KJeNKaO958P5',
   remoteUri: 'https://furtherreach.zendesk.com/api/v2'
 });
 
+// Generates and returns the body of the zendesk ticket based upon the new lead
+// request.
 function generateUserTicketBody(requestBody) {
   var bodyStr = "";
   bodyStr += "Full Name: " + requestBody["full name"] + "\n";
@@ -38,26 +44,27 @@ function handleNewLead(req, res) {
   console.log("got new lead POST " + JSON.stringify(req.body));
  
   // Create a ZenDesk ticket.
-  var ticket = { ticket: { 
-    requester: { name : "Web User", email : "barath@denovogroup.org" },
-    subject: "New User Signup: " + req.body["full name"],
-    priority: "high",
-    tags: "do_not_email",
-    comment: { body: generateUserTicketBody(req.body) },
-  }};
+  if (enableZenDesk) {
+    var ticket = { ticket: { 
+      requester: { name : "Web User", email : "barath@denovogroup.org" },
+      subject: "New User Signup: " + req.body["full name"],
+      priority: "high",
+      tags: "do_not_email",
+      comment: { body: generateUserTicketBody(req.body) },
+    }};
 
-  client.tickets.create(ticket, function(err, req, result) {
-    if (err) {
-      res.json(404, "But we had an error -- please try again.");
-      return;
-    }
+    client.tickets.create(ticket, function(err, req, result) {
+      if (err) {
+        res.json(404, "But we had an error -- please try again.");
+        return;
+      }
 
-    console.log(JSON.stringify(result, null, 2, true));
-    res.json(200, "We'll be in touch!");
-  });
+      console.log(JSON.stringify(result, null, 2, true));
+      res.json(200, "We'll be in touch!");
+    });
+  }
 
-
-  // Also add an entry in our local lead/user DB.
+  // Add an entry in our local lead/user DB.
   newLeadUser = {
     'full name' : req.body["full name"],
     'location' : { 'street address' : req.body["location"]["street address"], 'city' : req.body["location"]["city"] },

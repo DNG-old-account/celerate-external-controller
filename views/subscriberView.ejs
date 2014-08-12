@@ -27,7 +27,7 @@ var locationLng = ('location' in subscriber && 'lng' in subscriber['location']) 
 var email = ('contact' in subscriber && 'email' in subscriber['contact']) ? subscriber['contact']['email'] : "";
 var mobile = ('contact' in subscriber && 'mobile' in subscriber['contact']) ? subscriber['contact']['mobile'] : "";
 var subscribed = ('subscribed' in subscriber) ? subscriber['subscribed'] : "";
-var profile = ('profile' in subscriber) ? subscriber['profile'] : "";
+var plan = ('plan' in subscriber) ? subscriber['plan'] : "";
 var username = ('username' in subscriber) ? subscriber['username'] : "";
 var plan = ('plan' in subscriber) ? subscriber['plan'] : "";
 var cpemac = ('cpemac' in subscriber) ? subscriber['cpemac'] : "";
@@ -108,9 +108,9 @@ var apmac = ('apmac' in subscriber) ? subscriber['apmac'] : "";
               </div>
             </div>
             <div class="form-group">
-              <label for="profile" class="col-sm-2 control-label">Profile</label>
+              <label for="plan" class="col-sm-2 control-label">Plan</label>
               <div class="col-sm-10">
-              <input type="text" class="form-control" id="profile" value="<%- profile %>">
+              <input type="text" class="form-control" id="plan" value="<%- plan %>">
               </div>
             </div>
             <div class="form-group">
@@ -201,7 +201,7 @@ var apmac = ('apmac' in subscriber) ? subscriber['apmac'] : "";
       update['contact']['email'] = $("#email").val();
       update['contact']['mobile'] = $("#mobile").val();
       update['subscribed'] = $("#subscribed").prop('checked');
-      update['profile'] = $("#profile").val();
+      update['plan'] = $("#plan").val();
       update['username'] = $("#username").val();
       update['plan'] = $("#plan").val();
       update['cpemac'] = $("#cpemac option:selected").val();

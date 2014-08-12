@@ -5,7 +5,6 @@ var uP = require('micropromise');
 var url = require('url');
 
 function handleSubscriber(res, urlquery) {
-  // Get the nodes and the topology, asynchronously.
   var subscribers = uP();
   var leads = uP();
 
@@ -25,7 +24,6 @@ function handleSubscriber(res, urlquery) {
     }
   });
 
-  // Once we get the subscribers and leads, generate an object that can be used by the frontend.
   subscribers.join([leads]).spread(function(subscribers, leads) {
     console.log(leads);
     console.log(subscribers);

@@ -34,7 +34,7 @@
           <p class="bg-success"><h3><span class="label label-primary">Subscribers</span></h3></p>
           <div class="table-responsive">
             <table class="table table-striped">
-              <thead><tr><th>Username</th><th>Full Name</th><th>Street Address</th><th>City</th><th>Profile</th><th class="col-sm-1"></th></tr></thead>
+              <thead><tr><th>Username</th><th>Full Name</th><th>Street Address</th><th>City</th><th>Plan</th><th class="col-sm-1"></th></tr></thead>
               <tbody>
               <% for (s in subscribers) { %>
               <tr>
@@ -42,7 +42,7 @@
                 <td><%- subscribers[s]['full name'] %></td>
                 <td><% if ('location' in subscribers[s] && 'street address' in subscribers[s]['location']) { %> <%- subscribers[s]['location']['street address'] %> <% } %> </td>
                 <td><% if ('location' in subscribers[s] && 'city' in subscribers[s]['location']) { %> <%- subscribers[s]['location']['city'] %> <% } %> </td>
-                <td><%- subscribers[s]['profile'] %></td>
+                <td><%- subscribers[s]['plan'] %></td>
                 <td><a href="/subscriber/view?key=<%- subscribers[s]['_key'] %>">view/edit</a></td>
               </tr>
               <% } %>

@@ -5,10 +5,9 @@ var uP = require('micropromise');
 var url = require('url');
 
 function handleSubscriberView(res, urlquery) {
-  // Get the subscriber, subscriber notes, and subscription profiles, asynchronously.
   var subscriber = uP();
-  var subscriberNotes;
-  var profiles = uP();
+  var subscriberNotes = uP();
+  var plans = uP();
   var cpenodes = uP();
   var apnodes = uP();
 
@@ -21,29 +20,29 @@ function handleSubscriberView(res, urlquery) {
     subscriber.reject(err);
   });
 
-  /* No subscriber notes for now.
-  dblib.execQuery('FOR n IN subscriber_notes FILTER n.subscriber_id == ' + urlquery.key + ' SORT n.date DESC RETURN n', {}, function(err, result) {
-    if (err) {
-      res.send("Error: " + err);
-    } else {
-      console.log(result);
-      subscriberNotes.fulfill(result);
-    }
-  });
-  */
+  // TODO(barath): No subscriber notes for now, but add these back as we move away from outside systems.
+  //
+  // dblib.execQuery('FOR n IN subscriber_notes FILTER n.subscriber_id == ' + urlquery.key + ' SORT n.date DESC RETURN n', {}, function(err, result) {
+  //   if (err) {
+  //     res.send("Error: " + err);
+  //   } else {
+  //     console.log(result);
+  //     subscriberNotes.fulfill(result);
+  //   }
+  // });
 
-  dblib.execQuery('FOR p IN profile RETURN p', {}, function(err, result) {
+  dblib.execQuery('FOR p IN plan RETURN p', {}, function(err, result) {
     if (err) {
       res.send("Error: " + err);
     } else {
       console.log(result);
-      profiles.fulfill(result);
+      plans.fulfill(result);
     }
   });
 
   dblib.execQuery('FOR n IN node FILTER n.type == "cpe" RETURN n', {}, function(err, result) {
     if (err) {
-      res.send("CPEnodes Error: " + err);
+      res.send("CPE nodes Error: " + err);
     } else {
       cpenodes.fulfill(result);
     }
@@ -51,19 +50,19 @@ function handleSubscriberView(res, urlquery) {
 
   dblib.execQuery('FOR n IN node FILTER n.type == "ap" RETURN n', {}, function(err, result) {
     if (err) {
-      res.send("APnodes Error: " + err);
+      res.send("AP nodes Error: " + err);
     } else {
       apnodes.fulfill(result);
     }
   });
 
-  // Once we get the subscriber, subscriber notes, and profiles, generate an object that can be used by the frontend.
-  subscriber.join([profiles, cpenodes, apnodes]).spread(function(subscriber, profiles, cpenodes, apnodes) {
+  // Once we get the subscriber, subscriber notes, and plans, generate an object that can be used by the frontend.
+  subscriber.join([plans, cpenodes, apnodes]).spread(function(subscriber, plans, cpenodes, apnodes) {
     // For time parsing support.
     var moment = require('moment');
     moment().format();
 
-    res.render('subscriberView', { 'title' : 'Subscriber Info', 'subscriber' : subscriber, 'profiles' : profiles.result, 'cpenodes' : cpenodes.result, 'apnodes' : apnodes.result, 'moment' : moment });
+    res.render('subscriberView', { 'title' : 'Subscriber Info', 'subscriber' : subscriber, 'plans' : plans.result, 'cpenodes' : cpenodes.result, 'apnodes' : apnodes.result, 'moment' : moment });
   },
   function(err) {
     console.err("Error: ", err);

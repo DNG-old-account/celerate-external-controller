@@ -3,11 +3,11 @@ var uP = require('micropromise');
 var url = require('url');
 var fs = require('fs');
 
-// Store file.
+// Store an uploaded photo encoded in Base64.
 function handleUpload(req, res) {
-  console.log("got new upload POST " + JSON.stringify(req.body));
-  console.log("got new upload POST headers" + JSON.stringify(req.headers));
-  console.log("got new upload POST file data: " + JSON.stringify(req.files));
+  console.log("Got new upload POST " + JSON.stringify(req.body));
+  console.log("Got new upload POST headers" + JSON.stringify(req.headers));
+  console.log("Got new upload POST file data: " + JSON.stringify(req.files));
 
   if (!('nodekey' in req.headers) || !('file' in req.files)) {
     res.status(400).send("Error: nodekey or file not found");
