@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <% include header.ejs %>
+  </head>
+
+  <body>
+    <% include navbar.ejs %>
+
+    <div class="container-fluid">
+      <div class="row">
+        <% var activeSidebar = 'hardwareView'; %>
+        <% include sidebar.ejs %>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header"><%- title %></h1>
+<!-- Grab the various form variables to avoid many in-line if statements. -->
+<%
+var name = ('name' in hardware) ? hardware['name'] : "";
+var make = ('make' in hardware) ? hardware['make'] : "";
+var model = ('model' in hardware) ? hardware['model'] : "";
+var features = ('features' in hardware) ? JSON.stringify(hardware['features']) : "";
+%>
+          <form id="updateForm" class="form-horizontal" role="form">
+            <div class="form-group">
+              <label for="name" class="col-sm-2 control-label">Name</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="name" value="<%- name %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="make" class="col-sm-2 control-label">Make</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="make" value="<%- make %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="model" class="col-sm-2 control-label">Model</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="model" value="<%- model %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="features" class="col-sm-2 control-label">Features</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="features" value="<%- features %>">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary pull-right">Save</button><br>
+          </form>
+          
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script>
+    // Save the changes to the form.
+    $("#updateForm").submit(function(event) {
+      event.preventDefault();
+ 
+      // Construct POST message for update.
+      update = {};
+      update['_id'] = '<%- hardware['_id'] %>';
+      update['name'] = $("#name").val();
+      update['make'] = $("#make").val();
+      update['model'] = $("#model").val();
+      update['features'] = $("#features").val();
+
+      $.post(
+        "/hardware/update",
+        update,
+        function(response) {
+          if ('result' in response && response['result'] == 'ok') {
+            window.alert("Saved.");
+            window.location.reload();
+          } else {
+            window.alert("Couldn't save.");
+          }
+        },
+        "json"
+      );
+    });
+
+    </script>
+  </body>
+</html>
