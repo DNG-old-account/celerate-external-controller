@@ -31,6 +31,24 @@
             </table>
           </div>
 
+          <p class="bg-success"><h3><span class="label label-success">BaseStation Nodes</span></h3></p>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead><tr><th>Nickname</th><th>Type</th><th>Hardware</th><th>Location</th><th class="col-sm-1"></th></tr></thead>
+              <tbody>
+              <% for (n in bsnodes) { %>
+              <tr>
+                <td><%- bsnodes[n]['nickname'] %></td>
+                <td><%- bsnodes[n]['type'] %></td>
+                <td><%- bsnodes[n]['hardware'] %></td>
+                <td>(<%- bsnodes[n]['location']['lat'] %>, <%- bsnodes[n]['location']['lng'] %>)</td>
+                <td><a href="/node/view?key=<%- bsnodes[n]['_key'] %>">view/edit</a></td>
+              </tr>
+              <% } %>
+              </tbody>
+            </table>
+          </div>
+
           <p class="bg-success"><h3><span class="label label-success">CPE Nodes</span></h3></p>
           <div class="table-responsive">
             <table class="table table-striped">
