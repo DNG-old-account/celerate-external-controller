@@ -18,7 +18,7 @@
 var name = ('name' in hardware) ? hardware['name'] : "";
 var make = ('make' in hardware) ? hardware['make'] : "";
 var model = ('model' in hardware) ? hardware['model'] : "";
-var features = ('features' in hardware) ?  escape(JSON.stringify(hardware['features'])) : "";
+var features = ('features' in hardware) ? escape(JSON.stringify(hardware['features'])) : "";
 console.log("json.stringify features produced: " + features);
 %>
           <form id="updateForm" class="form-horizontal" role="form">
@@ -70,7 +70,7 @@ console.log("json.stringify features produced: " + features);
       update['name'] = $("#name").val();
       update['make'] = $("#make").val();
       update['model'] = $("#model").val();
-      update['features'] = $("#features").val();
+      update['features'] = unescape($("#features").val());
 
       $.post(
         "/hardware/update",
