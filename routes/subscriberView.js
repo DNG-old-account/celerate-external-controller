@@ -12,7 +12,7 @@ function handleSubscriberView(res, urlquery) {
   var apnodes = uP();
 
   dblib.db.document.get('subscriber/' + urlquery.key).then(function(result) {
-    console.log(result);
+    console.log("subscriber: %j", result);
     subscriber.fulfill(result);
   },
   function(err) {
@@ -34,8 +34,9 @@ function handleSubscriberView(res, urlquery) {
   dblib.execQuery('FOR p IN plan RETURN p', {}, function(err, result) {
     if (err) {
       res.send("Error: " + err);
+      plans.reject(err);
     } else {
-      console.log(result);
+      console.log("Plans %j", result);
       plans.fulfill(result);
     }
   });
@@ -43,7 +44,9 @@ function handleSubscriberView(res, urlquery) {
   dblib.execQuery('FOR n IN node FILTER n.type == "cpe" RETURN n', {}, function(err, result) {
     if (err) {
       res.send("CPE nodes Error: " + err);
+      cpenodes.reject(err);
     } else {
+      console.log("CPEnodes %j", result);
       cpenodes.fulfill(result);
     }
   });
@@ -51,7 +54,9 @@ function handleSubscriberView(res, urlquery) {
   dblib.execQuery('FOR n IN node FILTER n.type == "ap" RETURN n', {}, function(err, result) {
     if (err) {
       res.send("AP nodes Error: " + err);
+      apnodes.reject(err);
     } else {
+      console.log("APnodes %j", result);
       apnodes.fulfill(result);
     }
   });
