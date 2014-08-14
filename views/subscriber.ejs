@@ -28,7 +28,7 @@
               <% } %>
               </tbody>
             </table>
-            <a href="#" id="addUser" class="btn btn-primary btn-sm pull-right" role="button">Add Lead</a>
+            <a href="#" id="addLead" class="btn btn-primary btn-sm pull-right" role="button">Add Lead</a>
           </div>
           <br><br><br>
           <p class="bg-success"><h3><span class="label label-primary">Subscribers</span></h3></p>
@@ -48,7 +48,6 @@
               <% } %>
               </tbody>
             </table>
-            <a href="#" id="addUser" class="btn btn-primary btn-sm pull-right" role="button">Add User</a>
           </div>
         </div>
       </div>
@@ -60,12 +59,28 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <script>
-    $("#addUser").click(function() {
+    $("#addLead").click(function() {
       $.post(
         "/subscriber/newuser",
         {
           'full name' : 'New User',
-          'location' : { 'street address' : "", 'city' : "" },
+          'community' : '',
+          'location' : { 'street address' : '', 'city' : '', 'state' : '', 'lat' : '', 'lng' : ''},
+          'mobile' : '',
+          'landline' : '',
+          'prior email' : '',
+          'urgency' : 'low',
+          'current provider' : '',
+          'relay site' : '',
+          'time availability' : '',
+          'plan' : '',
+          'username' : '',
+          'signup date' : (new Date()).toJSON(),
+          'end date' : '',
+          'hold date' : '',
+          'cpemac' : '',
+          'apmac' : '',
+          'notes' : '',
           'subscribed' : false
         },
         function(response) {

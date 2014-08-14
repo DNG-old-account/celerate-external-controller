@@ -16,28 +16,40 @@
 <!-- Grab the various form variables to avoid many in-line if statements. -->
 <%
 var fullName = ('full name' in subscriber) ? subscriber['full name'] : "";
+var community = ('community' in subscriber) ? subscriber['community'] : "";
 var streetAddress = ('location' in subscriber && 'street address' in subscriber['location']) ? subscriber['location']['street address'] : "";
 var city = ('location' in subscriber && 'city' in subscriber['location']) ? subscriber['location']['city'] : "";
 var state = ('location' in subscriber && 'state' in subscriber['location']) ? subscriber['location']['state'] : "";
-var country = ('location' in subscriber && 'country' in subscriber['location']) ? subscriber['location']['country'] : "";
-var postalCode = ('location' in subscriber && 'postal code' in subscriber['location']) ? subscriber['location']['postal code'] : "";
-var locationNotes = ('location' in subscriber && 'notes' in subscriber['location']) ? subscriber['location']['notes'] : "";
 var locationLat = ('location' in subscriber && 'lat' in subscriber['location']) ? subscriber['location']['lat'] : "";
 var locationLng = ('location' in subscriber && 'lng' in subscriber['location']) ? subscriber['location']['lng'] : "";
-var email = ('contact' in subscriber && 'email' in subscriber['contact']) ? subscriber['contact']['email'] : "";
-var mobile = ('contact' in subscriber && 'mobile' in subscriber['contact']) ? subscriber['contact']['mobile'] : "";
-var subscribed = ('subscribed' in subscriber) ? subscriber['subscribed'] : "";
+var mobile = ('mobile' in subscriber) ? subscriber['mobile'] : "";
+var landline = ('landline' in subscriber) ? subscriber['landline'] : "";
+var priorEmail = ('prior email' in subscriber) ? subscriber['prior email'] : "";
+var urgency = ('urgency' in subscriber) ? subscriber['urgency'] : "";
+var currentProvider = ('current provider' in subscriber) ? subscriber['current provider'] : "";
+var relaySite = ('relay site' in subscriber) ? subscriber['relay site'] : "";
+var timeAvailability = ('time availability' in subscriber) ? subscriber['time availability'] : "";
 var plan = ('plan' in subscriber) ? subscriber['plan'] : "";
 var username = ('username' in subscriber) ? subscriber['username'] : "";
-var plan = ('plan' in subscriber) ? subscriber['plan'] : "";
+var signupDate = ('signup date' in subscriber) ? subscriber['signup date'] : "";
+var endDate = ('end date' in subscriber) ? subscriber['end date'] : "";
+var holdDate = ('hold date' in subscriber) ? subscriber['hold date'] : "";
 var cpemac = ('cpemac' in subscriber) ? subscriber['cpemac'] : "";
 var apmac = ('apmac' in subscriber) ? subscriber['apmac'] : "";
+var notes = ('notes' in subscriber) ? subscriber['notes'] : "";
+var subscribed = ('subscribed' in subscriber) ? subscriber['subscribed'] : "";
 %>
           <form id="updateForm" class="form-horizontal" role="form">
             <div class="form-group">
               <label for="fullName" class="col-sm-2 control-label">Full Name</label>
               <div class="col-sm-10">
               <input type="text" class="form-control" id="fullName" value="<%- fullName %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="community" class="col-sm-2 control-label">Community</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="community" value="<%- community%>">
               </div>
             </div>
             <div class="form-group">
@@ -59,24 +71,6 @@ var apmac = ('apmac' in subscriber) ? subscriber['apmac'] : "";
               </div>
             </div>
             <div class="form-group">
-              <label for="country" class="col-sm-2 control-label">Country</label>
-              <div class="col-sm-10">
-              <input type="text" class="form-control" id="country" value="<%- country %>">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="postalCode" class="col-sm-2 control-label">Postal Code</label>
-              <div class="col-sm-10">
-              <input type="text" class="form-control" id="postalCode" value="<%- postalCode %>">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="locationNotes" class="col-sm-2 control-label">Location Notes</label>
-              <div class="col-sm-10">
-              <input type="text" class="form-control" id="locationNotes" value="<%- locationNotes %>">
-              </div>
-            </div>
-            <div class="form-group">
               <label for="locationLat" class="col-sm-2 control-label">Location Lat</label>
               <div class="col-sm-2">
               <input type="text" class="form-control" id="locationLat" value="<%- locationLat %>">
@@ -89,22 +83,61 @@ var apmac = ('apmac' in subscriber) ? subscriber['apmac'] : "";
             </div>
 
             <div class="form-group">
-              <label for="email" class="col-sm-2 control-label">Alternative Email</label>
-              <div class="col-sm-10">
-              <input type="text" class="form-control" id="email" value="<%- email %>">
-              </div>
-            </div>
-            <div class="form-group">
               <label for="mobile" class="col-sm-2 control-label">Mobile</label>
               <div class="col-sm-10">
               <input type="text" class="form-control" id="mobile" value="<%- mobile %>">
               </div>
             </div>
             <div class="form-group">
-              <div class="col-sm-offset-2 col-sm-10">
-              <div class="checkbox">
-                <label> <input type="checkbox" id="subscribed" <% if (subscribed) { %>checked<% } %>> Subscribed </label>
+              <label for="landline" class="col-sm-2 control-label">Landline</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="landline" value="<%- landline %>">
               </div>
+            </div>
+            <div class="form-group">
+              <label for="priorEmail" class="col-sm-2 control-label">Prior Email</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="priorEmail" value="<%- priorEmail%>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="urgency" class="col-sm-2 control-label">Urgency</label>
+                <div class="col-sm-9">
+                  <select class="form-control" style="width:200px" id="urgency">
+                    <option value="high">high</option>
+                    <option value="medium">medium</option>
+                    <option value="low">low</option>
+                    <option value="none">none</option>
+                  </select>
+                </div>
+            </div>
+            <div class="form-group">
+              <label for="currentProvider" class="col-sm-2 control-label">currentProvider</label>
+                <div class="col-sm-9">
+                  <select class="form-control" style="width:200px" id="currentProvider">
+                    <option value="further reach">further reach</option>
+                    <option value="cvc">cvc</option>
+                    <option value="ukiah wireless">ukiah wireless</option>
+                    <option value="mcn">mcn</option>
+                    <option value="satellite">satellite</option>
+                    <option value="none">none</option>
+                  </select>
+                </div>
+            </div>
+            <div class="form-group">
+              <label for="relaySite" class="col-sm-2 control-label">Relay Site</label>
+                <div class="col-sm-9">
+                  <select class="form-control" style="width:200px" id="relaySite">
+                    <option value="yes">yes</option>
+                    <option value="maybe">maybe</option>
+                    <option value="no">no</option>
+                  </select>
+                </div>
+            </div>
+            <div class="form-group">
+              <label for="timeAvailability" class="col-sm-2 control-label">Time Availability</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="timeAvailability" value="<%- timeAvailability %>">
               </div>
             </div>
             <div class="form-group">
@@ -117,6 +150,24 @@ var apmac = ('apmac' in subscriber) ? subscriber['apmac'] : "";
               <label for="username" class="col-sm-2 control-label">User Name</label>
               <div class="col-sm-10">
               <input type="text" class="form-control" id="username" value="<%- username %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="signupDate" class="col-sm-2 control-label">Signup Date</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="signupDate" value="<%- signupDate %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="endDate" class="col-sm-2 control-label">End Date</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="endDate" value="<%- endDate %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="holdDate" class="col-sm-2 control-label">Hold Date</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="holdDate" value="<%- holdDate %>">
               </div>
             </div>
             <div class="form-group">
@@ -144,6 +195,19 @@ var apmac = ('apmac' in subscriber) ? subscriber['apmac'] : "";
                   <% } %>
                   </select>
                 </div>
+            </div>
+            <div class="form-group">
+              <label for="notes" class="col-sm-2 control-label">Notes</label>
+              <div class="col-sm-10">
+              <input type="text" class="form-control" id="notes" value="<%- notes %>">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+              <div class="checkbox">
+                <label> <input type="checkbox" id="subscribed" <% if (subscribed) { %>checked<% } %>> Subscribed </label>
+              </div>
+              </div>
             </div>
             <button type="submit" class="btn btn-primary pull-right">Save</button><br>
           </form>
@@ -190,22 +254,25 @@ var apmac = ('apmac' in subscriber) ? subscriber['apmac'] : "";
       update['location']['street address'] = $("#streetAddress").val();
       update['location']['city'] = $("#city").val();
       update['location']['state'] = $("#state").val();
-      update['location']['country'] = $("#country").val();
-      update['location']['postal code'] = $("#postalCode").val();
-      update['location']['notes'] = $("#locationNotes").val();
       update['location']['lat'] = $("#locationLat").val();
       update['location']['lng'] = $("#locationLng").val();
-      if (!('contact' in update)) {
-        update['contact'] = {}
-      }
-      update['contact']['email'] = $("#email").val();
-      update['contact']['mobile'] = $("#mobile").val();
-      update['subscribed'] = $("#subscribed").prop('checked');
+
+      update['mobile'] = $("#mobile").val();
+      update['landline'] = $("#landline").val();
+      update['prior email'] = $("#priorEmail").val();
+      update['urgency'] = $("#urgency option:selected").val();
+      update['current provider'] = $("#currentProvider option:selected").val();
+      update['relay site'] = $("#relaySite option:selected").val();
+      update['time availability'] = $("#timeAvailability").val();
       update['plan'] = $("#plan").val();
       update['username'] = $("#username").val();
-      update['plan'] = $("#plan").val();
+      update['signup date'] = $("#signupDate").val();
+      update['end date'] = $("#endDate").val();
+      update['hold date'] = $("#holdDate").val();
       update['cpemac'] = $("#cpemac option:selected").val();
       update['apmac'] = $("#apmac option:selected").val();
+      update['notes'] = $("#notes").val();
+      update['subscribed'] = $("#subscribed").prop('checked');
 
       $.post(
         "/subscriber/update",
@@ -229,7 +296,8 @@ var apmac = ('apmac' in subscriber) ? subscriber['apmac'] : "";
 
     // Open a new window to set up the user's billing.
     $("#userBillingSignupButton").click(function(event) {
-      var baseurl = { "ultra" : "https://furtherreach.chargify.com/h/3408194/subscriptions/new",
+      var baseurl = {
+        "ultra" : "https://furtherreach.chargify.com/h/3408194/subscriptions/new",
         "high" : "https://furtherreach.chargify.com/h/3408195/subscriptions/new",
         "basic" : "https://furtherreach.chargify.com/h/3408196/subscriptions/new",
         "limited" : "https://furtherreach.chargify.com/h/3408198/subscriptions/new",
