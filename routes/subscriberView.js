@@ -6,7 +6,7 @@ var url = require('url');
 
 function handleSubscriberView(res, urlquery) {
   var subscriber = uP();
-  var subscriberNotes = uP();
+  // var subscriberNotes = uP();
   var plans = uP();
   var cpenodes = uP();
   var apnodes = uP();
