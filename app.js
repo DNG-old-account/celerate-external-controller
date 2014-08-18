@@ -1,5 +1,6 @@
 var express = require('express');
-var http = require('http');
+var https = require('https');
+var fs = require('fs');
 var path = require('path');
 var util = require('util');
 
@@ -139,6 +140,10 @@ var getPhotoRoute = require('./routes/getPhoto');
 app.get('/photo', getPhotoRoute.draw);
 
 // Start the server.
-http.createServer(app).listen(app.get('port'), function() {
+var options = {
+  key : fs.readFileSync('keys/celerate-web-key.pem'),
+  cert : fs.readFileSync('keys/celerate-web-cert.pem')
+};
+https.createServer(app).listen(app.get('port'), function() {
   console.log('Celerate server listening on port ' + app.get('port'));
 });
