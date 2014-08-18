@@ -144,6 +144,6 @@ var options = {
   key : fs.readFileSync('keys/celerate-web-key.pem'),
   cert : fs.readFileSync('keys/celerate-web-cert.pem')
 };
-https.createServer(app).listen(app.get('port'), function() {
+https.createServer(options, app).listen(app.get('port'), function() {
   console.log('Celerate server listening on port ' + app.get('port'));
 });
