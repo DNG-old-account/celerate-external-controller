@@ -128,13 +128,9 @@ var relay_options = ["yes", "no", "maybe"];
               <label for="currentProvider" class="col-sm-2 control-label">currentProvider</label>
                 <div class="col-sm-9">
                   <select class="form-control" style="width:200px" id="currentProvider">
-                    <option value="further reach">further reach</option>
-                    <option value="cvc">cvc</option>
-                    <option value="ukiah wireless">ukiah wireless</option>
-                    <option value="mcn">mcn</option>
-                    <option value="satellite">satellite</option>
-                    <option value="none">none</option>
-                    <option value="unknown">unknown</option>
+                    <% for (o in provider_options) { %>
+                    <option value="<%- provider_options[o] %>" <% if (currentProvider == provider_options[o]) { %>selected<% } %>><%- provider_options[o] %></option>
+                    <% } %>
                   </select>
                 </div>
             </div>
@@ -142,9 +138,9 @@ var relay_options = ["yes", "no", "maybe"];
               <label for="relaySite" class="col-sm-2 control-label">Relay Site</label>
                 <div class="col-sm-9">
                   <select class="form-control" style="width:200px" id="relaySite">
-                    <option value="yes">yes</option>
-                    <option value="maybe">maybe</option>
-                    <option value="no">no</option>
+                    <% for (o in relay_options) { %>
+                    <option value="<%- relay_options[o] %>" <% if (relaySite == relay_options[o]) { %>selected<% } %>><%- relay_options[o] %></option>
+                    <% } %>
                   </select>
                 </div>
             </div>
