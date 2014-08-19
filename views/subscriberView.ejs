@@ -19,7 +19,7 @@ var apmac = ('apmac' in subscriber) ? subscriber['apmac'] : "";
 var city = ('city' in subscriber) ? subscriber['city'] : "";
 var community = ('community' in subscriber) ? subscriber['community'] : "";
 var cpemac = ('cpemac' in subscriber) ? subscriber['cpemac'] : "";
-var currentProvider = ('current provider' in subscriber) ? subscriber['current provider'] : "";
+var currentProvider = ('current provider' in subscriber) ? subscriber['current provider'] : "unknown";
 var endDate = ('end date' in subscriber) ? subscriber['end date'] : "";
 var firstName = ('first name' in subscriber) ? subscriber['first name'] : "";
 var holdDate = ('hold date' in subscriber) ? subscriber['hold date'] : "";
@@ -31,8 +31,8 @@ var mobile = ('mobile' in subscriber) ? subscriber['mobile'] : "";
 var notes = ('notes' in subscriber) ? subscriber['notes'] : "";
 var plan = ('plan' in subscriber) ? subscriber['plan'] : "";
 var priorEmail = ('prior email' in subscriber) ? subscriber['prior email'] : "";
-var priority = ('priority' in subscriber) ? subscriber['priority'] : "";
-var relaySite = ('relay site' in subscriber) ? subscriber['relay site'] : "";
+var priority = ('priority' in subscriber) ? subscriber['priority'] : "unknown";
+var relaySite = ('relay site' in subscriber) ? subscriber['relay site'] : "no";
 var signupDate = ('signup date' in subscriber) ? subscriber['signup date'] : "";
 var state = ('state' in subscriber) ? subscriber['state'] : "";
 var streetAddress = ('street address' in subscriber) ? subscriber['street address'] : "";
@@ -115,6 +115,7 @@ var username = ('username' in subscriber) ? subscriber['username'] : "";
                     <option value="medium">medium</option>
                     <option value="low">low</option>
                     <option value="none">none</option>
+                    <option value="unknown">unknown</option>
                   </select>
                 </div>
             </div>
@@ -128,6 +129,7 @@ var username = ('username' in subscriber) ? subscriber['username'] : "";
                     <option value="mcn">mcn</option>
                     <option value="satellite">satellite</option>
                     <option value="none">none</option>
+                    <option value="unknown">unknown</option>
                   </select>
                 </div>
             </div>
