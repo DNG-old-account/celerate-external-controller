@@ -39,7 +39,7 @@
               <% for (s in subscribers) { %>
               <tr>
                 <td><%- subscribers[s]['username'] %></td>
-                <td><%- subscribers[l]['first name'] %> <%- subscribers[l]['last name'] %></td>
+                <td><%- subscribers[s]['first name'] %> <%- subscribers[s]['last name'] %></td>
                 <td><% if ('street address' in subscribers[s]) { %> <%- subscribers[s]['street address'] %> <% } %> </td>
                 <td><% if ('city' in subscribers[s]) { %> <%- subscribers[s]['city'] %> <% } %> </td>
                 <td><%- subscribers[s]['plan'] %></td>
