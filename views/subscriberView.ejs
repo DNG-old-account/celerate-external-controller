@@ -15,6 +15,7 @@
           <h1 class="page-header"><%- title %></h1>
 <!-- Grab the various form variables to avoid many in-line if statements. -->
 <%
+// Fields from the database.
 var apmac = ('apmac' in subscriber) ? subscriber['apmac'] : "";
 var city = ('city' in subscriber) ? subscriber['city'] : "";
 var community = ('community' in subscriber) ? subscriber['community'] : "";
@@ -39,6 +40,12 @@ var streetAddress = ('street address' in subscriber) ? subscriber['street addres
 var subscribed = ('subscribed' in subscriber) ? subscriber['subscribed'] : "";
 var timeAvailability = ('time availability' in subscriber) ? subscriber['time availability'] : "";
 var username = ('username' in subscriber) ? subscriber['username'] : "";
+
+// Arrays of values for option fields.
+var priority_options = ["high", "medium", "low", "none", "unknown"];
+var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
+var relay_options = ["yes", "no", "maybe"];
+
 %>
           <form id="updateForm" class="form-horizontal" role="form">
             <div class="form-group">
@@ -111,11 +118,9 @@ var username = ('username' in subscriber) ? subscriber['username'] : "";
               <label for="priority" class="col-sm-2 control-label">Priority</label>
                 <div class="col-sm-9">
                   <select class="form-control" style="width:200px" id="priority">
-                    <option value="high">high</option>
-                    <option value="medium">medium</option>
-                    <option value="low">low</option>
-                    <option value="none">none</option>
-                    <option value="unknown">unknown</option>
+                    <% for (o in priority_options) { %>
+                    <option value="<%- priority_options[o] %>" <% if (priority == priority_options[o]) { %>selected<% } %>><%- priority_options[o] %></option>
+                    <% } %>
                   </select>
                 </div>
             </div>
