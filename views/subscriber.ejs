@@ -20,9 +20,9 @@
               <tbody>
               <% for (l in leads) { %>
               <tr>
-                <td><%- leads[l]['full name'] %></td>
-                <td><% if ('location' in leads[l] && 'street address' in leads[l]['location']) { %> <%- leads[l]['location']['street address'] %> <% } %></td>
-                <td><% if ('location' in leads[l] && 'city' in leads[l]['location']) { %> <%- leads[l]['location']['city'] %> <% } %></td>
+                <td><%- leads[l]['first name'] %> <%- leads[l]['last name'] %></td>
+                <td><% if ('street address' in leads[l]) { %> <%- leads[l]['street address'] %> <% } %></td>
+                <td><% if ('city' in leads[l]) { %> <%- leads[l]['city'] %> <% } %></td>
                 <td><a href="/subscriber/view?key=<%- leads[l]['_key'] %>">view/edit</a></td>
               </tr>
               <% } %>
@@ -39,9 +39,9 @@
               <% for (s in subscribers) { %>
               <tr>
                 <td><%- subscribers[s]['username'] %></td>
-                <td><%- subscribers[s]['full name'] %></td>
-                <td><% if ('location' in subscribers[s] && 'street address' in subscribers[s]['location']) { %> <%- subscribers[s]['location']['street address'] %> <% } %> </td>
-                <td><% if ('location' in subscribers[s] && 'city' in subscribers[s]['location']) { %> <%- subscribers[s]['location']['city'] %> <% } %> </td>
+                <td><%- subscribers[l]['first name'] %> <%- subscribers[l]['last name'] %></td>
+                <td><% if ('street address' in subscribers[s]) { %> <%- subscribers[s]['street address'] %> <% } %> </td>
+                <td><% if ('city' in subscribers[s]) { %> <%- subscribers[s]['city'] %> <% } %> </td>
                 <td><%- subscribers[s]['plan'] %></td>
                 <td><a href="/subscriber/view?key=<%- subscribers[s]['_key'] %>">view/edit</a></td>
               </tr>
@@ -63,25 +63,30 @@
       $.post(
         "/subscriber/newuser",
         {
-          'full name' : 'New User',
-          'community' : '',
-          'location' : { 'street address' : '', 'city' : '', 'state' : '', 'lat' : '', 'lng' : ''},
-          'mobile' : '',
-          'landline' : '',
-          'prior email' : '',
-          'urgency' : 'low',
-          'current provider' : '',
-          'relay site' : '',
-          'time availability' : '',
-          'plan' : '',
-          'username' : '',
-          'signup date' : (new Date()).toJSON(),
-          'end date' : '',
-          'hold date' : '',
-          'cpemac' : '',
           'apmac' : '',
+          'city' : '',
+          'community' : '',
+          'cpemac' : '',
+          'current provider' : '',
+          'end date' : '',
+          'first name' : 'New',
+          'hold date' : '',
+          'landline' : '',
+          'last name' : 'User',
+          'lat' : '',
+          'lng' : '',
+          'mobile' : '',
           'notes' : '',
+          'plan' : '',
+          'prior email' : '',
+          'priority' : 'low',
+          'relay site' : '',
+          'signup date' : (new Date()).toJSON(),
+          'state' : '',
+          'street address' : '',
           'subscribed' : false
+          'time availability' : '',
+          'username' : '',
         },
         function(response) {
           window.location.reload();
