@@ -8,7 +8,7 @@ function handleSubscriber(res, urlquery) {
   var subscribers = uP();
   var leads = uP();
 
-  dblib.execQuery('FOR s IN subscriber FILTER s.subscribed == false RETURN s', {}, function(err, result) {
+  dblib.execQuery('FOR s IN subscriber FILTER s.subscribed != true RETURN s', {}, function(err, result) {
     if (err) {
       res.send("Error: " + err);
     } else {
