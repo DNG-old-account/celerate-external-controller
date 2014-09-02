@@ -1,0 +1,186 @@
+[
+{
+"name":  "babbewendy-nanobeam-m5" ,
+"ip_address":  "10.131.2.62"
+},
+{
+"name":  "babbewendy-nanostation-loco-m5" ,
+"ip_address":  "10.131.2.198"
+},
+{
+"name":  "del-mar-nb5" ,
+"ip_address":  "172.18.0.176"
+},
+{
+"name":  "es-pa-nbm5-atc" ,
+"ip_address":  "172.18.1.9"
+},
+{
+"name":  "es-pa-nbm5-beattie-micheal" ,
+"ip_address":  "172.18.1.8"
+},
+{
+"name":  "es-pa-nbm5-library" ,
+"ip_address":  "172.18.1.7"
+},
+{
+"name":  "es-pa-nbm5-s" ,
+"ip_address":  "172.18.1.10"
+},
+{
+"name":  "es-pa-nsm2-free-s" ,
+"ip_address":  "172.18.1.11"
+},
+{
+"name":  "es-pa-nsm5-s" ,
+"ip_address":  "172.18.1.12"
+},
+{
+"name":  "es-pa-picostation-m2-1" ,
+"ip_address":  "172.18.1.5"
+},
+{
+"name":  "es-pa-picostation-m2-2" ,
+"ip_address":  "172.18.1.6"
+},
+{
+"name":  "es-rocket-m5-pa" ,
+"ip_address":  "172.18.0.2"
+},
+{
+"name":  "hs-af5" ,
+"ip_address":  "172.19.1.3"
+},
+{
+"name":  "hs-ns5" ,
+"ip_address":  "172.19.1.4"
+},
+{
+"name":  "lh-cvc1" ,
+"ip_address":  "10.4.2.6"
+},
+{
+"name":  "lh-cvc2" ,
+"ip_address":  "10.4.2.7"
+},
+{
+"name":  "lh-cvc-nbm5-relay" ,
+"ip_address":  "10.135.1.4"
+},
+{
+"name":  "lh-nb-m365-n" ,
+"ip_address":  "10.4.1.2"
+},
+{
+"name":  "lh-nsm5-e" ,
+"ip_address":  "10.135.0.2"
+},
+{
+"name":  "manchester-af24" ,
+"ip_address":  "172.16.2.2"
+},
+{
+"name":  "manchester-n-cpe-nbm5-1" ,
+"ip_address":  "10.0.3.111"
+},
+{
+"name":  "manchester-n-cpe-nbm5-2" ,
+"ip_address":  "10.0.3.73"
+},
+{
+"name":  "manchester-nsm5-l3-1" ,
+"ip_address":  "172.16.0.5"
+},
+{
+"name":  "manchester-nsm5-l3-n" ,
+"ip_address":  "172.16.0.6"
+},
+{
+"name":  "manchester-pico" ,
+"ip_address":  "172.16.0.3"
+},
+{
+"name":  "manchester-soekris" ,
+"ip_address":  "192.168.233.1"
+},
+{
+"name":  "manchester-toughswitch" ,
+"ip_address":  "172.16.0.2"
+},
+{
+"name":  "monitorserver" ,
+"ip_address":  "127.0.0.1"
+},
+{
+"name":  "rj-af24" ,
+"ip_address":  "172.16.2.3"
+},
+{
+"name":  "rj-af5" ,
+"ip_address":  "172.19.1.2"
+},
+{
+"name":  "rj-ns5-n" ,
+"ip_address":  "172.17.0.8"
+},
+{
+"name":  "rj-picostation-m2" ,
+"ip_address":  "172.17.0.5"
+},
+{
+"name":  "rj-rocket-3g" ,
+"ip_address":  "172.17.0.9"
+},
+{
+"name":  "rj-rocket-e" ,
+"ip_address":  "172.17.0.4"
+},
+{
+"name":  "rj-rocket-sector-ti_sw" ,
+"ip_address":  "172.17.0.3"
+},
+{
+"name":  "rj-rocketdish-m5-s" ,
+"ip_address":  "172.17.0.7"
+},
+{
+"name":  "rj-toughswitch" ,
+"ip_address":  "172.17.0.2"
+},
+{
+"name":  "rj-toughswitch2" ,
+"ip_address":  "172.17.0.10"
+},
+{
+"name":  "rjsoekris" ,
+"ip_address":  "172.16.2.10"
+},
+{
+"name":  "skarlato-airgateway-lr" ,
+"ip_address":  "10.131.2.53"
+},
+{
+"name":  "skarlato-nano-beam-m5" ,
+"ip_address":  "10.1.3.217"
+},
+{
+"name":  "skarlato-to-babbe-nanostation_m5" ,
+"ip_address":  "10.131.2.192"
+},
+{
+"name":  "skarlatos-nanobeam-m5-remote" ,
+"ip_address":  "10.131.2.233"
+},
+{
+"name":  "smiley-nano-beam-m5" ,
+"ip_address":  "10.1.3.235"
+},
+{
+"name":  "stornetta-farm-nmb5" ,
+"ip_address":  "10.135.1.3"
+},
+{
+"name":  "stornetta-office-nmb5" ,
+"ip_address":  "10.135.1.221"
+}
+]

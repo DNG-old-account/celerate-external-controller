@@ -1,7 +1,3 @@
-arangoimp --create-collection true --collection hardware --file hardware.json
-arangoimp --create-collection true --collection node --file node.json
-arangoimp --create-collection true --collection plan --file plan.json
-arangoimp --create-collection true --collection role --file role.json
-arangoimp --create-collection true --collection topology --file topology.json
-arangoimp --create-collection true --collection user --file user.json
-arangoimp --create-collection true --collection subscriber --file subscriber.json
+mongoimport -h localhost:3001 --db meteor --collection nodes --jsonArray icinga-hosts.json
+mongoimport -h localhost:3001 --db meteor --collection subscribers --jsonArray export-google-form-8-25.json
+mongoimport -h localhost:3001 --db meteor --collection subscribers --jsonArray insightly-aug-18.json
