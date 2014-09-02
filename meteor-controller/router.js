@@ -8,6 +8,11 @@ var checkUser = function (pause) {
 Router.onBeforeAction('loading');
 Router.map(function() {
   this.route('home_page', {path: '/'});
+  this.route('hardware_page', {
+    path: '/hardware',
+    onBeforeAction: checkUser
+  });
+  this.route('hardware_details', {path: '/hardware_details/:_id', data: function() { return Hardware.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
   this.route('node_page', {
     path: '/node',
     onBeforeAction: checkUser
