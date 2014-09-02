@@ -45,7 +45,7 @@
   </div>
   <div class="table_responsive">
     <table class="table table-striped">
-      <thead><tr><th class="name_header">Name</th><th class="status_header">Status</th><th class="hardware_header">Hardware</th><th class="mac_header">MAC</th><th class="col-sm-1"></th></tr></thead>
+      <thead><tr><th class="name_header">Name</th><th class="make_header">Make</th><th class="model_header">Model</th><th class="features_header">Features</th><th class="col-sm-1"></th></tr></thead>
       <tbody>
         {{#each hardwares}}
         {{> hardware}}
@@ -61,5 +61,6 @@
   <td>{{name}}</td>
   <td>{{make}}</td>
   <td>{{model}}</td>
+  <td>{{json features}}</td>
 </tr>
 </template>
