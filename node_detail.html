@@ -1,0 +1,32 @@
+<template name="node_details">
+<form class="form-horizontal" role="form">
+<div class="form-group">
+  <label for="name" class="col-sm-2 control-label">Name</label><div class="col-sm-8"><input class="form-control" id="name" type="text" value="{{name}}" disabled></div>
+</div>
+<div class="form-group">
+  <label for="hardware" class="col-sm-2 control-label">Hardware</label><div class="col-sm-8"><input class="form-control" id="hardware" type="text" value="{{hardware}}" disabled></div>
+</div>
+<div class="form-group">
+  <label for="type" class="col-sm-2 control-label">Type</label><div class="col-sm-8"><input class="form-control" id="type" type="text" value="{{type}}" disabled></div>
+</div>
+<div class="form-group">
+  <label for="status" class="col-sm-2 control-label">Status</label><div class="col-sm-8"><input class="form-control" id="status" type="text" value="{{status}}" disabled></div>
+</div>
+<div class="form-group">
+  <label for="mac" class="col-sm-2 control-label">MAC</label><div class="col-sm-8"><input class="form-control" id="mac" type="text" value="{{mac}}" disabled></div>
+</div>
+<div class="form-group">
+  <label for="ip_address" class="col-sm-2 control-label">IP address</label><div class="col-sm-8"><input class="form-control" id="ip_address" type="text" value="{{ip_address}}" disabled></div>
+</div>
+<div class="form-group">
+  <label for="lat" class="col-sm-2 control-label">Location Lat</label><div class="col-sm-8"><input class="form-control" id="lat" type="text" value="{{lat}}" disabled></div>
+</div>
+<div class="form-group">
+  <label for="lng" class="col-sm-2 control-label">Location Lng</label><div class="col-sm-8"><input class="form-control" id="lng" type="text" value="{{lng}}" disabled></div>
+</div>
+<button type="button" id="get_location_button" class="get_location_button btn btn-primary">Get Current Location</button><br>
+
+</form>
+</template>
+
+

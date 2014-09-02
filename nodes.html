@@ -1,0 +1,68 @@
+<template name="node_page">
+<body>
+  {{> celerate_navbar}}
+  <div class="container-fluid">
+    <div class="row">
+      {{> celerate_sidebar}}
+
+      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        {{> node_overview}}
+      </div>
+    </div>
+  </div>
+</body>
+</template>
+
+<template name="node_overview">
+  <div class="details">
+    {{#if selected_node}}
+    <div id="node_details_modal" class="modal fade" tabindex="-1" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content" style="height:55%; width:95%;">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h3>Node Details</h3>
+          </div>
+          <div class="modal-body" style="height:100%; width=100%; overflow-x:hidden;">
+            <iframe src="/node_details/{{selected_node._id._str}}" width="100%" height="75%" frameborder="0">
+            </iframe>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" data-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{/if}}
+  </div>
+
+  <br><br>
+  <div class="node_table_header">
+    <span class="glyphicon glyphicon-search"></span>
+    <span class="badge">{{node_count}}</span>
+    <input class="node_search_input" id="node_search_input" type="search" placeholder="Search nodes" value="">
+    <button type="button" class="new_node_button btn btn-warning" id="new_node_button">Add New Node</button>
+  </div>
+  <div class="table_responsive">
+    <table class="table table-striped">
+      <thead><tr><th class="name_header">Name</th><th class="status_header">Status</th><th class="hardware_header">Hardware</th><th class="mac_header">MAC</th><th class="col-sm-1"></th></tr></thead>
+      <tbody>
+        {{#each nodes}}
+        {{> node}}
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+</template>
+
+<template name="node">
+<tr class="node {{selected}}">
+  <td>{{name}}</td>
+  <td>{{status}}</td>
+  <td>{{hardware}}</td>
+  <td>{{mac}}</td>
+</tr>
+</template>
+
+
