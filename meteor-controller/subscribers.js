@@ -4,7 +4,7 @@ if (Meteor.isClient) {
   var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "priority_sort": "priority", "city_sort": "city"};
 
   Meteor.startup(function() {
-    Session.set("primary_sort_field", "status_sort");
+    Session.set("primary_sort_field_subscribers", "status_sort");
     Session.set("status_sort", -1);
     Session.set("name_sort", 1);
     Session.set("priority_sort", 1);
@@ -30,7 +30,7 @@ if (Meteor.isClient) {
 
     var include_fields = {'first_name': 1, 'last_name': 1, 'priority': 1, 'status': 1, 'street_address': 1, 'city': 1};
 
-    var result = Subscribers.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label)});
+    var result = Subscribers.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")});
     Session.set("subscriber_count", result.count());
     return result;
   };
@@ -62,19 +62,19 @@ if (Meteor.isClient) {
   Template.subscriber_overview.events({
     'click .name_header': function () {
       Session.set("name_sort", -1 * Session.get("name_sort"));
-      Session.set("primary_sort_field", "name_sort");
+      Session.set("primary_sort_field_subscribers", "name_sort");
     },
     'click .status_header': function () {
       Session.set("status_sort", -1 * Session.get("status_sort"));
-      Session.set("primary_sort_field", "status_sort");
+      Session.set("primary_sort_field_subscribers", "status_sort");
     },
     'click .priority_header': function () {
       Session.set("priority_sort", -1 * Session.get("priority_sort"));
-      Session.set("primary_sort_field", "priority_sort");
+      Session.set("primary_sort_field_subscribers", "priority_sort");
     },
     'click .city_header': function () {
       Session.set("city_sort", -1 * Session.get("city_sort"));
-      Session.set("primary_sort_field", "city_sort");
+      Session.set("primary_sort_field_subscribers", "city_sort");
     }
   });
 

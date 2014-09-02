@@ -4,7 +4,7 @@ if (Meteor.isClient) {
   var sort_fields_to_label = {"name_sort": "name", "make_sort": "make", "model_sort": "model"};
 
   Meteor.startup(function() {
-    Session.set("primary_sort_field", "name_sort");
+    Session.set("primary_sort_field_hardware", "name_sort");
     Session.set("name_sort", 1);
     Session.set("make_sort", 1);
     Session.set("model_sort", 1);
@@ -27,9 +27,11 @@ if (Meteor.isClient) {
     }
     console.log("query: " + JSON.stringify(query));
 
-    var include_fields = {'name': 1, 'make': 1, 'model': 1};
+    var include_fields = {'name': 1, 'make': 1, 'model': 1, 'features': 1};
 
-    var result = Hardware.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label)});
+    var query_options = {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_hardware")};
+    console.log(JSON.stringify(query_options));
+    var result = Hardware.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_hardware")});
     Session.set("hardware_count", result.count());
     return result;
   };
@@ -61,15 +63,15 @@ if (Meteor.isClient) {
   Template.hardware_overview.events({
     'click .name_header': function () {
       Session.set("name_sort", -1 * Session.get("name_sort"));
-      Session.set("primary_sort_field", "name_sort");
+      Session.set("primary_sort_field_hardware", "name_sort");
     },
     'click .make_header': function () {
       Session.set("make_sort", -1 * Session.get("make_sort"));
-      Session.set("primary_sort_field", "make_sort");
+      Session.set("primary_sort_field_hardware", "make_sort");
     },
     'click .model_header': function () {
       Session.set("model_sort", -1 * Session.get("model_sort"));
-      Session.set("primary_sort_field", "model_sort");
+      Session.set("primary_sort_field_hardware", "model_sort");
     }
   });
 
