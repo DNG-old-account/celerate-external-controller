@@ -15,3 +15,7 @@ GenerateHeaderSort = function(sort_fields, sort_fields_to_label) {
   console.log(JSON.stringify(sort_spec));
   return sort_spec;
 };
+
+Handlebars.registerHelper('json', function(obj) {
+  return JSON.stringify(obj);
+});
