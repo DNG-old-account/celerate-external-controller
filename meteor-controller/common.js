@@ -19,3 +19,11 @@ GenerateHeaderSort = function(sort_fields, sort_fields_to_label, primary_sort_fi
 Handlebars.registerHelper('json', function(obj) {
   return JSON.stringify(obj);
 });
+
+Handlebars.registerHelper('key_value', function(context, options) {
+  var result = [];
+  _.each(context, function(value, key, list){
+    result.push({key:key, value:value});
+  })
+  return result;
+});
