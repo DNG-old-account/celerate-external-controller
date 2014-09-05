@@ -16,7 +16,7 @@ if (Meteor.isClient) {
     }
 
     Deps.autorun(function() {
-      console.log("RENDERING MAP");
+      console.log("Rendering map...");
       for (var m in markers) {
         markers[m].setMap(null);
       }
@@ -29,11 +29,16 @@ if (Meteor.isClient) {
         return "purple";
       };
 
+      var bounds = new google.maps.LatLngBounds();
+
       Template.subscriber_overview.subscribers().forEach(function (subscriber) {
         if ('lat' in subscriber && 'lng' in subscriber) {
           var name = (subscriber.first_name ? subscriber.first_name : "") + " " + (subscriber.last_name ? subscriber.last_name : "");
+          var latlng = new google.maps.LatLng(subscriber.lat, subscriber.lng);
+          bounds.extend(latlng);
+
           markers[subscriber._id] = new google.maps.Marker({
-            position: new google.maps.LatLng(subscriber.lat, subscriber.lng),
+            position: latlng,
             title: name,
             icon: 'http://maps.google.com/mapfiles/ms/icons/' + subscriber_to_color(subscriber) + '-dot.png',
             map: map
@@ -45,6 +50,8 @@ if (Meteor.isClient) {
           });
         }
       });
+
+      map.fitBounds(bounds);
     });
   };
 
