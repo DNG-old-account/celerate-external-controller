@@ -29,6 +29,19 @@ if (Meteor.isClient) {
       db_update[evt.target.id] = evt.target.value;
       Subscribers.update(this._id, {$set: db_update}); 
 
+      // Handle special cases, such as marking a subscriber as connected.
+      if (evt.target.id == "status" && evt.target.value == "connected") {
+        var subscriber_id = this._id._str;
+        var existing_site = Sites.findOne(function() { return this.type && this.type.subscriber && this.type.subscriber == subscriber_id; });
+        console.log(existing_site);
+        if (!existing_site) {
+          Sites.insert({'_id': new Meteor.Collection.ObjectID(),
+                        'name': (this.first_name + " " + this.last_name),
+                        'type': {'subscriber': this._id}});
+          window.alert("Adding site for newly connected subscriber.");
+        }
+      }
+
       $("#real_selector_"+evt.target.id).addClass("hidden");
       $("#fake_selector_"+evt.target.id).removeClass("hidden");
     },
