@@ -50,7 +50,7 @@ if (Meteor.isClient) {
           });
 
           google.maps.event.addListener(markers[subscriber._id], 'click', function() {
-            var bubble_body = '<iframe src="/subscriber_details/'+subscriber._id._str+'" width="500px" frameborder="0"> </iframe>';
+            var bubble_body = '<iframe src="/subscriber_details/'+subscriber._id._str+'" height="400px" width="500px" frameborder="0"> </iframe>';
             (new google.maps.InfoWindow({ content: bubble_body })).open(map, markers[subscriber._id]);
           });
         }
