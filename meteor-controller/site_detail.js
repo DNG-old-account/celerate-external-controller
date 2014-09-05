@@ -80,6 +80,12 @@ if (Meteor.isClient) {
     },
   });
 
+  Template.site_details.nodes_in_site = function () {
+    console.log("nodes_in_site called.");
+    console.log(this);
+    return [];
+  };
+
   Handlebars.registerHelper('site_type_deletable', function (key) {
     return (key in {'relay': '', 'core': '', 'storage': ''});
   });

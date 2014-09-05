@@ -1,7 +1,7 @@
 if (Meteor.isClient) {
-  var search_fields = ["status", "first_name", "last_name", "priority", "city", "street_address"];
-  var sort_fields = ["status_sort", "name_sort", "priority_sort", "city_sort"];
-  var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "priority_sort": "priority", "city_sort": "city"};
+  var search_fields = ["status", "first_name", "last_name", "priority", "city", "community", "street_address"];
+  var sort_fields = ["status_sort", "name_sort", "priority_sort", "city_sort", "community_sort"];
+  var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "priority_sort": "priority", "city_sort": "city", "community_sort": "community"};
 
   Meteor.startup(function() {
     Session.set("primary_sort_field_subscribers", "status_sort");
@@ -9,6 +9,7 @@ if (Meteor.isClient) {
     Session.set("name_sort", 1);
     Session.set("priority_sort", 1);
     Session.set("city_sort", 1);
+    Session.set("community_sort", 1);
 
     Session.set("selected_subscriber", null);
     Session.set("subscriber_search_input", "");
@@ -26,9 +27,8 @@ if (Meteor.isClient) {
       }
       query = {$or: subquery};
     }
-    console.log("query: " + JSON.stringify(query));
 
-    var include_fields = {'first_name': 1, 'last_name': 1, 'priority': 1, 'status': 1, 'street_address': 1, 'city': 1};
+    var include_fields = {'first_name': 1, 'last_name': 1, 'priority': 1, 'status': 1, 'street_address': 1, 'city': 1, 'community': 1, 'lat': 1, 'lng': 1};
 
     var result = Subscribers.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")});
     Session.set("subscriber_count", result.count());
@@ -75,6 +75,10 @@ if (Meteor.isClient) {
     'click .city_header': function () {
       Session.set("city_sort", -1 * Session.get("city_sort"));
       Session.set("primary_sort_field_subscribers", "city_sort");
+    },
+    'click .community_header': function () {
+      Session.set("community_sort", -1 * Session.get("community_sort"));
+      Session.set("primary_sort_field_subscribers", "community_sort");
     }
   });
 

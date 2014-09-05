@@ -1,3 +1,7 @@
+<head>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry"></script>
+</head>
+
 <template name="subscriber_page">
 <body>
   {{> celerate_navbar}}
@@ -43,9 +47,13 @@
     <input class="subscriber_search_input" id="subscriber_search_input" type="search" placeholder="Search subscribers" value="">
     <button type="button" class="new_user_button btn btn-warning" id="new_user_button">Add New User</button>
   </div>
+  <br><br>
+  {{#if true}}
+    {{> subscriber_map}}
+  {{/if}}
   <div class="table_responsive">
     <table class="table table-striped">
-      <thead><tr><th class="name_header">Full Name</th><th class="status_header">Status</th><th class="priority_header">Priority</th><th class="address_header">Street Address</th><th class="city_header">City</th><th class="col-sm-1"></th></tr></thead>
+      <thead><tr><th class="name_header">Full Name</th><th class="status_header">Status</th><th class="priority_header">Priority</th><th class="address_header">Street Address</th><th class="city_header">City</th><th class="community_header">Community</th></tr></thead>
       <tbody>
         {{#each subscribers}}
         {{> subscriber}}
@@ -63,6 +71,6 @@
   <td>{{priority}}</td>
   <td>{{street_address}}</td>
   <td>{{city}}</td>
+  <td>{{community}}</td>
 </tr>
 </template>
-
