@@ -81,9 +81,7 @@ if (Meteor.isClient) {
   });
 
   Template.site_details.nodes_in_site = function () {
-    console.log("nodes_in_site called.");
-    console.log(this);
-    return [];
+    return Nodes.find({'site': this._id._str});
   };
 
   Handlebars.registerHelper('site_type_deletable', function (key) {

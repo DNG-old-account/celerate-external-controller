@@ -52,5 +52,30 @@ if (Meteor.isClient) {
       navigator.geolocation.getCurrentPosition(setCurrentLocation);
     },
   });
+
+  Template.node_details.hardware_options = function () {
+    return Hardware.find({});
+  };
+
+  Template.node_details.type_options = function () {
+    return ["cpe", "ap", "base_station", "core", "other"];
+  };
+
+  Template.node_details.status_options = function () {
+    return ["operational", "failed", "undeployed"];
+  };
+
+  Template.node_details.site_options = function () {
+    return Sites.find({});
+  };
+
+  Template.node_details.site_name = function() {
+    console.log(this);
+    var site_query = Sites.findOne(new Meteor.Collection.ObjectID(this.site));
+    console.log(site_query);
+    if (site_query) { return site_query.name; }
+    return "";
+  };
+
 }
 
