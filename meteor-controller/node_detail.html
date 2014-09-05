@@ -3,15 +3,83 @@
 <div class="form-group">
   <label for="name" class="col-sm-2 control-label">Name</label><div class="col-sm-8"><input class="form-control" id="name" type="text" value="{{name}}" disabled></div>
 </div>
+
 <div class="form-group">
-  <label for="hardware" class="col-sm-2 control-label">Hardware</label><div class="col-sm-8"><input class="form-control" id="hardware" type="text" value="{{hardware}}" disabled></div>
+  <label for="hardware" class="col-sm-2 control-label">Hardware</label>
+  <div class="col-sm-8">
+    <div class="selector_parent">
+      <div id="fake_selector_hardware">
+        <input class="form-control" id="hardware" type="text" value="{{hardware}}" disabled>
+      </div>
+      <div id="real_selector_hardware" class="hidden">
+        <select class="form-control" style="width:200px" id="hardware">
+          <option value=""></option>
+          {{#each hardware_options}}
+          <option value="{{name}}">{{name}}: {{make}} / {{model}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+  </div>
 </div>
+
 <div class="form-group">
-  <label for="type" class="col-sm-2 control-label">Type</label><div class="col-sm-8"><input class="form-control" id="type" type="text" value="{{type}}" disabled></div>
+  <label for="type" class="col-sm-2 control-label">Type</label>
+  <div class="col-sm-8">
+    <div class="selector_parent">
+      <div id="fake_selector_type">
+        <input class="form-control" id="type" type="text" value="{{type}}" disabled>
+      </div>
+      <div id="real_selector_type" class="hidden">
+        <select class="form-control" style="width:200px" id="type">
+          <option value=""></option>
+          {{#each type_options}}
+          <option value="{{this}}">{{this}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+  </div>
 </div>
+
 <div class="form-group">
-  <label for="status" class="col-sm-2 control-label">Status</label><div class="col-sm-8"><input class="form-control" id="status" type="text" value="{{status}}" disabled></div>
+  <label for="status" class="col-sm-2 control-label">Status</label>
+  <div class="col-sm-8">
+    <div class="selector_parent">
+      <div id="fake_selector_status">
+        <input class="form-control" id="status" type="text" value="{{status}}" disabled>
+      </div>
+      <div id="real_selector_status" class="hidden">
+        <select class="form-control" style="width:200px" id="status">
+          <option value=""></option>
+          {{#each status_options}}
+          <option value="{{this}}">{{this}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+  </div>
 </div>
+
+<div class="form-group">
+  <label for="site" class="col-sm-2 control-label">Site</label>
+  <div class="col-sm-8">
+    <div class="selector_parent">
+      <div id="fake_selector_site">
+        <input class="form-control" id="site" type="text" value="{{site_name}}" disabled>
+      </div>
+      <div id="real_selector_site" class="hidden">
+        <select class="form-control" style="width:200px" id="site">
+          <option value=""></option>
+          {{#each site_options}}
+          <option value="{{this._id._str}}">{{this.name}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="form-group">
   <label for="mac" class="col-sm-2 control-label">MAC</label><div class="col-sm-8"><input class="form-control" id="mac" type="text" value="{{mac}}" disabled></div>
 </div>
