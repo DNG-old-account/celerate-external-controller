@@ -1,4 +1,9 @@
 if (Meteor.isClient) {
+  Template.subscriber_map.destroyed = function() {
+    Session.set("subscriber_map", false);
+    map = null;
+  };
+
   Template.subscriber_map.rendered = function() {
     map = null;
     markers = {};
