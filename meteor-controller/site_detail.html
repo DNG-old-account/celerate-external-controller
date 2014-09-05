@@ -55,5 +55,22 @@
 </div>
 {{/if}}
 
+{{#each nodes_in_site}}
+<div class="form-group">
+  <label for="{{key}}" class="col-sm-2 control-label" id="{{key}}">Type Tag</label><div class="col-sm-8">
+    <p class="form-control-static" style="width:10em;">
+    <div id="{{key}}">
+      {{key}}
+      {{#if site_type_deletable key}}
+      {{#with ..}}
+        <button type="button" class="delete_tag close" id="delete_tag">x</button>
+      {{/with}}
+    {{/if}}
+    </div>
+    </p>
+  </div>
+</div>
+{{/each}}
+
 </form>
 </template>

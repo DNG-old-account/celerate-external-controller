@@ -1,3 +1,4 @@
+// Generates a MongoDB sort specification given fields to sort on.
 GenerateHeaderSort = function(sort_fields, sort_fields_to_label, primary_sort_field_key) {
   var SortFieldToSpec = function(sort_field) {
     return [sort_fields_to_label[sort_field], Session.get(sort_field) == 1 ? "asc" : "desc"];
@@ -12,7 +13,6 @@ GenerateHeaderSort = function(sort_fields, sort_fields_to_label, primary_sort_fi
     }
   }
 
-  console.log(JSON.stringify(sort_spec));
   return sort_spec;
 };
 
