@@ -1,7 +1,7 @@
 if (Meteor.isClient) {
   var search_fields = ["status", "first_name", "last_name", "priority", "city", "community", "street_address"];
-  var sort_fields = ["status_sort", "name_sort", "priority_sort", "city_sort", "community_sort"];
-  var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "priority_sort": "priority", "city_sort": "city", "community_sort": "community"};
+  var sort_fields = ["status_sort", "name_sort", "priority_sort", "city_sort", "community_sort", "mapped_sort"];
+  var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "priority_sort": "priority", "city_sort": "city", "community_sort": "community", "mapped_sort": "lat"};
 
   Meteor.startup(function() {
     Session.set("primary_sort_field_subscribers", "status_sort");
@@ -10,6 +10,7 @@ if (Meteor.isClient) {
     Session.set("priority_sort", 1);
     Session.set("city_sort", 1);
     Session.set("community_sort", 1);
+    Session.set("mapped_sort", 1);
 
     Session.set("selected_subscriber", null);
     Session.set("subscriber_search_input", "");
@@ -79,6 +80,10 @@ if (Meteor.isClient) {
     'click .community_header': function () {
       Session.set("community_sort", -1 * Session.get("community_sort"));
       Session.set("primary_sort_field_subscribers", "community_sort");
+    },
+    'click .mapped_header': function () {
+      Session.set("mapped_sort", -1 * Session.get("mapped_sort"));
+      Session.set("primary_sort_field_subscribers", "mapped_sort");
     }
   });
 
