@@ -95,3 +95,35 @@ body {
   display: inline-block;
   border-radius: 50%;
 }
+
+/*
+ * Modals
+ */
+
+.details .modal-dialog {
+  width: 80%;
+  height: 80%;
+}
+
+.details .modal-content {
+  width: 95%;
+  height: 100%;
+}
+
+.details .modal-content .modal-header {
+  height: 10%;
+}
+
+.details .modal-content .modal-body {
+  width: 100%; 
+  overflow-y: scroll;
+  height: 80%;
+}
+
+.details .modal-content .modal-footer {
+  height: 10%;
+}
+
+.details .modal-content .modal-body iframe {
+  height: 100%;
+}
