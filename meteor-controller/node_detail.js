@@ -58,7 +58,7 @@ if (Meteor.isClient) {
   };
 
   Template.node_details.type_options = function () {
-    return ["cpe", "ap", "base_station", "core", "other"];
+    return ["client", "cpe", "ap", "base_station", "core", "other"];
   };
 
   Template.node_details.status_options = function () {
