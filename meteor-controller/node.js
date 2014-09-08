@@ -12,6 +12,7 @@ if (Meteor.isClient) {
 
     Session.set("selected_node", null);
     Session.set("node_search_input", "");
+
   });
 
   Template.node_overview.nodes = function () {
@@ -51,6 +52,16 @@ if (Meteor.isClient) {
     },
     'click .new_node_button': function (evt) {
       Nodes.insert({ '_id': new Meteor.Collection.ObjectID(), 'name': "New Node" });
+    },
+    'click .update_monitoring_button': function (evt) {
+      console.log("update monitoring eh?");
+      var cursor = Nodes.find({});
+      var currentNodes = [];
+      cursor.forEach(function(node) {
+        currentNodes.push(node);
+      });
+      console.log(currentNodes);
+      Meteor.call('updateMonitoring', currentNodes);
     }
   });
 
