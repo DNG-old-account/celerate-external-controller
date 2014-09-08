@@ -56,6 +56,7 @@ spacebars-compiler@1.0.1
 spacebars@1.0.0
 standard-app-packages@1.0.0
 stylus@1.0.3
+synced-cron@0.0.0
 templating@1.0.4
 ui@1.0.0
 underscore@1.0.0

@@ -5,7 +5,6 @@ var sys = require('sys');
 var exec = require('child_process').exec;
 var request = require('request');
 var querystring = require('querystring');
-require('request').debug = true;
 module.exports = {
   update: function(nodes) {
     fs.readFile('/opt/celerate-external-controller/monitor-wrapper/icinga_nodes_template.cfg', {encoding: 'utf-8'}, function (err, data) {
