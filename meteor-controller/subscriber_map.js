@@ -17,6 +17,13 @@ if (Meteor.isClient) {
 
       map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
+      google.maps.event.addListener(map, "rightclick", function(event) {
+          var lat = event.latLng.lat();
+          var lng = event.latLng.lng();
+          // populate yor box/field with lat, lng
+          $('.lat-lng-info').text('Lat=' + lat + ', Lng=' + lng);
+      });
+
       Session.set("subscriber_map", true);
     }
 

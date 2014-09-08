@@ -127,3 +127,11 @@ body {
 .details .modal-content .modal-body iframe {
   height: 100%;
 }
+
+.subscriber-table-header {
+  margin: 40px 0 0 10px;
+}
+
+.lat-lng-info {
+  float: right;
+}
