@@ -48,8 +48,10 @@ module.exports = {
       if (err) {
         return console.error('failed: ', err);
       }
-      console.log('results: ', body);
-      callback(body.result);
+      console.log('body: ', body);
+      var results = JSON.parse(body).result;
+      var nodes = {};
+      callback(results);
     });
   },
 };

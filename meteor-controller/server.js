@@ -7,8 +7,8 @@ if (Meteor.isServer) {
       return parser.text('every 10 seconds');
     }, 
     job: function() {
-      MonitorWrapper.getStatus(function(data) {
-        console.log(data);
+      MonitorWrapper.getStatus(function(nodes) {
+        console.log("nodes: " , nodes);
       });
     }
   });
