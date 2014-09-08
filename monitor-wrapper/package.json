@@ -1,0 +1,9 @@
+{
+  "name": "monitor-wrapper",
+  "description": "A wrapper for our external controller to update monitoring on nodes",
+  "author": "Max B <max@denovogroup.org>",
+  "dependencies": {
+    "handlebars": "^2.0.0"
+  },
+  "devDependencies": {}
+}
