@@ -95,3 +95,47 @@ body {
   display: inline-block;
   border-radius: 50%;
 }
+
+/*
+ * Modals
+ */
+
+.details .modal-dialog {
+  width: 80%;
+  height: 80%;
+}
+
+.details .modal-content {
+  width: 95%;
+  height: 100%;
+}
+
+.details .modal-content .modal-header {
+  height: 10%;
+}
+
+.details .modal-content .modal-body {
+  width: 100%; 
+  overflow-y: scroll;
+  height: 80%;
+  padding: 0;
+}
+
+.details .modal-content .modal-footer {
+  height: 10%;
+}
+
+.details .modal-content .modal-body iframe {
+  padding-left: 2%;
+  padding-top: 2%;
+  height: 96%;
+  width: 96%
+}
+
+.subscriber-table-header {
+  margin: 40px 0 0 10px;
+}
+
+.lat-lng-info {
+  float: right;
+}
