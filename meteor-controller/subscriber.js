@@ -51,7 +51,7 @@ if (Meteor.isClient) {
       Session.set("subscriber_search_input", evt.target.value);
     },
     'click .new_user_button': function (evt) {
-      Subscribers.insert({ '_id': new Meteor.Collection.ObjectID(), 'name': "New User" });
+      Subscribers.insert({ '_id': new Meteor.Collection.ObjectID(), 'first_name': "", 'last_name': "A New User" });
     }
   });
 

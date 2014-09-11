@@ -81,7 +81,7 @@ if (Meteor.isClient) {
   };
 
   Template.subscriber_details.plan_options = function () {
-    return ["beta-free", "free-nonprofit", "essential", "standard", "ultra"];
+    return ["beta-free", "nonprofit-free", "limited", "essential", "performance", "ultra"];
   };
 
   Template.subscriber_details.status_options = function () {
