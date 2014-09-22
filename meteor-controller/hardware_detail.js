@@ -1,55 +1,39 @@
 if (Meteor.isClient) {
   // Hardware details functionality and events.
   Template.hardware_details.events({
-    'dblclick': function (evt) {
+    'click': function (evt) {
       console.log(evt);
 
-      // Handle events that are directed to fake input fields that we use while disabled, that are replaced by select dropdowns when enabled.
-      if (evt.target.parentHardware.id == ("fake_selector_"+evt.target.id)) {
-        $("#real_selector_"+evt.target.id).removeClass("hidden");
-        $("#fake_selector_"+evt.target.id).addClass("hidden");
-        return;
-      }
+      if (evt.target.id == "edit" && !evt.target.classList.contains("text-gray")) {
+        // User clicked on pencil icon to begin editing.
+        // Toggle the icon visual state.
+        evt.target.classList.add("text-gray");
+        evt.target.nextElementSibling.classList.remove("text-gray");
 
-      // Handle normal input boxes.
-      if (evt.target.disabled) {
-        evt.target.disabled = false;
-      } else {
+        var formelement = evt.target.parentElement.previousElementSibling.firstChild;
+        formelement.disabled = false;
+      } else if (evt.target.id == "save" && !evt.target.classList.contains("text-gray")) {
+        // User clicked on save icon to save input.
+        var formelement = evt.target.parentElement.previousElementSibling.firstChild;
+        console.log(formelement);
+        console.log(this);
+
         db_update = {};
-        db_update[evt.target.id] = evt.target.value;
+        db_update[formelement.id] = formelement.value;
         Hardware.update(this._id, {$set: db_update}); 
-        evt.target.disabled = true;
+        formelement.disabled = true;
+
+        // Toggle the icon visual state.
+        evt.target.classList.add("text-gray");
+        evt.target.previousElementSibling.classList.remove("text-gray");
       }
-    },
-    'change select': function (evt) {
-      console.log(evt);
-
-      // Handle events for drop-down select boxes.
-      db_update = {};
-      db_update[evt.target.id] = evt.target.value;
-      Hardware.update(this._id, {$set: db_update}); 
-
-      $("#real_selector_"+evt.target.id).addClass("hidden");
-      $("#fake_selector_"+evt.target.id).removeClass("hidden");
-    },
-    'click .get_location_button': function (evt) {
-      var id = this._id;
-
-      function setCurrentLocation(location, hardware_id) {
-        if ('latitude' in location.coords && 'longitude' in location.coords) {
-          var lat = location.coords.latitude;
-          var lng = location.coords.longitude;
-          $("#lat").val(lat);
-          $("#lng").val(lng);
-
-          db_update = {};
-          db_update['lat'] = lat;
-          db_update['lng'] = lng;
-          Hardware.update(id, {$set: db_update});
-        }
-      }
-
-      navigator.geolocation.getCurrentPosition(setCurrentLocation);
     },
   });
+
+  Template.hardware_details.hardware_fields = function () {
+    return [ { field: "name", label: "Name", value: this.name },
+             { field: "make", label: "Make", value: this.make },
+             { field: "model", label: "Model", value: this.model }
+           ];
+  };
 }

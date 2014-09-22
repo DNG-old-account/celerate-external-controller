@@ -16,6 +16,11 @@ GenerateHeaderSort = function(sort_fields, sort_fields_to_label, primary_sort_fi
   return sort_spec;
 };
 
+Handlebars.registerHelper('toupper', function(obj) {
+  console.log(obj.toUpperCase());
+  return obj.toUpperCase();
+});
+
 Handlebars.registerHelper('json', function(obj) {
   return JSON.stringify(obj);
 });
@@ -26,4 +31,14 @@ Handlebars.registerHelper('key_value', function(context, options) {
     result.push({key:key, value:value});
   })
   return result;
+});
+
+Handlebars.registerHelper('selected_if_equal', function(val1, val2) {
+  if (val1 == val2) return "selected";
+  return "";
+});
+
+Handlebars.registerHelper('selected_if_empty', function(val) {
+  if (!val || val == "") return "selected";
+  return "";
 });

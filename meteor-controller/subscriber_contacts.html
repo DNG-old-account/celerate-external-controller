@@ -1,0 +1,41 @@
+<template name="subscriber_contacts">
+<h4>Extra Contact Info</h4>
+<ul class="nav nav-pills" role="tablist">
+  <li class="dropdown">
+  <a class="dropdown-toggle" data-toggle="dropdown" href="#">Add Contact<span class="caret"></span></a>
+  <ul class="dropdown-menu" role="menu">
+    {{#each new_contact_type_options}}
+    <li><a href="#add_contact" id="{{this}}" class="{{../_id._str}}">{{toupper this}}</a></li>
+    {{/each}}
+  </ul>
+  </li>
+{{#each this.contacts}}
+<li><a href="#{{contact_id._str}}" role="tab" data-toggle="tab">{{toupper type}}</a></li>
+{{/each}}
+</ul>
+
+<div class="tab-content">
+{{#each get_contacts}}
+<div class="tab-pane" id="{{data._id._str}}">
+{{#with data}}
+{{#each contact_fields}}
+<div class="form-group">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-2"><label for="{{field}}" class="control-label">{{label}}</label></div>
+      <div class="col-xs-8"><input class="form-control" id="{{field}}" type="text" value="{{value}}" disabled></div>
+      {{#with ..}}
+      <div class="col-xs-2">
+        <span class="glyphicon-pencil glyphicon" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Edit" id="edit"></span>
+        <span class="glyphicon-save glyphicon text-gray" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Save" id="save"></span>
+      </div>
+      {{/with}}
+    </div>
+  </div>
+</div>
+{{/each}}
+{{/with}}
+</div>
+{{/each}}
+</div>
+</template>

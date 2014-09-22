@@ -48,7 +48,7 @@ if (Meteor.isClient) {
 
   Template.hardware_overview.events({
     'keyup .hardware_search_input': function (evt) {
-      Session.set("hardware_search_input", evt.target.value);
+      Session.set("hardware_search_input", evt.target.value.trim());
     },
     'click .new_hardware_button': function (evt) {
       Hardware.insert({ '_id': new Meteor.Collection.ObjectID(), 'name': "New Hardware" });

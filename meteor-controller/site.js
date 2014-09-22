@@ -44,7 +44,7 @@ if (Meteor.isClient) {
 
   Template.site_overview.events({
     'keyup .site_search_input': function (evt) {
-      Session.set("site_search_input", evt.target.value);
+      Session.set("site_search_input", evt.target.value.trim());
     },
     'click .new_site_button': function (evt) {
       Sites.insert({ '_id': new Meteor.Collection.ObjectID(), 'name': "New site" });

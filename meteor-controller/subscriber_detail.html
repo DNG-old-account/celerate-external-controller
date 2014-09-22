@@ -3,184 +3,46 @@
 <button type="button" class="user_google_account_setup_button btn btn-info" id="user_google_account_setup_button">User Google Account Setup</button>
 <button type="button" class="user_billing_setup_button btn btn-success" id="user_billing_setup_button">User Billing Setup</button>
 <hr>
+
 <form class="form-horizontal" role="form">
-<div class="form-group">
-  <label for="first_name" class="col-sm-2 control-label">First Name</label><div class="col-sm-8"><input class="form-control" id="first_name" type="text" value="{{first_name}}" disabled></div>
-</div>
-<div class="form-group">
-  <label for="last_name" class="col-sm-2 control-label">Last Name</label><div class="col-sm-8"><input class="form-control" id="last_name" type="text" value="{{last_name}}" disabled></div>
-</div>
-<div class="form-group">
-  <label for="community" class="col-sm-2 control-label">Community</label><div class="col-sm-8"><input class="form-control" id="community" type="text" value="{{[community]}}" disabled></div>
-</div>
-<div class="form-group">
-  <label for="street_address" class="col-sm-2 control-label">Street Address</label><div class="col-sm-8"><input class="form-control" id="street_address" type="text" value="{{street_address}}" disabled></div>
-</div>
-<div class="form-group">
-  <label for="city" class="col-sm-2 control-label">City</label><div class="col-sm-8"><input class="form-control" id="city" type="text" value="{{[city]}}" disabled></div>
-</div>
-<div class="form-group">
-  <label for="state" class="col-sm-2 control-label">State</label><div class="col-sm-8"><input class="form-control" id="state" type="text" value="{{[state]}}" disabled></div>
-</div>
-<div class="form-group">
-  <label for="lat" class="col-sm-2 control-label">Location Lat</label><div class="col-sm-8"><input class="form-control" id="lat" type="text" value="{{[lat]}}" disabled></div>
-</div>
-<div class="form-group">
-  <label for="lng" class="col-sm-2 control-label">Location Lng</label><div class="col-sm-8"><input class="form-control" id="lng" type="text" value="{{[lng]}}" disabled></div>
-</div>
-<button type="button" id="get_location_button" class="get_location_button btn btn-primary">Get Current Location</button><br>
 
-<div class="form-group">
-  <label for="mobile" class="col-sm-2 control-label">Mobile</label><div class="col-sm-8"><input class="form-control" id="mobile" type="tel" value="{{[mobile]}}" disabled></div>
-</div>
-<div class="form-group">
-  <label for="landline" class="col-sm-2 control-label">Landline</label><div class="col-sm-8"><input class="form-control" id="landline" type="tel" value="{{[landline]}}" disabled></div>
-</div>
-<div class="form-group">
-  <label for="prior_email" class="col-sm-2 control-label">Prior Email</label><div class="col-sm-8"><input class="form-control" id="prior_email" type="text" value="{{prior_email}}" disabled></div>
-</div>
+<ul class="nav nav-pills" role="tablist">
+  <li class="active"><a href="#basic_info" role="tab" data-toggle="tab">Basic Info</a></li>
+  <li><a href="#extra_contact_info" role="tab" data-toggle="tab">Extra Contact Info</a></li>
+</ul>
+<div class="tab-content">
 
+<div class="tab-pane active" id="basic_info">
+<button type="button" id="get_location_button" class="get_location_button btn btn-info btn-sm">Get Current Location</button>
+{{#each basic_info_fields}}
 <div class="form-group">
-  <label for="priority" class="col-sm-2 control-label">Priority</label>
-  <div class="col-sm-8">
-    <div class="selector_parent">
-      <div id="fake_selector_priority">
-        <input class="form-control" id="priority" type="text" value="{{priority}}" disabled>
-      </div>
-      <div id="real_selector_priority" class="hidden">
-        <select class="form-control" style="width:200px" id="priority">
-          <option value=""></option>
-          {{#each priority_options}}
-          <option value="{{this}}">{{this}}</option>
-          {{/each}}
-        </select>
-      </div>
+  <div class="container-fluid">
+    <div class="col-xs-2"><label for="{{field}}" class="control-label">{{label}}</label></div>
+    {{#if options}}
+    <div class="col-xs-8"><select class="form-control" id="{{field}}" disabled>
+        <option value="" {{selected_if_empty ../value}}></option>
+        {{#each options}}
+        <option value="{{this}}" {{selected_if_equal this ../value}}>{{this}}</option>
+        {{/each}}
+    </select></div>
+    {{else}}
+    <div class="col-xs-8"><input class="form-control" id="{{field}}" type="text" value="{{value}}" disabled></div>
+    {{/if}}
+    {{#with ..}}
+    <div class="col-xs-2">
+      <span class="glyphicon-pencil glyphicon" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Edit" id="edit"></span>
+      <span class="glyphicon-save glyphicon text-gray" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Save" id="save"></span>
     </div>
+    {{/with}}
   </div>
 </div>
-
-<div class="form-group">
-  <label for="status" class="col-sm-2 control-label">Status</label>
-  <div class="col-sm-8">
-    <div class="selector_parent">
-      <div id="fake_selector_status">
-        <input class="form-control" id="status" type="text" value="{{status}}" disabled>
-      </div>
-      <div id="real_selector_status" class="hidden">
-        <select class="form-control" style="width:200px" id="status">
-          <option value=""></option>
-          {{#each status_options}}
-          <option value="{{this}}">{{this}}</option>
-          {{/each}}
-        </select>
-      </div>
-    </div>
-  </div>
+{{/each}}
 </div>
 
-
-<div class="form-group">
-  <label for="current_provider" class="col-sm-2 control-label">Current Provider</label>
-  <div class="col-sm-8">
-    <div class="selector_parent">
-      <div id="fake_selector_current_provider">
-        <input class="form-control" id="current_provider" type="text" value="{{current_provider}}" disabled>
-      </div>
-      <div id="real_selector_current_provider" class="hidden">
-        <select class="form-control" style="width:200px" id="current_provider">
-          <option value=""></option>
-          {{#each provider_options}}
-          <option value="{{this}}">{{this}}</option>
-          {{/each}}
-        </select>
-      </div>
-    </div>
-  </div>
+<div class="tab-pane" id="extra_contact_info">
+  {{> subscriber_contacts}}
 </div>
 
-<div class="form-group">
-  <label for="relay_site" class="col-sm-2 control-label">Relay Site</label><div class="col-sm-8"><input class="form-control" id="relay_site" type="text" value="{{relay_site}}" disabled></div>
 </div>
-
-<div class="form-group">
-  <label for="time_availability" class="col-sm-2 control-label">Time Availability</label><div class="col-sm-8"><input class="form-control" id="time_availability" type="text" value="{{time_availability}}" disabled></div>
-</div>
-
-<div class="form-group">
-  <label for="plan" class="col-sm-2 control-label">Plan</label>
-  <div class="col-sm-8">
-    <div class="selector_parent">
-      <div id="fake_selector_plan">
-        <input class="form-control" id="plan" type="text" value="{{plan}}" disabled>
-      </div>
-      <div id="real_selector_plan" class="hidden">
-        <select class="form-control" style="width:200px" id="plan">
-          <option value=""></option>
-          {{#each plan_options}}
-          <option value="{{this}}">{{this}}</option>
-          {{/each}}
-        </select>
-      </div>
-    </div>
-  </div>
-</div>
-
-{{!-- Disabled CPE / AP settings in subscriber entities.
-<div class="form-group">
-  <label for="cpe" class="col-sm-2 control-label">CPE</label>
-  <div class="col-sm-8">
-    <div class="selector_parent">
-      <div id="fake_selector_cpe">
-        <input class="form-control" id="cpe" type="text" value="{{cpe}}" disabled>
-      </div>
-      <div id="real_selector_cpe" class="hidden">
-        <select class="form-control" style="width:200px" id="cpe">
-          <option value=""></option>
-          {{#each cpe_options}}
-          <option value="{{mac}}">{{hardware}} {{mac}}</option>
-          {{/each}}
-        </select>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="form-group">
-  <label for="ap" class="col-sm-2 control-label">AP</label>
-  <div class="col-sm-8">
-    <div class="selector_parent">
-      <div id="fake_selector_ap">
-        <input class="form-control" id="ap" type="text" value="{{ap}}" disabled>
-      </div>
-      <div id="real_selector_ap" class="hidden">
-        <select class="form-control" style="width:200px" id="ap">
-          <option value=""></option>
-          {{#each ap_options}}
-          <option value="{{mac}}">{{hardware}} {{mac}}</option>
-          {{/each}}
-        </select>
-      </div>
-    </div>
-  </div>
-</div>
---}}
-
-<div class="form-group">
-  <label for="username" class="col-sm-2 control-label">Username</label><div class="col-sm-8"><input class="form-control" id="username" type="text" value="{{username}}" disabled></div>
-</div>
-
-<div class="form-group">
-  <label for="signup_date" class="col-sm-2 control-label">Signup Date</label><div class="col-sm-8"><input class="form-control" id="signup_date" type="text" value="{{signup_date}}" disabled></div>
-</div>
-
-<div class="form-group">
-  <label for="end_date" class="col-sm-2 control-label">End Date</label><div class="col-sm-8"><input class="form-control" id="end_date" type="text" value="{{end_date}}" disabled></div>
-</div>
-
-<div class="form-group">
-  <label for="hold_date" class="col-sm-2 control-label">Hold Date</label><div class="col-sm-8"><input class="form-control" id="hold_date" type="text" value="{{hold_date}}" disabled></div>
-</div>
-
 </form>
 </template>
-

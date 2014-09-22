@@ -48,13 +48,12 @@ if (Meteor.isClient) {
 
   Template.subscriber_overview.events({
     'keyup .subscriber_search_input': function (evt) {
-      Session.set("subscriber_search_input", evt.target.value);
+      Session.set("subscriber_search_input", evt.target.value.trim());
     },
     'click .new_user_button': function (evt) {
       Subscribers.insert({ '_id': new Meteor.Collection.ObjectID(), 'first_name': "", 'last_name': "A New User" });
     }
   });
-
 
   Template.subscriber.selected = function () {
     return Session.equals("selected_subscriber", this._id) ? 'info' : '';

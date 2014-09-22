@@ -1,36 +1,32 @@
 if (Meteor.isClient) {
   // Node details functionality and events.
   Template.node_details.events({
-    'dblclick': function (evt) {
+    'click': function (evt) {
       console.log(evt);
 
-      // Handle events that are directed to fake input fields that we use while disabled, that are replaced by select dropdowns when enabled.
-      if (evt.target.parentNode.id == ("fake_selector_"+evt.target.id)) {
-        $("#real_selector_"+evt.target.id).removeClass("hidden");
-        $("#fake_selector_"+evt.target.id).addClass("hidden");
-        return;
-      }
+      if (evt.target.id == "edit" && !evt.target.classList.contains("text-gray")) {
+        // User clicked on pencil icon to begin editing.
+        // Toggle the icon visual state.
+        evt.target.classList.add("text-gray");
+        evt.target.nextElementSibling.classList.remove("text-gray");
 
-      // Handle normal input boxes.
-      if (evt.target.disabled) {
-        evt.target.disabled = false;
-      } else {
+        var formelement = evt.target.parentElement.previousElementSibling.firstChild;
+        formelement.disabled = false;
+      } else if (evt.target.id == "save" && !evt.target.classList.contains("text-gray")) {
+        // User clicked on save icon to save input.
+        var formelement = evt.target.parentElement.previousElementSibling.firstChild;
+        console.log(formelement);
+        console.log(this);
+
         db_update = {};
-        db_update[evt.target.id] = evt.target.value;
+        db_update[formelement.id] = formelement.value;
         Nodes.update(this._id, {$set: db_update}); 
-        evt.target.disabled = true;
+        formelement.disabled = true;
+
+        // Toggle the icon visual state.
+        evt.target.classList.add("text-gray");
+        evt.target.previousElementSibling.classList.remove("text-gray");
       }
-    },
-    'change select': function (evt) {
-      console.log(evt);
-
-      // Handle events for drop-down select boxes.
-      db_update = {};
-      db_update[evt.target.id] = evt.target.value;
-      Nodes.update(this._id, {$set: db_update}); 
-
-      $("#real_selector_"+evt.target.id).addClass("hidden");
-      $("#fake_selector_"+evt.target.id).removeClass("hidden");
     },
     'click .get_location_button': function (evt) {
       var id = this._id;
@@ -57,14 +53,6 @@ if (Meteor.isClient) {
     return Hardware.find({});
   };
 
-  Template.node_details.type_options = function () {
-    return ["client", "cpe", "ap", "base_station", "core", "other"];
-  };
-
-  Template.node_details.status_options = function () {
-    return ["operational", "failed", "undeployed"];
-  };
-
   Template.node_details.site_options = function () {
     return Sites.find({});
   };
@@ -77,5 +65,24 @@ if (Meteor.isClient) {
     return "";
   };
 
-}
+  Template.node_details.node_fields = function () {
+    var type_options = ["client", "cpe", "ap", "base_station", "core", "other"];
+    var status_options = ["operational", "failed", "undeployed"];
 
+    var hardware_options = Template.node_details.hardware_options().map(function(item, index, cursor) { return { value: item.name, label: (item.make + "/" + item.model) }; });
+
+    var site_options = Template.node_details.site_options().map(function(item, index, cursor) { return { value: item._id._str, label: item.name }; });
+
+    return [ { field: "name", label: "Name", value: this.name },
+             { field: "hardware", label: "Hardware", value: this.hardware, options: true, options_custom_view: hardware_options },
+             { field: "type", label: "Type", value: this.type, options: type_options },
+             { field: "status", label: "Status", value: this.status, options: status_options },
+             { field: "site", label: "Site", value: this.site, options: true, options_custom_view: site_options },
+             { field: "mac", label: "MAC", value: this.mac },
+             { field: "ip_address", label: "IP Address", value: this.ip_address },
+             { field: "lat", label: "Location Lat", value: this.lat },
+             { field: "lng", label: "Location Lng", value: this.lng }
+           ];
+  };
+
+}

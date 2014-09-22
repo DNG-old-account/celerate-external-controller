@@ -47,7 +47,7 @@ if (Meteor.isClient) {
 
   Template.node_overview.events({
     'keyup .node_search_input': function (evt) {
-      Session.set("node_search_input", evt.target.value);
+      Session.set("node_search_input", evt.target.value.trim());
     },
     'click .new_node_button': function (evt) {
       Nodes.insert({ '_id': new Meteor.Collection.ObjectID(), 'name': "New Node" });
@@ -91,14 +91,9 @@ if (Meteor.isClient) {
     }
   });
 
-
-
-
   // Sidebar stuff.
   Template.celerate_sidebar.activeSidebar = function () {
     return '';
     //return Session.equals("currentPage", this.id) ? 'class="active"' : '';
   };
-
 }
-

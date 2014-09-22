@@ -1,100 +1,40 @@
 <template name="node_details">
+
+<button type="button" id="get_location_button" class="get_location_button btn btn-primary">Get Current Location</button>
+<hr>
+
 <form class="form-horizontal" role="form">
+{{#each node_fields}}
 <div class="form-group">
-  <label for="name" class="col-sm-2 control-label">Name</label><div class="col-sm-8"><input class="form-control" id="name" type="text" value="{{name}}" disabled></div>
-</div>
-
-<div class="form-group">
-  <label for="hardware" class="col-sm-2 control-label">Hardware</label>
-  <div class="col-sm-8">
-    <div class="selector_parent">
-      <div id="fake_selector_hardware">
-        <input class="form-control" id="hardware" type="text" value="{{hardware}}" disabled>
-      </div>
-      <div id="real_selector_hardware" class="hidden">
-        <select class="form-control" style="width:200px" id="hardware">
-          <option value=""></option>
-          {{#each hardware_options}}
-          <option value="{{name}}">{{name}}: {{make}} / {{model}}</option>
-          {{/each}}
-        </select>
-      </div>
+  <div class="container-fluid">
+    <div class="col-xs-2"><label for="{{field}}" class="control-label">{{label}}</label></div>
+    {{#if options}}
+    {{#if options_custom_view}}
+    <div class="col-xs-8"><select class="form-control" id="{{field}}" disabled>
+        <option value="" {{selected_if_empty ../value}}></option>
+        {{#each options_custom_view}}
+        <option value="{{this.value}}" {{selected_if_equal this.value ../value}}>{{this.label}}</option>
+        {{/each}}
+    </select></div>
+    {{else}}
+    <div class="col-xs-8"><select class="form-control" id="{{field}}" disabled>
+        <option value="" {{selected_if_empty ../value}}></option>
+        {{#each options}}
+        <option value="{{this}}" {{selected_if_equal this ../value}}>{{this}}</option>
+        {{/each}}
+    </select></div>
+    {{/if}}
+    {{else}}
+    <div class="col-xs-8"><input class="form-control" id="{{field}}" type="text" value="{{value}}" disabled></div>
+    {{/if}}
+    {{#with ..}}
+    <div class="col-xs-2">
+      <span class="glyphicon-pencil glyphicon" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Edit" id="edit"></span>
+      <span class="glyphicon-save glyphicon text-gray" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Save" id="save"></span>
     </div>
+    {{/with}}
   </div>
 </div>
-
-<div class="form-group">
-  <label for="type" class="col-sm-2 control-label">Type</label>
-  <div class="col-sm-8">
-    <div class="selector_parent">
-      <div id="fake_selector_type">
-        <input class="form-control" id="type" type="text" value="{{type}}" disabled>
-      </div>
-      <div id="real_selector_type" class="hidden">
-        <select class="form-control" style="width:200px" id="type">
-          <option value=""></option>
-          {{#each type_options}}
-          <option value="{{this}}">{{this}}</option>
-          {{/each}}
-        </select>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="form-group">
-  <label for="status" class="col-sm-2 control-label">Status</label>
-  <div class="col-sm-8">
-    <div class="selector_parent">
-      <div id="fake_selector_status">
-        <input class="form-control" id="status" type="text" value="{{status}}" disabled>
-      </div>
-      <div id="real_selector_status" class="hidden">
-        <select class="form-control" style="width:200px" id="status">
-          <option value=""></option>
-          {{#each status_options}}
-          <option value="{{this}}">{{this}}</option>
-          {{/each}}
-        </select>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="form-group">
-  <label for="site" class="col-sm-2 control-label">Site</label>
-  <div class="col-sm-8">
-    <div class="selector_parent">
-      <div id="fake_selector_site">
-        <input class="form-control" id="site" type="text" value="{{site_name}}" disabled>
-      </div>
-      <div id="real_selector_site" class="hidden">
-        <select class="form-control" style="width:200px" id="site">
-          <option value=""></option>
-          {{#each site_options}}
-          <option value="{{this._id._str}}">{{this.name}}</option>
-          {{/each}}
-        </select>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="form-group">
-  <label for="mac" class="col-sm-2 control-label">MAC</label><div class="col-sm-8"><input class="form-control" id="mac" type="text" value="{{mac}}" disabled></div>
-</div>
-<div class="form-group">
-  <label for="ip_address" class="col-sm-2 control-label">IP address</label><div class="col-sm-8"><input class="form-control" id="ip_address" type="text" value="{{ip_address}}" disabled></div>
-</div>
-<div class="form-group">
-  <label for="lat" class="col-sm-2 control-label">Location Lat</label><div class="col-sm-8"><input class="form-control" id="lat" type="text" value="{{lat}}" disabled></div>
-</div>
-<div class="form-group">
-  <label for="lng" class="col-sm-2 control-label">Location Lng</label><div class="col-sm-8"><input class="form-control" id="lng" type="text" value="{{lng}}" disabled></div>
-</div>
-<button type="button" id="get_location_button" class="get_location_button btn btn-primary">Get Current Location</button><br>
-
+{{/each}}
 </form>
 </template>
-
-
