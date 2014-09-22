@@ -28,6 +28,18 @@ if (Meteor.isClient) {
     }
 
     Deps.autorun(function() {
+      if (!Session.equals("selected_subscriber", null)) {
+        var m = markers[Session.get("selected_subscriber")];
+        if (m != null) {
+          map.setCenter(m.position);
+          map.setZoom(15);
+          m.setAnimation(google.maps.Animation.BOUNCE);
+          setTimeout(function(){ m.setAnimation(null); }, 1400);
+        }
+      }
+    });
+
+    Deps.autorun(function() {
       console.log("Rendering map...");
       for (var m in markers) {
         markers[m].setMap(null);
