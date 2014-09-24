@@ -76,15 +76,23 @@ if (Meteor.isClient) {
   });
 
   Template.hardware.events({
-    'click': function () {
+    'click': function (evt) {
       Session.set("selected_hardware", this._id);
       console.log("selected_hardware set to: " + Session.get("selected_hardware"))
+      if ($(evt.target).hasClass('edit-row')) {
+        // Enable the modal for the node.
+        Meteor.defer(function () {
+          $('#hardware_details_modal').modal({show:true})
+        });
+      }
     },
     'dblclick': function() {
       Session.set("selected_hardware", this._id);
       console.log("selected_hardware set to: " + Session.get("selected_hardware"));
       // Enable the modal for the hardware.
-      $('#hardware_details_modal').modal({show:true})
+      Meteor.defer(function () {
+        $('#hardware_details_modal').modal({show:true})
+      });
     }
   });
 
