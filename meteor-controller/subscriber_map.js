@@ -56,7 +56,7 @@ if (Meteor.isClient) {
       var bounds = new google.maps.LatLngBounds();
 
       Template.subscriber_overview.subscribers().forEach(function (subscriber) {
-        if ('lat' in subscriber && 'lng' in subscriber) {
+        if ('lat' in subscriber && subscriber['lat'].trim().length > 0 && 'lng' in subscriber && subscriber['lng'].trim().length > 0) {
           var name = (subscriber.first_name ? subscriber.first_name : "") + " " + (subscriber.last_name ? subscriber.last_name : "");
           var latlng = new google.maps.LatLng(subscriber.lat, subscriber.lng);
           bounds.extend(latlng);
