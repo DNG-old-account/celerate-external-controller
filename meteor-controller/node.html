@@ -45,7 +45,7 @@
   </div>
   <div class="table_responsive">
     <table class="table table-striped">
-      <thead><tr><th class="name_header">Name</th><th class="status_header">Status</th><th class="hardware_header">Hardware</th><th class="mac_header">MAC</th><th class="col-sm-1"></th></tr></thead>
+      <thead><tr><th class="name_header">Name</th><th class="status_header">Status</th><th class="hardware_header">Hardware</th><th class="mac_header">MAC</th><th class="col-sm-1"></th><th class="edit_row_column"></th></tr></thead>
       <tbody>
         {{#each nodes}}
         {{> node}}
@@ -62,5 +62,6 @@
   <td>{{status}}</td>
   <td>{{hardware}}</td>
   <td>{{mac}}</td>
+  <td><span class="glyphicon-pencil glyphicon edit-row" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Edit"></span></td>
 </tr>
 </template>
