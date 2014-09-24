@@ -92,19 +92,10 @@ if (Meteor.isClient) {
       console.log("selected_subscriber set to: " + Session.get("selected_subscriber"));
       if ($(evt.target).hasClass('edit-row')) {
         // Enable the modal for the subscriber.
-        Meteor.defer(function () {
+        Tracker.afterFlush(function () {
           $('#subscriber_details_modal').modal({show:true})
         });
       }
-    },
-    'dblclick': function() {
-      console.log(this);
-      Session.set("selected_subscriber", this._id);
-      console.log("selected_subscriber set to: " + Session.get("selected_subscriber"));
-      // Enable the modal for the subscriber.
-      Meteor.defer(function () {
-        $('#subscriber_details_modal').modal({show:true})
-      });
     }
   });
 

@@ -81,18 +81,10 @@ if (Meteor.isClient) {
       console.log("selected_hardware set to: " + Session.get("selected_hardware"))
       if ($(evt.target).hasClass('edit-row')) {
         // Enable the modal for the node.
-        Meteor.defer(function () {
+        Tracker.afterFlush(function () {
           $('#hardware_details_modal').modal({show:true})
         });
       }
-    },
-    'dblclick': function() {
-      Session.set("selected_hardware", this._id);
-      console.log("selected_hardware set to: " + Session.get("selected_hardware"));
-      // Enable the modal for the hardware.
-      Meteor.defer(function () {
-        $('#hardware_details_modal').modal({show:true})
-      });
     }
   });
 

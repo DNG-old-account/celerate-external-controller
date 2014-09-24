@@ -73,18 +73,10 @@ if (Meteor.isClient) {
       console.log("selected_site set to: " + Session.get("selected_site"))
       if ($(evt.target).hasClass('edit-row')) {
         // Enable the modal for the node.
-        Meteor.defer(function () {
+        Tracker.afterFlush(function () {
           $('#site_details_modal').modal({show:true})
         });
       }
-    },
-    'dblclick': function() {
-      Session.set("selected_site", this._id);
-      console.log("selected_site set to: " + Session.get("selected_site"));
-      // Enable the modal for the site.
-      Meteor.defer(function () {
-        $('#site_details_modal').modal({show:true})
-      });
     }
   });
 

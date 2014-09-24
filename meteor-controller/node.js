@@ -84,18 +84,10 @@ if (Meteor.isClient) {
       console.log("selected_node set to: " + Session.get("selected_node"))
       if ($(evt.target).hasClass('edit-row')) {
         // Enable the modal for the node.
-        Meteor.defer(function () {
+        Tracker.afterFlush(function () {
           $('#node_details_modal').modal({show:true})
         });
       }
-    },
-    'dblclick': function() {
-      Session.set("selected_node", this._id);
-      console.log("selected_node set to: " + Session.get("selected_node"));
-      // Enable the modal for the node.
-      Meteor.defer(function () {
-        $('#node_details_modal').modal({show:true})
-      });
     }
   });
 
