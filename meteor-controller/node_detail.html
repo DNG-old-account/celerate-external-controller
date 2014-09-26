@@ -5,38 +5,42 @@
 
 <form class="form-horizontal" role="form">
 {{#if isIterable node_fields}}
-{{#each node_fields}}
-<div class="form-group">
-  <div class="container-fluid">
-    <div class="col-xs-2"><label for="{{field}}" class="control-label">{{label}}</label></div>
-    {{#if options}}
-    {{#if options_custom_view}}
-    <div class="col-xs-8"><select class="form-control" id="{{field}}" disabled>
-        <option value="" {{selected_if_empty ../value}}></option>
-        {{#each options_custom_view}}
-        <option value="{{this.value}}" {{selected_if_equal this.value ../value}}>{{this.label}}</option>
-        {{/each}}
-    </select></div>
-    {{else}}
-    <div class="col-xs-8"><select class="form-control" id="{{field}}" disabled>
-        <option value="" {{selected_if_empty ../value}}></option>
-        {{#each options}}
-        <option value="{{this}}" {{selected_if_equal this ../value}}>{{this}}</option>
-        {{/each}}
-    </select></div>
-    {{/if}}
-    {{else}}
-    <div class="col-xs-8"><input class="form-control" id="{{field}}" type="text" value="{{value}}" disabled></div>
-    {{/if}}
-    {{#with ..}}
-    <div class="col-xs-2">
-      <span class="glyphicon-pencil glyphicon" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Edit" id="edit"></span>
-      <span class="glyphicon-save glyphicon text-gray" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Save" id="save"></span>
+  {{#each node_fields}}
+    <div class="form-group">
+      <div class="container-fluid">
+        <div class="col-xs-2"><label for="{{field}}" class="control-label">{{label}}</label></div>
+        {{#if options}}
+          {{#if isIterable options_custom_view}}
+            <div class="col-xs-8"><select class="form-control" id="{{field}}" disabled>
+                <option value="" {{selected_if_empty ../value}}></option>
+                {{#each options_custom_view}}
+                <option value="{{this.value}}" {{selected_if_equal this.value ../value}}>{{this.label}}</option>
+                {{/each}}
+            </select></div>
+          {{else}}
+            {{#if isIterable options}}
+              <div class="col-xs-8">
+                <select class="form-control" id="{{field}}" disabled>
+                  <option value="" {{selected_if_empty ../value}}></option>
+                  {{#each options}}
+                  <option value="{{this}}" {{selected_if_equal this ../value}}>{{this}}</option>
+                  {{/each}}
+                </select>
+              </div>
+            {{/if}}
+          {{/if}}
+        {{else}}
+          <div class="col-xs-8"><input class="form-control" id="{{field}}" type="text" value="{{value}}" disabled></div>
+        {{/if}}
+        {{#with ..}}
+        <div class="col-xs-2">
+          <span class="glyphicon-pencil glyphicon" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Edit" id="edit"></span>
+          <span class="glyphicon-save glyphicon text-gray" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Save" id="save"></span>
+        </div>
+        {{/with}}
+      </div>
     </div>
-    {{/with}}
-  </div>
-</div>
-{{/each}}
+  {{/each}}
 {{/if}}
 </form>
 </template>
