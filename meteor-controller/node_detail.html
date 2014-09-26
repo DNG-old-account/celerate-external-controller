@@ -4,6 +4,7 @@
 <hr>
 
 <form class="form-horizontal" role="form">
+{{#if isIterable node_fields}}
 {{#each node_fields}}
 <div class="form-group">
   <div class="container-fluid">
@@ -36,5 +37,6 @@
   </div>
 </div>
 {{/each}}
+{{/if}}
 </form>
 </template>
