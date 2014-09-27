@@ -42,3 +42,11 @@ Handlebars.registerHelper('selected_if_empty', function(val) {
   if (!val || val == "") return "selected";
   return "";
 });
+
+
+if (Meteor.isClient) {
+  Template.registerHelper('isIterable', function(collection) {
+    return typeof collection === "object";
+  });
+}
+

@@ -65,10 +65,6 @@ if (Meteor.isClient) {
     return "";
   };
 
-  Template.node_details.isIterable = function(collection) {
-    return typeof collection === "object";
-  }
-
   Template.node_details.node_fields = function () {
     var type_options = ["client", "cpe", "ap", "base_station", "core", "other"];
     var status_options = ["operational", "failed", "undeployed"];
