@@ -99,6 +99,7 @@ if (Meteor.isClient) {
              { field: "relay_site", label: "Relay Site", value: this.relay_site },
              { field: "time_availability", label: "Time Availability", value: this.time_availability },
              { field: "plan", label: "Plan", value: this.plan, options: plan_options },
+             { field: "notes", label: "Notes", value: this.notes },
              { field: "username", label: "Username", value: this.username },
              { field: "signup_date", label: "Signup Date", value: this.signup_date },
              { field: "end_date", label: "End Date", value: this.end_date },
