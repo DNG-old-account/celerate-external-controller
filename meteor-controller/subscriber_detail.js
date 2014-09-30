@@ -73,7 +73,7 @@ if (Meteor.isClient) {
   };
 
   Template.subscriber_details.terms_info = function () {
-    return hasAgreedToTerms = (this.agreedToTerms) ? "Yes" : "No";
+    return hasAgreedToTerms = (this.agreed_to_terms) ? "Yes" : "No";
   };
 
   Template.subscriber_details.ap_options = function () {

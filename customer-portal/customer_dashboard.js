@@ -18,8 +18,8 @@ if (Meteor.isClient) {
           return false;
         }
         dbUpdate = {};
-        dbUpdate.agreedToTerms = true;
-        Subscribers.update(this.subscriberInfo._id, {$set: dbUpdate}); 
+        dbUpdate.agreed_to_terms = true;
+        Subscribers.update(this._id, {$set: dbUpdate}); 
       }
     }
   });

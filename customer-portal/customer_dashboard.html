@@ -14,6 +14,7 @@
         <h3>{{subscriberInfo.first_name}} {{subscriberInfo.last_name}}</h3>
         <div class="well">
           <form role="form">
+            {{#with subscriberInfo}}
             <a href="http://furtherreach.net/customeragreement" target="_new">Customer Agreement</a>
             <div class="checkbox">
               <label>
@@ -21,6 +22,7 @@
               </label>
             </div>
             <button type="submit" id="submit-to-terms" class="btn btn-default">Submit</button>
+            {{/with}}
           </form>
         </div>
         {{/if}}
