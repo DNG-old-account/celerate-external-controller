@@ -12,5 +12,6 @@ iron:router
 accounts-google
 rajit:accounts-ui-bootstrap-3
 mizzao:user-status
+accounts-password
 service-configuration
 

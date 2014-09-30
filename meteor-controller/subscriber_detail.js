@@ -72,6 +72,10 @@ if (Meteor.isClient) {
     return Nodes.find({ type: 'cpe' });
   };
 
+  Template.subscriber_details.terms_info = function () {
+    return hasAgreedToTerms = (this.agreedToTerms) ? "Yes" : "No";
+  };
+
   Template.subscriber_details.ap_options = function () {
     return Nodes.find({ type: 'ap' });
   };

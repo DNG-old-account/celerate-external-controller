@@ -1,0 +1,15 @@
+{
+  "meteor": {},
+  "dependencies": {
+    "basePackages": {
+      "synced-cron": {}
+    },
+    "packages": {
+      "synced-cron": {
+        "git": "https://github.com/percolatestudio/meteor-synced-cron.git",
+        "tag": "v0.2.2",
+        "commit": "fe98b8634e0587e4f9cc4688f92af7af32551503"
+      }
+    }
+  }
+}
