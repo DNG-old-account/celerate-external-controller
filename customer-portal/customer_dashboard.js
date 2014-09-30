@@ -3,8 +3,39 @@ if (Meteor.isServer) {
 }
 if (Meteor.isClient) {
 
-  Template.customer_dashboard.subscriberInfo = function() {
+  Template.order_form.subscriberInfo = Template.customer_dashboard.subscriberInfo = function() {
+    var authToken = Session.get('authToken');
+    Meteor.call('getSubscriber', authToken, function(err, result) {
+      if (!err && typeof result === 'object') {
+        Session.set('subscriber', result);
+      }
+    });
     return Session.get('subscriber');
+
+  };
+
+  Template.order_form.billingInfo = function() {
+    var authToken = Session.get('authToken');
+    Meteor.call('billingInfo', authToken, function(err, result) {
+      if (!err && typeof result === 'object') {
+        Session.set('billingInfo', result);
+      }
+    });
+    return Session.get('billingInfo');
+  };
+
+  Template.order_form.planInfo = function() {
+    var authToken = Session.get('authToken');
+    Meteor.call('planInfo', authToken, function(err, result) {
+      var thisSub = Session.get('subscriber');
+      if (!err && typeof result === 'object' && 
+          typeof thisSub.plan !== 'undefined' && 
+          result[thisSub.plan] !== 'undefined') {
+
+        Session.set('planInfo', result[thisSub.plan]);
+      }
+    });
+    return Session.get('planInfo');
   };
 
   Template.customer_dashboard.events({

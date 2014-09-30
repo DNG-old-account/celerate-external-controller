@@ -84,7 +84,7 @@ if (Meteor.isClient) {
     var priority_options = ["high", "medium", "low", "none", "unknown"];
     var status_options = ["connected", "new lead", "no coverage"];
     var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
-    var plan_options = ["beta-free", "nonprofit-free", "relay-free", "landuse-free", "limited", "essential", "performance", "ultra"];
+    var plan_options = ["beta-free", "nonprofit-free", "relay-free", "landuse-free", "limited", "essential", "performance", "ultra", "silver", "gold"];
 
     return [ { field: "first_name", label: "First Name", value: this.first_name },
              { field: "last_name", label: "Last Name", value: this.last_name },

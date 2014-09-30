@@ -31,12 +31,8 @@ Router.map(function() {
     onBeforeAction: checkAdmin,
     action: function() {
       var thisRoute = this;
-      Meteor.call('authorize', this.params._hash, function(err, result) {
-        if (!err) {
-          Session.set('subscriber', result);
-          thisRoute.render();
-        }
-      });
+      Session.set('authToken', thisRoute.params._hash);
+      thisRoute.render('customer_dashboard');
     }
   });
 

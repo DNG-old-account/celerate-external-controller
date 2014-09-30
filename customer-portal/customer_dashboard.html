@@ -1,34 +1,206 @@
+<template name="order_form">
+  <div class="well">
+    <form role="form">
+      {{#with subscriberInfo}}
+      <div class="order-form">
+        <div class="row">
+          <div class="col-xs-5">
+            <h2>Order Form</h2>
+          </div>
+        </div>
+        <div class="row org-details">
+          <div class="col-xs-5">
+            <div class="org-name">
+              DeNovo Group
+            </div>
+            <div class="address">
+              521 Bonnie Dr.
+            </div>
+            <div class="city">
+              El Cerrito, CA 94530
+            </div>
+            <div class="phone">
+              Phone: (707) 278 8899
+            </div>
+            <div class="website">
+              <a href="http://furtherreach.net">www.furtherreach.net</a>
+            </div>
+          </div>
+        </div><!-- /.row -->
+        <div class="row description-billing">
+          <div class="col-xs-8">
+            <div class="form-header">
+              Description
+            </div>
+            <div class="installation-description">
+              Installation of Further Reach antenna and initiation of broadband Internet service:   
+            </div>
+            <div class="plan-name">
+              Plan: {{planInfo.label}}
+            </div>
+          </div>
+          <div class="col-xs-4">
+            <div class="form-header">
+              Bill To
+            </div>
+            <div class="billing-information">
+              <div class="billing-name">
+                {{billingInfo.first_name}} {{billingInfo.last_name}}
+              </div>
+              <div class="billing-street">
+                {{billingInfo.street_address}}
+              </div>
+              <div class="billing-city-state-zip">
+                {{billingInfo.city}}, {{billingInfo.state}} {{billingInfo.zip}}
+              </div>
+              <div class="billing-phone">
+                {{billingInfo.mobile}} {{billingInfo.landline}}
+              </div>
+              <div class="billing-email">
+                {{billingInfo.email}}
+              </div>
+            </div>
+          </div>
+        </div><!-- /.row -->
+        <div class="row one-time-pricing">
+          <div class="col-xs-4 item-details">
+            <div class="form-header">
+              Service and Labor
+            </div>
+            <div class="installation-detail">
+              Standard Installation (includes antenna, access point, Ethernet cable, 3 hour labor)      
+            </div>
+          </div>
+          <div class="col-xs-2 type-details">
+            <div class="form-header">
+              Type
+            </div>
+          </div>
+          <div class="col-xs-2 quantity-details">
+            <div class="form-header">
+              Quantity
+            </div>
+            <div class="quantity">
+              1
+            </div>
+          </div>
+          <div class="col-xs-2 rate-details">
+            <div class="form-header">
+              Rate
+            </div>
+            <div class="installation-rate">
+              $150
+            </div>
+          </div>
+          <div class="col-xs-2 totals">
+            <div class="form-header">
+              Totals
+            </div>
+            <div class="installation-total">
+              $150
+            </div>
+          </div>
+        </div><!-- ./row -->
+        <div class="row installation-price-totals">
+          <div class="col-xs-2 col-xs-offset-8 bold">
+            Total:
+          </div>
+          <div class="col-xs-2">
+            $150
+          </div>
+        </div><!-- /.row -->
+        <div class="row recurring-pricing">
+          <div class="col-xs-4 item-details">
+            <div class="form-header">
+              Monthly Payments
+            </div>
+            <div class="internet-detail">
+              Broadband Internet
+            </div>
+          </div>
+          <div class="col-xs-2 col-xs-offset-4 recurring-type-details">
+            <div class="form-header">
+              Type
+            </div>
+            <div class="recurring-type-detail">
+              {{planInfo.label}}
+            </div>
+            <div class="bold">
+              Total:
+            </div>
+          </div>
+          <div class="col-xs-2 recurring-rates">
+            <div class="form-header">
+              Monthly Rate
+            </div>
+            <div class="recurring-rate">
+              ${{planInfo.monthly}}
+            </div>
+            <div>
+              ${{planInfo.monthly}}
+            </div>
+          </div>
+        </div><!-- ./row -->
+        <div class="row notes-row">
+          <div class="col-xs-12">
+            <div>
+              Notes:
+            </div>
+            <ol class="notes-list">
+              <li>
+                Effective date is only the date of initiating this legal agreement
+              </li>
+              <li>
+                Initial monthly service is pro rated based on number of days provided service, beginning from the day of installation
+              </li>
+              <li>
+                Broadband Internet service is billed at the end of each month
+              </li>
+              <li>
+                Standard Installation cost only can be financed and paid in (6) monthly installments instead of one time payment
+              </li>
+              <li>
+                Optional additional equipment not included above and will be added after installation is complete
+              </li>
+              <li>
+                Standard installation includes antenna, access point and up to three hours of installation time. Additional labor if required is billed at $50/hr.
+              </li>
+            </ol>
+          </div>
+        </div><!-- ./row.notes-row -->
+      </div><!-- /.order-form -->
+      {{#if subscriberInfo.agreed_to_terms}}
+        <h4>Has Agreed to Terms</h4>
+      {{else}}
+        <a href="http://furtherreach.net/customeragreement" target="_new">Customer Agreement</a>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" id="agree-to-terms" checked={{subscriberInfo.agreed_to_terms}}> By checking the box to the left, you agree that you have read, understand, had the option to print, and accept the terms and conditions of this agreement
+          </label>
+        </div>
+        <button type="submit" id="submit-to-terms" class="btn btn-default">Submit</button>
+      {{/if}}
+      {{/with}}
+    </form>
+  </div>
+</template>
 <template name="customer_dashboard">
 <body>
   <div class="navbar navbar-default" role="navigation">
     <div class="navbar-header">
       <a class="navbar-brand" href="#">Celerate</a>
+      {{#if subscriberInfo}}
+        <p class="navbar-text pull-right">Signed in as {{subscriberInfo.first_name}} {{subscriberInfo.last_name}}</p>
+      {{/if}}
     </div>
   </div>
 
   <div class="container">
     <div class="row">
-      <div class="col-xs-10 col-xs-offset-1">
+      <div class="col-xs-12">
         <h2>Further Reach Customer Dashboard</h2>
         {{#if subscriberInfo}}
-        <h3>{{subscriberInfo.first_name}} {{subscriberInfo.last_name}}</h3>
-        <div class="well">
-          <form role="form">
-            {{#with subscriberInfo}}
-            {{#if subscriberInfo.agreed_to_terms}}
-              <h4>Has Agreed to Terms</h4>
-            {{else}}
-              <a href="http://furtherreach.net/customeragreement" target="_new">Customer Agreement</a>
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" id="agree-to-terms" checked={{subscriberInfo.agreed_to_terms}}> By checking the box to the left, you agree that you have read, understand, had the option to print, and accept the terms and conditions of this agreement
-                </label>
-              </div>
-              <button type="submit" id="submit-to-terms" class="btn btn-default">Submit</button>
-            {{/if}}
-            {{/with}}
-          </form>
-        </div>
+        {{> order_form subscriberInfo}}
         {{/if}}
       </div>
     </div>
