@@ -3,7 +3,7 @@ if (Meteor.isClient) {
   var sort_fields = ["status_sort", "name_sort", "priority_sort", "city_sort", "community_sort", "mapped_sort"];
   var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "priority_sort": "priority", "city_sort": "city", "community_sort": "community", "mapped_sort": "lat"};
 
-  var hidden_subscribers_dep = new Tracker.Dependency;
+  var archived_subscribers_dep = new Tracker.Dependency;
 
   Meteor.startup(function() {
     Session.set("primary_sort_field_subscribers", "status_sort");
@@ -29,8 +29,8 @@ if (Meteor.isClient) {
         subquery.push(field_query);
       }
 
-      hidden_subscribers_dep.depend();
-      var show_archived = $("#show_hidden_subscribers").prop('checked');
+      archived_subscribers_dep.depend();
+      var show_archived = $("#show_archived_subscribers").prop('checked');
       if (show_archived) {
         query = {$or: subquery};
       } else {
@@ -61,8 +61,17 @@ if (Meteor.isClient) {
     'click .new_user_button': function (evt) {
       Subscribers.insert({ '_id': new Meteor.Collection.ObjectID(), 'first_name': "", 'last_name': "A New User" });
     },
-    'click .show_hidden_subscribers': function (evt) {
-      hidden_subscribers_dep.changed();
+    'click .show_archived_subscribers': function (evt) {
+      archived_subscribers_dep.changed();
+    },
+    'click .show_map': function (evt) {
+      console.log(evt);
+      var show_map = evt.target.checked;
+      if (show_map) {
+        $("#subscriber_map").slideDown();
+      } else {
+        $("#subscriber_map").slideUp();
+      }
     }
   });
 

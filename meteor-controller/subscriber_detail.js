@@ -15,30 +15,46 @@ if (Meteor.isClient) {
       } else if (evt.target.id == "save" && !evt.target.classList.contains("text-gray")) {
         // User clicked on save icon to save input.
         var formelement = evt.target.parentElement.previousElementSibling.firstChild;
-        console.log(formelement);
-        console.log(this);
 
-        db_update = {};
-        db_update[formelement.id] = formelement.value;
-        Subscribers.update(this._id, {$set: db_update}); 
-        formelement.disabled = true;
-
-        // Handle special cases, such as marking a subscriber as connected.
+        // Confirm when marking as connected.
         if (formelement.id == "status" && formelement.value == "connected") {
-          var subscriber_id = this._id._str;
-          var existing_site = Sites.findOne(function() { return this.type && this.type.subscriber && this.type.subscriber == subscriber_id; });
-          console.log(existing_site);
-          if (!existing_site) {
-            Sites.insert({'_id': new Meteor.Collection.ObjectID(),
-                          'name': (this.first_name + " " + this.last_name),
-                          'type': {'subscriber': this._id}});
-            window.alert("Adding site for newly connected subscriber.");
-          }
-        }
+          var context = this;
+          bootbox.confirm("Are you sure you want to mark this subscriber as connected?", function(result) {
+            if (result) {
+              db_update = {};
+              db_update[formelement.id] = formelement.value;
+              if (formelement.id == "status" && formelement.value == "connected") {
+                db_update['current_provider'] = 'further reach';
+                db_update['activation_date'] = new Date();
+              }
+              Subscribers.update(context._id, {$set: db_update}); 
+              formelement.disabled = true;
 
-        // Toggle the icon visual state.
-        evt.target.classList.add("text-gray");
-        evt.target.previousElementSibling.classList.remove("text-gray");
+              var subscriber_id = context._id._str;
+              var existing_site = Sites.findOne(function() { return context.type && context.type.subscriber && context.type.subscriber == subscriber_id; });
+              console.log(existing_site);
+              if (!existing_site) {
+                Sites.insert({'_id': new Meteor.Collection.ObjectID(),
+                  'name': (context.first_name + " " + context.last_name),
+                  'type': {'subscriber': context._id}});
+                window.alert("Adding site for newly connected subscriber.");
+              }
+
+              // Toggle the icon visual state.
+              evt.target.classList.add("text-gray");
+              evt.target.previousElementSibling.classList.remove("text-gray");
+            }
+          });
+        } else {
+          db_update = {};
+          db_update[formelement.id] = formelement.value;
+          Subscribers.update(this._id, {$set: db_update}); 
+          formelement.disabled = true;
+
+          // Toggle the icon visual state.
+          evt.target.classList.add("text-gray");
+          evt.target.previousElementSibling.classList.remove("text-gray");
+        }
       }
     },
     'click .get_location_button': function (evt) {
@@ -95,34 +111,44 @@ if (Meteor.isClient) {
   };
 
   Template.subscriber_details.basic_info_fields = function () {
-    var priority_options = ["high", "medium", "low", "none", "unknown"];
+    var subscriber_type_options = ["residential", "business", "non profit organization"];
     var status_options = ["connected", "new lead", "no coverage"];
-    var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
-    var plan_options = ["beta-free", "nonprofit-free", "relay-free", "landuse-free", "limited", "essential", "performance", "ultra"];
+    var plan_options = ["limited", "essential", "performance", "ultra", "business-silver", "business-gold", "beta-free", "nonprofit-free", "relay-free", "landuse-free", ];
 
     return [ { field: "first_name", label: "First Name", value: this.first_name },
              { field: "last_name", label: "Last Name", value: this.last_name },
+             { field: "subscriber_type", label: "Subscriber Type", value: this.subscriber_type, options: subscriber_type_options },
              { field: "community", label: "Community", value: this.community },
              { field: "street_address", label: "Street Address", value: this.street_address },
              { field: "city", label: "City", value: this.city },
              { field: "state", label: "State", value: this.state },
-             { field: "zipcode", label: "Zip Code", value: this.zip_code },
+             { field: "zip_code", label: "Zip Code", value: this.zip_code },
              { field: "lat", label: "Location Lat", value: this.lat },
              { field: "lng", label: "Location Lng", value: this.lng },
              { field: "mobile", label: "Mobile", value: this.mobile },
              { field: "landline", label: "Landline", value: this.landline },
              { field: "prior_email", label: "Prior Email", value: this.prior_email },
-             { field: "priority", label: "Priority", value: this.priority, options: priority_options },
              { field: "status", label: "Status", value: this.status, options: status_options },
-             { field: "current_provider", label: "Current Provider", value: this.current_provider, options: provider_options },
-             { field: "relay_site", label: "Relay Site", value: this.relay_site },
-             { field: "time_availability", label: "Time Availability", value: this.time_availability },
              { field: "plan", label: "Plan", value: this.plan, options: plan_options },
-             { field: "notes", label: "Notes", value: this.notes },
              { field: "username", label: "Username", value: this.username },
+             { field: "max_speed", label: "Max Speed", value: this.max_speed },
+             { field: "activation_date", label: "Activation Date", value: this.activation_date },
              { field: "signup_date", label: "Signup Date", value: this.signup_date },
              { field: "end_date", label: "End Date", value: this.end_date },
              { field: "hold_date", label: "Hold Date", value: this.hold_date }
+           ];
+  };
+
+  Template.subscriber_details.scheduling_fields = function () {
+    var priority_options = ["high", "medium", "low", "none", "unknown"];
+    var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
+
+    return [ { field: "priority", label: "Priority", value: this.priority, options: priority_options },
+             { field: "current_provider", label: "Current Provider", value: this.current_provider, options: provider_options },
+             { field: "relay_site", label: "Relay Site", value: this.relay_site },
+             { field: "time_availability", label: "Time Availability", value: this.time_availability },
+             { field: "notes", label: "Notes", value: this.notes },
+             { field: "signup_date", label: "Signup Date", value: this.signup_date }
            ];
   };
 }

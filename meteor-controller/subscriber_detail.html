@@ -17,6 +17,7 @@
 
 <ul class="nav nav-pills" role="tablist">
   <li class="active"><a href="#basic_info" role="tab" data-toggle="tab">Basic Info</a></li>
+  <li><a href="#scheduling" role="tab" data-toggle="tab">Scheduling</a></li>
   <li><a href="#extra_contact_info" role="tab" data-toggle="tab">Extra Contact Info</a></li>
 </ul>
 <div class="tab-content">
@@ -24,6 +25,32 @@
 <div class="tab-pane active" id="basic_info">
 <button type="button" id="get_location_button" class="get_location_button btn btn-info btn-sm">Get Current Location</button>
 {{#each basic_info_fields}}
+<div class="form-group">
+  <div class="container-fluid">
+    <div class="col-xs-2"><label for="{{field}}" class="control-label">{{label}}</label></div>
+    {{#if options}}
+    <div class="col-xs-8"><select class="form-control" id="{{field}}" disabled>
+        <option value="" {{selected_if_empty ../value}}></option>
+        {{#each options}}
+        <option value="{{this}}" {{selected_if_equal this ../value}}>{{this}}</option>
+        {{/each}}
+    </select></div>
+    {{else}}
+    <div class="col-xs-8"><input class="form-control" id="{{field}}" type="text" value="{{value}}" disabled></div>
+    {{/if}}
+    {{#with ..}}
+    <div class="col-xs-2">
+      <span class="glyphicon-pencil glyphicon" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Edit" id="edit"></span>
+      <span class="glyphicon-save glyphicon text-gray" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Save" id="save"></span>
+    </div>
+    {{/with}}
+  </div>
+</div>
+{{/each}}
+</div>
+
+<div class="tab-pane" id="scheduling">
+{{#each scheduling_fields}}
 <div class="form-group">
   <div class="container-fluid">
     <div class="col-xs-2"><label for="{{field}}" class="control-label">{{label}}</label></div>
