@@ -63,8 +63,26 @@ if (Meteor.isClient) {
     'click .user_google_account_setup_button': function (evt) {
       window.open("https://admin.google.com/AdminHome?fral=1#UserList:org=45257bl2kp4lkp");
     },
-    'click .user_billing_setup_button': function (evt) {
-
+    'click .archive_subscriber_button': function (evt) {
+      var id = this._id;
+      bootbox.confirm("Are you sure you want to archive this subscriber?", function(result) {
+        if (result) {
+          Subscribers.update(id, {$set: {archived: true}});
+        }
+      }); 
+    },
+    'click .delete_subscriber_button': function (evt) {
+      var id = this._id;
+      bootbox.confirm("Are you sure you want to delete this subscriber?", function(first_result) {
+        if (first_result) {
+          bootbox.confirm("Are you REALLY REALLY sure you want to delete this subscriber?", function(second_result) {
+            if (second_result) {
+              window.parent.close_subscriber_modal();
+              setTimeout(function(){ Subscribers.remove(id); }, 1000);
+            }
+          });
+        }
+      }); 
     }
   });
 

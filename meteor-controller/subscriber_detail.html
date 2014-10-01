@@ -1,7 +1,16 @@
 <template name="subscriber_details">
+{{#if archived}}
+<div class="alert alert-warning" role="alert"><strong>Warning:</strong> This is an ARCHIVED Subscriber</div>
+{{/if}}
 
-<button type="button" class="user_google_account_setup_button btn btn-info" id="user_google_account_setup_button">User Google Account Setup</button>
-<button type="button" class="user_billing_setup_button btn btn-success" id="user_billing_setup_button">User Billing Setup</button>
+<button type="button" class="btn btn-success" id="user_billing_setup_button">User Billing Setup</button>
+{{#if archived}}
+{{else}}
+<button type="button" class="archive_subscriber_button btn btn-warning">Archive Subscriber</button>
+{{/if}}
+{{#with ..}}
+<button type="button" class="delete_subscriber_button btn btn-danger">Delete Subscriber</button>
+{{/with}}
 <hr>
 
 <form class="form-horizontal" role="form">

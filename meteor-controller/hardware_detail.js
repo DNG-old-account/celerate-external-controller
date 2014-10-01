@@ -1,15 +1,17 @@
 if (Meteor.isClient) {
   // Hardware details functionality and events.
   Template.hardware_details.events({
+    'click .add-port': function (evt) {
+      Hardware.update(this._id, {$push: {ports: {name: 'new_port', type: 'wired'}}});
+    },
+    'click .delete-port': function (evt) {
+      var db_update = {};
+      db_update.ports = {'name' : evt.target.id};
+      Hardware.update(this.hardware_instance._id, {$pull: db_update}); 
+    },
     'click': function (evt) {
       console.log(evt);
-      if (evt.target.classList.contains("add-port")) {
-        Hardware.update(this._id, {$push: {ports: {name: 'new_port', type: 'wired'}}});
-      } else if (evt.target.classList.contains("delete-port")) {
-        var db_update = {};
-        db_update.ports = {'name' : evt.target.id};
-        Hardware.update(this.hardware_instance._id, {$pull: db_update}); 
-      } else if (evt.target.id == "edit" && !evt.target.classList.contains("text-gray")) {
+      if (evt.target.id == "edit" && !evt.target.classList.contains("text-gray")) {
         // User clicked on pencil icon to begin editing.
         // Toggle the icon visual state.
         evt.target.classList.add("text-gray");
