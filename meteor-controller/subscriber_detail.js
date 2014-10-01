@@ -106,6 +106,7 @@ if (Meteor.isClient) {
              { field: "street_address", label: "Street Address", value: this.street_address },
              { field: "city", label: "City", value: this.city },
              { field: "state", label: "State", value: this.state },
+             { field: "zipcode", label: "Zip Code", value: this.zip_code },
              { field: "lat", label: "Location Lat", value: this.lat },
              { field: "lng", label: "Location Lng", value: this.lng },
              { field: "mobile", label: "Mobile", value: this.mobile },
