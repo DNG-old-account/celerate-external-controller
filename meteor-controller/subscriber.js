@@ -54,9 +54,18 @@ if (Meteor.isClient) {
     return subscriber;
   };
 
+  var subscriber_search_input_timeout = false;
+  var subscriber_search_input_lag_ms = 350;
   Template.subscriber_overview.events({
     'keyup .subscriber_search_input': function (evt) {
-      Session.set("subscriber_search_input", evt.target.value.trim());
+      if (Session.get("subscriber_search_input_timeout") != true) {
+        subscriber_search_input_timeout = true;
+
+        setTimeout(function() {
+          Session.set("subscriber_search_input", $("#subscriber_search_input").val().trim());
+          subscriber_search_input_timeout = false;
+        }, subscriber_search_input_lag_ms);
+      }
     },
     'click .new_user_button': function (evt) {
       Subscribers.insert({ '_id': new Meteor.Collection.ObjectID(), 'first_name': "", 'last_name': "A New User" });
