@@ -55,7 +55,7 @@ if (Meteor.isClient) {
   };
 
   var subscriber_search_input_timeout = false;
-  var subscriber_search_input_lag_ms = 350;
+  var subscriber_search_input_lag_ms = 1000;
   Template.subscriber_overview.events({
     'keyup .subscriber_search_input': function (evt) {
       if (Session.get("subscriber_search_input_timeout") != true) {
