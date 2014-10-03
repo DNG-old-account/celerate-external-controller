@@ -1,0 +1,21 @@
+<template name="payments">
+<body>
+  <div class="navbar navbar-default" role="navigation">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Celerate</a>
+      {{#if subscriberInfo}}
+        <p class="navbar-text pull-right">Signed in as {{subscriberInfo.first_name}} {{subscriberInfo.last_name}}</p>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12">
+        <h2>Further Reach Payments</h2>
+        <button id="make-payment" class="btn btn-success">Purchase</button>
+      </div>
+    </div>
+  </div>
+</body>
+</template>

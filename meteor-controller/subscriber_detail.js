@@ -169,8 +169,10 @@ if (Meteor.isClient) {
         installation: {
           standard_installation: '150',
           additional_equipment: [],
-          additional_labor: []
-        }
+          additional_labor: [],
+          paid: false
+        },
+        charges: []
       };
       db_update = {};
       db_update['billing_info'] = billing;

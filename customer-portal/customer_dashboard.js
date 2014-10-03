@@ -43,10 +43,10 @@ if (Meteor.isClient) {
       console.log(evt);
       console.log(this);
       var thisSub = this;
-      if (evt.target.id === "submit-to-terms") {
+      if (evt.target.id === 'pay-for-installation') {
         evt.preventDefault();
         if (!$('#agree-to-terms').prop('checked')) {
-          console.log("need to check agree to terms box.");
+          bootbox.alert("Need to agree to terms");
           return false;
         }
         dbUpdate = {};
@@ -54,6 +54,8 @@ if (Meteor.isClient) {
         thisSub.agreed_to_terms = true; // TODO: Feels a little hacky - maxb
         Subscribers.update(thisSub._id, {$set: dbUpdate}); 
         Session.set('subscriber', thisSub);
+        var authToken = Session.get('authToken');
+        Router.go('/payments/' + authToken);
       }
     }
   });

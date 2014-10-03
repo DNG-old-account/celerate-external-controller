@@ -171,6 +171,7 @@
       </div><!-- /.order-form -->
       {{#if subscriberInfo.agreed_to_terms}}
         <h4>Has Agreed to Terms</h4>
+        <input type="checkbox" id="agree-to-terms" checked={{subscriberInfo.agreed_to_terms}} class="hidden"> 
       {{else}}
         <a href="http://furtherreach.net/customeragreement" target="_new">Customer Agreement</a>
         <div class="checkbox">
@@ -178,8 +179,8 @@
             <input type="checkbox" id="agree-to-terms" checked={{subscriberInfo.agreed_to_terms}}> By checking the box to the left, you agree that you have read, understand, had the option to print, and accept the terms and conditions of this agreement
           </label>
         </div>
-        <button type="submit" id="submit-to-terms" class="btn btn-default">Submit</button>
       {{/if}}
+      <button type="submit" id="pay-for-installation" class="btn btn-default">Pay for Installation</button>
       {{/with}}
     </form>
   </div>
