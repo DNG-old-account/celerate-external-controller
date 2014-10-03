@@ -79,6 +79,21 @@ if (Meteor.isClient) {
     'click .user_google_account_setup_button': function (evt) {
       window.open("https://admin.google.com/AdminHome?fral=1#UserList:org=45257bl2kp4lkp");
     },
+    'click .user_billing_setup_button': function (evt) {
+      var id = this._id;
+
+    },
+    'click #update_billing': function (evt) {
+      // TODO: Doesn't have a handler for other equipment or labor
+      evt.preventDefault();
+      thisSub = this;
+
+      var form = $(evt.target).parents('form.billing-form');
+      var updatedVal = form.find('#standard_installation').val();
+
+      Subscribers.update(thisSub._id, {$set: {'billing_info.installation.standard_installation': updatedVal }});
+
+    },
     'click .archive_subscriber_button': function (evt) {
       var id = this._id;
       bootbox.confirm("Are you sure you want to archive this subscriber?", function(result) {
@@ -107,7 +122,9 @@ if (Meteor.isClient) {
   };
 
   Template.subscriber_details.terms_info = function () {
-    return hasAgreedToTerms = (this.agreed_to_terms) ? "Yes" : "No";
+    return {
+      agreed_to_terms: (this.agreed_to_terms) ? "Yes" : "No"
+    }
   };
 
   Template.subscriber_details.ap_options = function () {
@@ -142,6 +159,27 @@ if (Meteor.isClient) {
              { field: "end_date", label: "End Date", value: this.end_date },
              { field: "hold_date", label: "Hold Date", value: this.hold_date }
            ];
+  };
+
+  Template.subscriber_details.billing_info = function () {
+    // If a subscriber doesn't have billing info yet, we can just create it here
+    if (typeof this.billing_info !== 'object') {
+      // Create default billing info
+      var billing = {
+        installation: {
+          standard_installation: '150',
+          additional_equipment: [],
+          additional_labor: []
+        }
+      };
+      db_update = {};
+      db_update['billing_info'] = billing;
+      Subscribers.update(this._id, {$set: db_update}); 
+    }
+
+  
+    return this.billing_info; 
+
   };
 
   Template.subscriber_details.scheduling_fields = function () {

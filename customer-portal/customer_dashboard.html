@@ -45,19 +45,19 @@
             </div>
             <div class="billing-information">
               <div class="billing-name">
-                {{billingInfo.first_name}} {{billingInfo.last_name}}
+                {{billingInfo.contact.first_name}} {{billingInfo.contact.last_name}}
               </div>
               <div class="billing-street">
-                {{billingInfo.street_address}}
+                {{billingInfo.contact.street_address}}
               </div>
               <div class="billing-city-state-zip">
-                {{billingInfo.city}}, {{billingInfo.state}} {{billingInfo.zip}}
+                {{billingInfo.contact.city}}, {{billingInfo.contact.state}} {{billingInfo.contact.zip}}
               </div>
               <div class="billing-phone">
-                {{billingInfo.mobile}} {{billingInfo.landline}}
+                {{billingInfo.contact.mobile}} {{billingInfo.contact.landline}}
               </div>
               <div class="billing-email">
-                {{billingInfo.email}}
+                {{billingInfo.contact.email}}
               </div>
             </div>
           </div>
@@ -89,7 +89,7 @@
               Rate
             </div>
             <div class="installation-rate">
-              $150
+              ${{billingInfo.billingDetails.installation.standard_installation}}
             </div>
           </div>
           <div class="col-xs-2 totals">
@@ -97,7 +97,7 @@
               Totals
             </div>
             <div class="installation-total">
-              $150
+              ${{billingInfo.billingDetails.installation.standard_installation}}
             </div>
           </div>
         </div><!-- ./row -->
@@ -106,7 +106,7 @@
             Total:
           </div>
           <div class="col-xs-2">
-            $150
+            ${{billingInfo.billingDetails.installation.standard_installation}}
           </div>
         </div><!-- /.row -->
         <div class="row recurring-pricing">

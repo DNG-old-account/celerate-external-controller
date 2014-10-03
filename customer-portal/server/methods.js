@@ -31,17 +31,22 @@ Meteor.methods({
     var sub = Subscribers.findOne(subId);
     var hasBillingContact = false;
     var contact;
-    console.log(sub);
     _.each(sub.contacts, function(c) {
       if (c.type === "billing") {
         hasBillingContact = true;
         contact = Contacts.findOne(c.contact_id);
       }
     });
+
     if (!hasBillingContact) {
       contact = sub;
     }
-    return contact;
+
+    billingDetails = sub.billing_info; 
+    return {
+      contact: contact,
+      billingDetails: billingDetails
+    }
   },
 
   planInfo: function(token) {
