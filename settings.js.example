@@ -5,10 +5,6 @@
     "server": "smtp.googlemail.com",
     "port": 465
   },
-  "mongo": {
-    "mongoUrl": "mongodb://localhost:3001/appdb",
-    "oplogUrl": "mongodb://localhost:3001/local"
-  },
   "serviceAuth": {
     "google": {
       "name": "google",
