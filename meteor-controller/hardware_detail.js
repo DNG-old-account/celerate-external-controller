@@ -1,9 +1,16 @@
 if (Meteor.isClient) {
   // Hardware details functionality and events.
   Template.hardware_details.events({
+    'click .add-port': function (evt) {
+      Hardware.update(this._id, {$push: {ports: {name: 'new_port', type: 'wired'}}});
+    },
+    'click .delete-port': function (evt) {
+      var db_update = {};
+      db_update.ports = {'name' : evt.target.id};
+      Hardware.update(this.hardware_instance._id, {$pull: db_update}); 
+    },
     'click': function (evt) {
       console.log(evt);
-
       if (evt.target.id == "edit" && !evt.target.classList.contains("text-gray")) {
         // User clicked on pencil icon to begin editing.
         // Toggle the icon visual state.
@@ -20,6 +27,7 @@ if (Meteor.isClient) {
 
         db_update = {};
         db_update[formelement.id] = formelement.value;
+
         Hardware.update(this._id, {$set: db_update}); 
         formelement.disabled = true;
 
@@ -31,9 +39,14 @@ if (Meteor.isClient) {
   });
 
   Template.hardware_details.hardware_fields = function () {
+    for (var p in this.ports) {
+      this.ports[p].index = p;
+    }
+
     return [ { field: "name", label: "Name", value: this.name },
              { field: "make", label: "Make", value: this.make },
-             { field: "model", label: "Model", value: this.model }
+             { field: "model", label: "Model", value: this.model },
+             { field: "ports", label: "Ports", value: this.ports, display_ports: true },
            ];
   };
 }

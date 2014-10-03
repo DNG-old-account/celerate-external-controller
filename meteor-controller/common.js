@@ -27,8 +27,18 @@ Handlebars.registerHelper('json', function(obj) {
 
 Handlebars.registerHelper('key_value', function(context, options) {
   var result = [];
-  _.each(context, function(value, key, list){
+  _.each(context, function(value, key, list) {
     result.push({key:key, value:value});
+  })
+  return result;
+});
+
+Handlebars.registerHelper('key_value_without_index', function(context, options) {
+  var result = [];
+  _.each(context, function(value, key, list) {
+    if (key != 'index') {
+      result.push({key:key, value:value});
+    }
   })
   return result;
 });
@@ -42,7 +52,6 @@ Handlebars.registerHelper('selected_if_empty', function(val) {
   if (!val || val == "") return "selected";
   return "";
 });
-
 
 if (Meteor.isClient) {
   Template.registerHelper('isIterable', function(collection) {
