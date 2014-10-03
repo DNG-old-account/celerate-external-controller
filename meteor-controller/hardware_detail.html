@@ -1,4 +1,9 @@
 <template name="hardware_details">
+{{#with ..}}
+<button type="button" class="delete_hardware_button btn btn-danger">Delete Hardware</button>
+{{/with}}
+<hr>
+
 <form class="form-horizontal" role="form">
 {{#each hardware_fields}}
 

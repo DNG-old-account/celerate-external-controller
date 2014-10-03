@@ -108,6 +108,11 @@ if (Meteor.isClient) {
     return street_address + ", " + city;
   });
 
+  close_site_modal = function() {
+    $('#site_details_modal').modal('hide');
+  };
+
+
   // Sidebar stuff.
   Template.celerate_sidebar.activeSidebar = function () {
     return '';

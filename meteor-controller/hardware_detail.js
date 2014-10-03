@@ -36,6 +36,19 @@ if (Meteor.isClient) {
         evt.target.previousElementSibling.classList.remove("text-gray");
       }
     },
+    'click .delete_hardware_button': function (evt) {
+      var id = this._id;
+      bootbox.confirm("Are you sure you want to delete this hardware?", function(first_result) {
+        if (first_result) {
+          bootbox.confirm("Are you REALLY REALLY sure you want to delete this hardware?", function(second_result) {
+            if (second_result) {
+              window.parent.close_hardware_modal();
+              setTimeout(function(){ Hardware.remove(id); }, 1000);
+            }
+          });
+        }
+      }); 
+    }
   });
 
   Template.hardware_details.hardware_fields = function () {

@@ -1,6 +1,9 @@
 <template name="node_details">
 
 <button type="button" id="get_location_button" class="get_location_button btn btn-primary">Get Current Location</button>
+{{#with ..}}
+<button type="button" class="delete_node_button btn btn-danger">Delete Node</button>
+{{/with}}
 <hr>
 
 <form class="form-horizontal" role="form">

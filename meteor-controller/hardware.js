@@ -88,6 +88,10 @@ if (Meteor.isClient) {
     }
   });
 
+  close_hardware_modal = function() {
+    $('#hardware_details_modal').modal('hide');
+  };
+
   // Sidebar stuff.
   Template.celerate_sidebar.activeSidebar = function () {
     return '';

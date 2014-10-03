@@ -78,6 +78,19 @@ if (Meteor.isClient) {
 
       navigator.geolocation.getCurrentPosition(setCurrentLocation);
     },
+    'click .delete_site_button': function (evt) {
+      var id = this._id;
+      bootbox.confirm("Are you sure you want to delete this site?", function(first_result) {
+        if (first_result) {
+          bootbox.confirm("Are you REALLY REALLY sure you want to delete this site?", function(second_result) {
+            if (second_result) {
+              window.parent.close_site_modal();
+              setTimeout(function(){ Sites.remove(id); }, 1000);
+            }
+          });
+        }
+      }); 
+    }
   });
 
   Template.site_details.nodes_in_site = function () {

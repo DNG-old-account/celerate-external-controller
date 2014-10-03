@@ -91,6 +91,10 @@ if (Meteor.isClient) {
     }
   });
 
+  close_node_modal = function() {
+    $('#node_details_modal').modal('hide');
+  };
+
   // Sidebar stuff.
   Template.celerate_sidebar.activeSidebar = function () {
     return '';
