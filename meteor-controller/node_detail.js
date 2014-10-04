@@ -10,11 +10,11 @@ if (Meteor.isClient) {
         evt.target.classList.add("text-gray");
         evt.target.nextElementSibling.classList.remove("text-gray");
 
-        var formelement = evt.target.parentElement.previousElementSibling.firstChild;
+        var formelement = evt.target.parentElement.previousElementSibling.firstElementChild;
         formelement.disabled = false;
       } else if (evt.target.id == "save" && !evt.target.classList.contains("text-gray")) {
         // User clicked on save icon to save input.
-        var formelement = evt.target.parentElement.previousElementSibling.firstChild;
+        var formelement = evt.target.parentElement.previousElementSibling.firstElementChild;
         console.log(formelement);
         console.log(this);
 
@@ -63,11 +63,11 @@ if (Meteor.isClient) {
   });
 
   Template.node_details.hardware_options = function () {
-    return Hardware.find({});
+    return Hardware.find({}, {sort: {make: 1, model: 1}});
   };
 
   Template.node_details.site_options = function () {
-    return Sites.find({});
+    return Sites.find({}, {sort: {name: 1}});
   };
 
   Template.node_details.site_name = function() {
@@ -90,12 +90,12 @@ if (Meteor.isClient) {
              { field: "hardware", label: "Hardware", value: this.hardware, options: true, options_custom_view: hardware_options },
              { field: "type", label: "Type", value: this.type, options: type_options },
              { field: "status", label: "Status", value: this.status, options: status_options },
-             { field: "site", label: "Site", value: this.site, options: true, options_custom_view: site_options },
-             { field: "mac", label: "MAC", value: this.mac },
-             { field: "ip_address", label: "IP Address", value: this.ip_address },
-             { field: "lat", label: "Location Lat", value: this.lat },
-             { field: "lng", label: "Location Lng", value: this.lng }
+             { field: "site", label: "Site", value: this.site, options: true, options_custom_view: site_options }
            ];
+  };
+
+  Template.node_details.hardware_data = function () {
+    return Hardware.find({name: this.hardware});
   };
 
 }
