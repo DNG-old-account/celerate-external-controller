@@ -30,23 +30,25 @@ if (Meteor.isClient) {
     });
   };
 
-
   Template.payments.events({
     'click': function (evt) {
       evt.preventDefault;
       console.log(evt);
       var thisSub = Session.get('subscriber');
+      var billingInfo = Session.get('billingInfo');
       var authToken = Session.get('authToken');
       if (evt.target.id === 'make-payment') {
         var stripeConfig = {
           name: 'Further Reach',
           description: 'Standard Installation',
-          amount: (thisSub.billing_info.installation.standard_installation * 100) // Stripe does it by cents
+          allowRememberMe: false,
+          email: billingInfo.contact.email,
+          amount: (billingInfo.billingDetails.installation.standard_installation * 100) // Stripe does it by cents
         };
 
         var handler = StripeCheckout.configure({
           key: Meteor.settings.public.stripe.publicKey,
-          image: '/FurtherReachLogo.png',
+          image: '/FurtherReachLogo.png?cache_bust=23476',
           token: function(stripeToken) {
             console.log(stripeToken);
             Meteor.call('chargeCard', authToken, stripeToken, stripeConfig, function(err, result) {
@@ -55,7 +57,7 @@ if (Meteor.isClient) {
               if (err || result.error) {
                 bootbox.alert('There seems to have been an error processing your card.');
               } else {
-                bootbox.alert('Your payment has been processed.');
+                bootbox.alert('Your payment has been processed. An email has been sent to you for your records');
               }
             });
           }

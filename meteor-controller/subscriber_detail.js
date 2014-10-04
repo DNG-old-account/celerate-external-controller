@@ -90,8 +90,11 @@ if (Meteor.isClient) {
 
       var form = $(evt.target).parents('form.billing-form');
       var updatedVal = form.find('#standard_installation').val();
+      var paidInstallation = form.find('#paid_installation').val();
+      paidInstallation = (paidInstallation === "true") ? true : false;
 
       Subscribers.update(thisSub._id, {$set: {'billing_info.installation.standard_installation': updatedVal }});
+      Subscribers.update(thisSub._id, {$set: {'billing_info.installation.paid': paidInstallation }});
 
     },
     'click .archive_subscriber_button': function (evt) {

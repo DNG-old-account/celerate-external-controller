@@ -43,7 +43,8 @@ Meteor.methods({
       });
     });
 
-    if (!result.err && !result.result.err) {
+    console.log(result);
+    if (!result.error && !result.result.err) {
       Subscribers.update(thisSub._id, {$set: {'billing_info.installation.paid': true }});
       Subscribers.update(thisSub._id, {$push: {'billing_info.charges': result.result}});
     }
@@ -64,10 +65,18 @@ Meteor.methods({
     });
 
     if (!hasBillingContact) {
-      contact = sub;
+      contact = {
+        first_name: sub.first_name || '',
+        last_name: sub.last_name || '',
+        street_address: sub.street_address || '',
+        city: sub.city || '',
+        state: sub.state || '',
+        zip_code: sub.zip_code || '',
+        email: sub.prior_email || ''
+      }
     }
 
-    billingDetails = sub.billing_info; 
+    var billingDetails = sub.billing_info; 
     return {
       contact: contact,
       billingDetails: billingDetails

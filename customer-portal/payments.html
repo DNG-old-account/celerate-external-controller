@@ -12,8 +12,61 @@
   <div class="container">
     <div class="row">
       <div class="col-xs-12">
-        <h2>Further Reach Payments</h2>
-        <button id="make-payment" class="btn btn-success">Purchase</button>
+        {{#if billingInfo.billingDetails.installation.paid}}
+        <h2>Thanks for your Payment!</h2>
+        {{else}}
+        <h2>Installation Payment</h2>
+        <div class="well">
+          <div class="row one-time-pricing">
+            <div class="col-xs-4 item-details">
+              <div class="form-header">
+                Service and Labor
+              </div>
+              <div class="installation-detail">
+                Standard Installation (includes antenna, access point, Ethernet cable, 3 hour labor)      
+              </div>
+            </div>
+            <div class="col-xs-2 type-details">
+              <div class="form-header">
+                Type
+              </div>
+            </div>
+            <div class="col-xs-2 quantity-details">
+              <div class="form-header">
+                Quantity
+              </div>
+              <div class="quantity">
+                1
+              </div>
+            </div>
+            <div class="col-xs-2 rate-details">
+              <div class="form-header">
+                Rate
+              </div>
+              <div class="installation-rate">
+                ${{billingInfo.billingDetails.installation.standard_installation}}
+              </div>
+            </div>
+            <div class="col-xs-2 totals">
+              <div class="form-header">
+                Totals
+              </div>
+              <div class="installation-total">
+                ${{billingInfo.billingDetails.installation.standard_installation}}
+              </div>
+            </div>
+          </div><!-- ./row -->
+          <div class="row installation-price-totals">
+            <div class="col-xs-2 col-xs-offset-8 bold">
+              Total:
+            </div>
+            <div class="col-xs-2">
+              ${{billingInfo.billingDetails.installation.standard_installation}}
+            </div>
+          </div><!-- /.row -->
+          <button id="make-payment" class="btn btn-success">Pay with Credit Card</button>
+        </div>
+        {{/if}}
       </div>
     </div>
   </div>
