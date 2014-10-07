@@ -5,7 +5,7 @@ if [[ "$1" == "dev" ]]; then
   export ROOT_URL="http://localhost:3002"
   echo "Starting celerate customer portal in dev mode at: " $ROOT_URL
 else
-  export ROOT_URL="http://celerate-controller.furtherreach.net:3002"
+  export ROOT_URL="https://celerate-controller.furtherreach.net"
   echo "Starting celerate customer portal in prod mode at: " $ROOT_URL
 fi
 
