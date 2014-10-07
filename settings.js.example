@@ -18,11 +18,10 @@
   "public": {
     "stripe": {
       "publicKey": "pk_test_6pRNASCoBOKtIshFeQd4XMUh" // This is a stripe demo key
-    }
-  },
-  "urls": {
+    },
+    "urls": {
       "customerPortal": "http://localhost:3002",
       "externalController": "http://localhost:3000"
     }
-
+  }
 }

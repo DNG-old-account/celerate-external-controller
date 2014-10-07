@@ -58,6 +58,9 @@ if (Meteor.isClient) {
                 bootbox.alert('There seems to have been an error processing your card.');
               } else {
                 bootbox.alert('Your payment has been processed. An email has been sent to you for your records');
+                $('.btn').on('click', function(evt) {
+                  window.close();
+                });
               }
             });
           }
