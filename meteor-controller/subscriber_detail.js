@@ -79,8 +79,14 @@ if (Meteor.isClient) {
     'click .user_google_account_setup_button': function (evt) {
       window.open("https://admin.google.com/AdminHome?fral=1#UserList:org=45257bl2kp4lkp");
     },
-    'click .user_billing_setup_button': function (evt) {
+    'click #user_billing_setup_button': function (evt) {
       var id = this._id;
+      // Try/Catch to allow for customerPortal or url to be undefined
+      try {
+        var win = window.open(Meteor.settings.public.urls.customerPortal +  id, '_blank');
+        win.focus();
+      } catch (e) {
+      }
 
     },
     'click #update_billing': function (evt) {
