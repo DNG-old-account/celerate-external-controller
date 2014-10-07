@@ -10,19 +10,13 @@ var checkAdmin = function(pause) {
 Router.onBeforeAction('loading');
 Router.map(function() {
 
-  this.route('admin_login', {
-    path: '/admin/customer/:_id',
-    template: 'customer_dashboard',
+  this.route('payments', {
+    path: '/payments/:_hash',
     onBeforeAction: checkAdmin,
-    onAfterAction: function() {
-      console.log('impersonating');
-      var userId = this.params._id;
-      Meteor.call('impersonate', userId, function(error, result) {
-        if(!error) {
-          Meteor.connection.setUserId(userId);
-          Router.go('customer_dashboard');
-        }
-      });
+    action: function() {
+      var thisRoute = this;
+      Session.set('authToken', thisRoute.params._hash);
+      thisRoute.render('payments');
     }
   });
 

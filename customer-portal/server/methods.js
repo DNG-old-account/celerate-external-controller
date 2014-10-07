@@ -26,22 +26,61 @@ Meteor.methods({
     return sub;
   },
 
+  chargeCard: function(token, stripeToken, stripeConfig) {
+    var stripe = Meteor.npmRequire('stripe')(Meteor.settings.stripe.privateKey);
+    var subId = new Meteor.Collection.ObjectID(authenticate(token));
+    var thisSub = Subscribers.findOne(subId);
+
+    // Have to wrap our call to stripe in a sync pause
+    var result = Async.runSync(function(done) {
+      stripe.charges.create({
+        amount: stripeConfig.amount,
+        currency: "usd",
+        card: stripeToken.id,
+        description: stripeConfig.description
+      }, function(err, charge) {
+        done(err, charge);
+      });
+    });
+
+    console.log(result);
+    if (!result.error && !result.result.err) {
+      Subscribers.update(thisSub._id, {$set: {'billing_info.installation.paid': true }});
+      Subscribers.update(thisSub._id, {$push: {'billing_info.charges': result.result}});
+    }
+    return result;
+
+  },
+
   billingInfo: function(token) {
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
     var sub = Subscribers.findOne(subId);
     var hasBillingContact = false;
     var contact;
-    console.log(sub);
     _.each(sub.contacts, function(c) {
       if (c.type === "billing") {
         hasBillingContact = true;
         contact = Contacts.findOne(c.contact_id);
       }
     });
+
     if (!hasBillingContact) {
-      contact = sub;
+      contact = {
+        first_name: sub.first_name || '',
+        last_name: sub.last_name || '',
+        street_address: sub.street_address || '',
+        city: sub.city || '',
+        state: sub.state || '',
+        zip_code: sub.zip_code || '',
+        email: sub.prior_email || ''
+      }
     }
-    return contact;
+
+    var billingDetails = sub.billing_info; 
+    return {
+      contact: contact,
+      billingDetails: billingDetails
+    }
   },
 
   planInfo: function(token) {

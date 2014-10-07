@@ -45,19 +45,19 @@
             </div>
             <div class="billing-information">
               <div class="billing-name">
-                {{billingInfo.first_name}} {{billingInfo.last_name}}
+                {{billingInfo.contact.first_name}} {{billingInfo.contact.last_name}}
               </div>
               <div class="billing-street">
-                {{billingInfo.street_address}}
+                {{billingInfo.contact.street_address}}
               </div>
               <div class="billing-city-state-zip">
-                {{billingInfo.city}}, {{billingInfo.state}} {{billingInfo.zip}}
+                {{billingInfo.contact.city}}, {{billingInfo.contact.state}} {{billingInfo.contact.zip_code}}
               </div>
               <div class="billing-phone">
-                {{billingInfo.mobile}} {{billingInfo.landline}}
+                {{billingInfo.contact.mobile}} {{billingInfo.contact.landline}}
               </div>
               <div class="billing-email">
-                {{billingInfo.email}}
+                {{billingInfo.contact.email}}
               </div>
             </div>
           </div>
@@ -89,7 +89,7 @@
               Rate
             </div>
             <div class="installation-rate">
-              $150
+              ${{billingInfo.billingDetails.installation.standard_installation}}
             </div>
           </div>
           <div class="col-xs-2 totals">
@@ -97,7 +97,7 @@
               Totals
             </div>
             <div class="installation-total">
-              $150
+              ${{billingInfo.billingDetails.installation.standard_installation}}
             </div>
           </div>
         </div><!-- ./row -->
@@ -106,7 +106,7 @@
             Total:
           </div>
           <div class="col-xs-2">
-            $150
+            ${{billingInfo.billingDetails.installation.standard_installation}}
           </div>
         </div><!-- /.row -->
         <div class="row recurring-pricing">
@@ -148,38 +148,33 @@
             </div>
             <ol class="notes-list">
               <li>
-                Effective date is only the date of initiating this legal agreement
-              </li>
-              <li>
-                Initial monthly service is pro rated based on number of days provided service, beginning from the day of installation
+                Initial monthly service is pro rated based on number of days provided service in that month beginning from the day of installation
               </li>
               <li>
                 Broadband Internet service is billed at the end of each month
               </li>
               <li>
-                Standard Installation cost only can be financed and paid in (6) monthly installments instead of one time payment
+                Standard Installation cost can be financed and paid in (6) monthly installments instead of one time payment
               </li>
               <li>
-                Optional additional equipment not included above and will be added after installation is complete
-              </li>
-              <li>
-                Standard installation includes antenna, access point and up to three hours of installation time. Additional labor if required is billed at $50/hr.
+                Standard installation includes antenna, access point and up to three hours of installation time. Additional labor is billed at $50/hr.
               </li>
             </ol>
           </div>
         </div><!-- ./row.notes-row -->
       </div><!-- /.order-form -->
+      <a href="http://furtherreach.net/customeragreement" target="_new">Customer Agreement</a>
       {{#if subscriberInfo.agreed_to_terms}}
         <h4>Has Agreed to Terms</h4>
+        <input type="checkbox" id="agree-to-terms" checked={{subscriberInfo.agreed_to_terms}} class="hidden"> 
       {{else}}
-        <a href="http://furtherreach.net/customeragreement" target="_new">Customer Agreement</a>
         <div class="checkbox">
           <label>
             <input type="checkbox" id="agree-to-terms" checked={{subscriberInfo.agreed_to_terms}}> By checking the box to the left, you agree that you have read, understand, had the option to print, and accept the terms and conditions of this agreement
           </label>
         </div>
-        <button type="submit" id="submit-to-terms" class="btn btn-default">Submit</button>
       {{/if}}
+      <button type="submit" id="pay-for-installation" class="btn btn-default">Submit Payment</button>
       {{/with}}
     </form>
   </div>
