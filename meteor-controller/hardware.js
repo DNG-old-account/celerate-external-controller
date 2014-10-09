@@ -51,7 +51,12 @@ if (Meteor.isClient) {
       Session.set("hardware_search_input", evt.target.value.trim());
     },
     'click .new_hardware_button': function (evt) {
-      Hardware.insert({ '_id': new Meteor.Collection.ObjectID(), 'name': "New Hardware" });
+      var newId = new Meteor.Collection.ObjectID();
+      Hardware.insert({ '_id': newId, 'name': "New Hardware" });
+      Session.set("selected_hardware", newId);
+      Tracker.afterFlush(function () {
+        $('#hardware_details_modal').modal({show:true})
+      });
     }
   });
 

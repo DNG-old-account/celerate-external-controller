@@ -47,7 +47,12 @@ if (Meteor.isClient) {
       Session.set("site_search_input", evt.target.value.trim());
     },
     'click .new_site_button': function (evt) {
-      Sites.insert({ '_id': new Meteor.Collection.ObjectID(), 'name': "New site" });
+      var newId = new Meteor.Collection.ObjectID();
+      Sites.insert({ '_id': newId, 'name': "New site" });
+      Session.set("selected_site", newId);
+      Tracker.afterFlush(function () {
+        $('#site_details_modal').modal({show:true})
+      });
     }
   });
 

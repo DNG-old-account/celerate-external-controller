@@ -50,7 +50,13 @@ if (Meteor.isClient) {
       Session.set("node_search_input", evt.target.value.trim());
     },
     'click .new_node_button': function (evt) {
-      Nodes.insert({ '_id': new Meteor.Collection.ObjectID(), 'name': "New Node" });
+      var newId = new Meteor.Collection.ObjectID();
+      Nodes.insert({ '_id': newId, 'name': "New Node" });
+      Session.set("selected_node", newId);
+      // Enable the modal for the subscriber.
+      Tracker.afterFlush(function () {
+        $('#node_details_modal').modal({show:true})
+      });
     }
   });
 

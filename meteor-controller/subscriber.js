@@ -68,7 +68,14 @@ if (Meteor.isClient) {
       }
     },
     'click .new_user_button': function (evt) {
-      Subscribers.insert({ '_id': new Meteor.Collection.ObjectID(), 'first_name': "", 'last_name': "A New User" });
+      var newId = new Meteor.Collection.ObjectID();
+      Subscribers.insert({ '_id': newId, 'first_name': "", 'last_name': "A New User" });
+      Session.set("selected_subscriber", newId);
+      console.log("selected_subscriber set to: " + Session.get("selected_subscriber"));
+      // Enable the modal for the subscriber.
+      Tracker.afterFlush(function () {
+        $('#subscriber_details_modal').modal({show:true})
+      });
     },
     'click .show_archived_subscribers': function (evt) {
       archived_subscribers_dep.changed();
