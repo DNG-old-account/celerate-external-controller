@@ -7,6 +7,9 @@ if (Meteor.isClient) {
     var authToken = Session.get('authToken');
     Meteor.call('getSubscriber', authToken, function(err, result) {
       if (!err && typeof result === 'object') {
+        if (typeof result.terms === "object" && result.terms.agreed) {
+          result.agreedToTerms = true;
+        }
         Session.set('subscriber', result);
       }
     });
@@ -50,8 +53,11 @@ if (Meteor.isClient) {
           return false;
         }
         dbUpdate = {};
-        dbUpdate.agreed_to_terms = true;
-        thisSub.agreed_to_terms = true; // TODO: Feels a little hacky - maxb
+        dbUpdate.terms = {
+          agreed: true,
+          date: new Date()
+        };
+        thisSub.terms = dbUpdate.terms; // TODO: Feels a little hacky - maxb
         Subscribers.update(thisSub._id, {$set: dbUpdate}); 
         Session.set('subscriber', thisSub);
         var authToken = Session.get('authToken');

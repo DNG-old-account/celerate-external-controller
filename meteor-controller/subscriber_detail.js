@@ -132,7 +132,7 @@ if (Meteor.isClient) {
 
   Template.subscriber_details.terms_info = function () {
     return {
-      agreed_to_terms: (this.agreed_to_terms) ? "Yes" : "No"
+      agreed_to_terms: (typeof this.terms === "object" && this.terms.agreed) ? "Yes: " + this.terms.date : "No"
     }
   };
 

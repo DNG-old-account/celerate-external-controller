@@ -164,13 +164,13 @@
         </div><!-- ./row.notes-row -->
       </div><!-- /.order-form -->
       <a href="http://furtherreach.net/customeragreement" target="_new">Customer Agreement</a>
-      {{#if subscriberInfo.agreed_to_terms}}
+      {{#if subscriberInfo.agreedToTerms}}
         <h4>Has Agreed to Terms</h4>
-        <input type="checkbox" id="agree-to-terms" checked={{subscriberInfo.agreed_to_terms}} class="hidden"> 
+        <input type="checkbox" id="agree-to-terms" checked={{subscriberInfo.agreedToTerms}} class="hidden"> 
       {{else}}
         <div class="checkbox">
           <label>
-            <input type="checkbox" id="agree-to-terms" checked={{subscriberInfo.agreed_to_terms}}> By checking the box to the left, you agree that you have read, understand, had the option to print, and accept the terms and conditions of this agreement
+            <input type="checkbox" id="agree-to-terms" checked={{subscriberInfo.agreedToTerms}}> By checking the box to the left, you agree that you have read, understand, had the option to print, and accept the terms and conditions of this agreement
           </label>
         </div>
       {{/if}}
