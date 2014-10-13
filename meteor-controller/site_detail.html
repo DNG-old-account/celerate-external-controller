@@ -66,5 +66,17 @@
 </div>
 {{/each}}
 
+<input type="file" id="site-picture">Upload a Site Picture
+<p id="status">Please select a file</p>
+<div style="border:1px solid gray;width:300px;"  id="preview"></div>
+
 </form>
+
+{{#each picturesList}}
+<div class="picture-container">
+  <label>{{label}}</label>
+  <img src="{{url}}" />
+</div>
+{{/each}}
+
 </template>
