@@ -1,53 +1,56 @@
 if (Meteor.isClient) {
   // site details functionality and events.
   Template.site_details.events({
-    'change #site-picture': function (evt) {
+    'click #upload-picture': function (evt) {
+      evt.preventDefault();
       var thisSite = this;
       console.log(evt.target);
 
       function s3_upload(signedUrl, key){
-        var status_elem = document.getElementById("status");
-        var preview_elem = document.getElementById("preview");
+        var statusElem = document.getElementById("status");
+        var previewElem = document.getElementById("preview");
         var s3upload = new S3Upload({
             file_dom_selector: 'site-picture',
             signedUrl: signedUrl,
             onProgress: function(percent, message) {
-              status_elem.innerHTML = 'Upload progress: ' + percent + '% ' + message;
+              statusElem.innerHTML = 'Upload progress: ' + percent + '% ' + message;
             },
             onFinishS3Put: function() {
               Meteor.call('getS3Url', key, function(err, result) {
-                console.log(err);
-                console.log(result);
 
-                status_elem.innerHTML = 'Upload completed. Uploaded to: '+ result;
-                preview_elem.innerHTML = '<img src="'+result+'" style="width:300px;" />';
+                if (!err && typeof result === "string") {
+                  statusElem.innerHTML = 'Upload completed. Uploaded to: '+ result;
+                  $(previewElem).removeClass('hidden');
+                  $(previewElem).find('img').attr('src', result);
 
-                var db_update = {};
-                if ($.isArray(thisSite.pictures)) {
-                  db_update['pictures'] = thisSite.pictures;
-                } else {
-                  db_update['pictures'] = [];
+                  var db_update = {};
+                  if ($.isArray(thisSite.pictures)) {
+                    db_update['pictures'] = thisSite.pictures;
+                  } else {
+                    db_update['pictures'] = [];
+                  }
+
+                  var label = $('#site-picture-label').val();
+                  db_update['pictures'].push({
+                    'label': label,
+                    'key': key
+                  });
+
+                  Sites.update(thisSite._id, {$set: db_update}); 
                 }
-                db_update['pictures'].push({
-                  'label': 'A new picture',
-                  'key': key
-                });
-
-                Sites.update(thisSite._id, {$set: db_update}); 
-
               });
             },
             onError: function(status) {
-              status_elem.innerHTML = 'Upload error: ' + status;
+              statusElem.innerHTML = 'Upload error: ' + status;
             }
         });
       }
-      
-      var s3FileKey = 'pictures/' + thisSite._id._str + '-' + evt.target.files[0].name;
 
-      Meteor.call('signS3Upload', evt.target.files[0], s3FileKey, function(err, result) {
-        console.log(err);
-        console.log(result);
+      var file = $('#site-picture')[0].files[0];
+      
+      var s3FileKey = 'pictures/' + thisSite._id._str + '-' + file.name;
+
+      Meteor.call('signS3Upload', file, s3FileKey, function(err, result) {
         if (typeof result === 'object' && typeof result.signedUrl === 'string') {
           s3_upload(result.signedUrl, s3FileKey) 
         }

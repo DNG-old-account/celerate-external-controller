@@ -8,6 +8,10 @@
   "stripe": {
     "privateKey": "sk_test_BQokikJOvBiI2HlWgH4olfQ2" // This is a stripe demo key
   },
+  "aws": {
+    "accessKeyId": "ACCESSKEYID",
+    "secretAccessKey": "SECRETACCESSKEY"
+  },
   "serviceAuth": {
     "google": {
       "name": "google",
