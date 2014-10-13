@@ -58,12 +58,14 @@ Meteor.methods({
     var sub = Subscribers.findOne(subId);
     var hasBillingContact = false;
     var contact;
-    _.each(sub.contacts, function(c) {
-      if (c.type === "billing") {
-        hasBillingContact = true;
-        contact = Contacts.findOne(c.contact_id);
-      }
-    });
+    if (typeof sub.contacts === 'object') {
+      _.each(sub.contacts, function(c) {
+        if (c.type === "billing") {
+          hasBillingContact = true;
+          contact = Contacts.findOne(c.contact_id);
+        }
+      });
+    }
 
     if (!hasBillingContact) {
       contact = {
