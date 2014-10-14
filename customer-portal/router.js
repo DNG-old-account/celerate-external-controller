@@ -11,21 +11,21 @@ Router.onBeforeAction('loading');
 Router.map(function() {
 
   this.route('payments', {
-    path: '/payments/:_hash',
+    path: '/payments/:_authToken',
     onBeforeAction: checkAdmin,
     action: function() {
       var thisRoute = this;
-      Session.set('authToken', thisRoute.params._hash);
+      Session.set('authToken', thisRoute.params._authToken);
       thisRoute.render('payments');
     }
   });
 
   this.route('customer_dashboard', {
-    path: '/:_hash',
+    path: '/:_authToken',
     onBeforeAction: checkAdmin,
     action: function() {
       var thisRoute = this;
-      Session.set('authToken', thisRoute.params._hash);
+      Session.set('authToken', thisRoute.params._authToken);
       thisRoute.render('customer_dashboard');
     }
   });

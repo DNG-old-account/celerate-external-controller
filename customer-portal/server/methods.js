@@ -31,7 +31,7 @@ Meteor.methods({
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
     var thisSub = Subscribers.findOne(subId);
 
-    // Have to wrap our call to stripe in a sync pause
+    // Make our call to stripe syncronous
     var result = Async.runSync(function(done) {
       stripe.charges.create({
         amount: stripeConfig.amount,

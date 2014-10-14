@@ -32,8 +32,7 @@ if (Meteor.isClient) {
 
   Template.payments.events({
     'click': function (evt) {
-      evt.preventDefault;
-      console.log(evt);
+      evt.preventDefault();
       var thisSub = Session.get('subscriber');
       var billingInfo = Session.get('billingInfo');
       var authToken = Session.get('authToken');
@@ -48,9 +47,8 @@ if (Meteor.isClient) {
 
         var handler = StripeCheckout.configure({
           key: Meteor.settings.public.stripe.publicKey,
-          image: '/FurtherReachLogo.png?cache_bust=23476',
+          image: '/FurtherReachLogo.png',
           token: function(stripeToken) {
-            console.log(stripeToken);
             Meteor.call('chargeCard', authToken, stripeToken, stripeConfig, function(err, result) {
               console.log(err);
               console.log(result);
