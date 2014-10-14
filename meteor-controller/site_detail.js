@@ -6,10 +6,10 @@ if (Meteor.isClient) {
       var thisSite = this;
       console.log(evt.target);
 
-      function s3_upload(signedUrl, key){
+      var s3UploadHandler = function (signedUrl, key){
         var statusElem = document.getElementById("status");
         var previewElem = document.getElementById("preview");
-        var s3upload = new S3Upload({
+        var s3UploadObj = new S3Upload({
             file_dom_selector: 'site-picture',
             signedUrl: signedUrl,
             onProgress: function(percent, message) {
@@ -33,10 +33,13 @@ if (Meteor.isClient) {
                   var label = $('#site-picture-label').val();
                   db_update['pictures'].push({
                     'label': label,
-                    'key': key
+                    'key': key,
+                    'date_uploaded': new Date()
                   });
 
                   Sites.update(thisSite._id, {$set: db_update}); 
+                } else {
+                  bootbox.alert('Error: ' + JSON.stringify(errorString) + ' <br/>Result:  ' + JSON.stringify(result));
                 }
               });
             },
@@ -48,11 +51,11 @@ if (Meteor.isClient) {
 
       var file = $('#site-picture')[0].files[0];
       
-      var s3FileKey = 'pictures/' + thisSite._id._str + '-' + file.name;
+      var s3FileKey = 'pictures/' + thisSite._id._str + '-' + new Date().getTime() + '-' + file.name;
 
       Meteor.call('signS3Upload', file, s3FileKey, function(err, result) {
-        if (typeof result === 'object' && typeof result.signedUrl === 'string') {
-          s3_upload(result.signedUrl, s3FileKey) 
+        if (!err && typeof result === 'string') {
+          s3UploadHandler(result, s3FileKey) 
         }
       });
     },

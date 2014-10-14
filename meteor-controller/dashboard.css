@@ -136,6 +136,14 @@ body {
   width: 100%
 }
 
+.picture-container {
+  max-width: 100%;
+}
+
+.picture-container img {
+  max-width: 100%;
+}
+
 .subscriber-table-header {
   margin: 40px 0 0 10px;
 }

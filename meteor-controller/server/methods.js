@@ -53,8 +53,6 @@ Meteor.methods({
 
     signedUrl = s3.getSignedUrl('putObject', params);
 
-    return {
-      signedUrl: signedUrl,
-    };
+    return signedUrl;
   }
 });
