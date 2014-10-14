@@ -1,6 +1,64 @@
 if (Meteor.isClient) {
   // site details functionality and events.
   Template.site_details.events({
+    'click #upload-picture': function (evt) {
+      evt.preventDefault();
+      var thisSite = this;
+      console.log(evt.target);
+
+      var s3UploadHandler = function (signedUrl, key){
+        var statusElem = document.getElementById("status");
+        var previewElem = document.getElementById("preview");
+        var s3UploadObj = new S3Upload({
+            file_dom_selector: 'site-picture',
+            signedUrl: signedUrl,
+            onProgress: function(percent, message) {
+              statusElem.innerHTML = 'Upload progress: ' + percent + '% ' + message;
+            },
+            onFinishS3Put: function() {
+              Meteor.call('getS3Url', key, function(err, result) {
+
+                if (!err && typeof result === "string") {
+                  statusElem.innerHTML = 'Upload completed. Uploaded to: '+ result;
+                  $(previewElem).removeClass('hidden');
+                  $(previewElem).find('img').attr('src', result);
+
+                  var db_update = {};
+                  if ($.isArray(thisSite.pictures)) {
+                    db_update['pictures'] = thisSite.pictures;
+                  } else {
+                    db_update['pictures'] = [];
+                  }
+
+                  var label = $('#site-picture-label').val();
+                  db_update['pictures'].push({
+                    'label': label,
+                    'key': key,
+                    'date_uploaded': new Date()
+                  });
+
+                  Sites.update(thisSite._id, {$set: db_update}); 
+                } else {
+                  bootbox.alert('Error: ' + JSON.stringify(errorString) + ' <br/>Result:  ' + JSON.stringify(result));
+                }
+              });
+            },
+            onError: function(status) {
+              statusElem.innerHTML = 'Upload error: ' + status;
+            }
+        });
+      }
+
+      var file = $('#site-picture')[0].files[0];
+      
+      var s3FileKey = 'pictures/' + thisSite._id._str + '-' + new Date().getTime() + '-' + file.name;
+
+      Meteor.call('signS3Upload', file, s3FileKey, function(err, result) {
+        if (!err && typeof result === 'string') {
+          s3UploadHandler(result, s3FileKey) 
+        }
+      });
+    },
     'dblclick': function (evt) {
       console.log(evt);
 
@@ -95,6 +153,20 @@ if (Meteor.isClient) {
 
   Template.site_details.nodes_in_site = function () {
     return Nodes.find({'site': this._id._str});
+  };
+
+  Template.site_details.picturesList = function() {
+    var thisSite = this;
+    Meteor.call('getPictures', thisSite, function(err, result) {
+
+      if (!err && typeof result === 'object') {
+        Session.set('pictureList', result);
+      }
+
+    });
+
+    return Session.get('pictureList');
+
   };
 
   Handlebars.registerHelper('site_type_deletable', function (key) {

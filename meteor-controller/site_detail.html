@@ -4,67 +4,105 @@
 {{/with}}
 <hr>
 
-<form class="form-horizontal" role="form">
-<div class="form-group">
-  <label for="name" class="col-sm-2 control-label">Name</label><div class="col-sm-8"><input class="form-control" id="name" type="text" value="{{name}}" disabled></div>
-</div>
+<ul class="nav nav-pills" role="tablist">
+  <li class="active"><a href="#basic_info" role="tab" data-toggle="tab">Basic Info</a></li>
+  <li><a href="#pictures" role="tab" data-toggle="tab">Pictures</a></li>
+</ul>
+<div class="tab-content">
 
-{{#each key_value type}}
-<div class="form-group">
-  <label for="{{key}}" class="col-sm-2 control-label" id="{{key}}">Type Tag</label><div class="col-sm-8">
-    <p class="form-control-static" style="width:10em;">
-    <div id="{{key}}">
-      {{key}}
-      {{#if site_type_deletable key}}
-      {{#with ..}}
-        <button type="button" class="delete_tag close" id="delete_tag">x</button>
-      {{/with}}
-      {{/if}}
+  <div class="tab-pane active" id="basic_info">
+
+    <form class="form-horizontal" role="form">
+    <div class="form-group">
+      <label for="name" class="col-sm-2 control-label">Name</label><div class="col-sm-8"><input class="form-control" id="name" type="text" value="{{name}}" disabled></div>
     </div>
-    </p>
+
+    {{#each key_value type}}
+    <div class="form-group">
+      <label for="{{key}}" class="col-sm-2 control-label" id="{{key}}">Type Tag</label><div class="col-sm-8">
+        <p class="form-control-static" style="width:10em;">
+        <div id="{{key}}">
+          {{key}}
+          {{#if site_type_deletable key}}
+          {{#with ..}}
+            <button type="button" class="delete_tag close" id="delete_tag">x</button>
+          {{/with}}
+          {{/if}}
+        </div>
+        </p>
+      </div>
+    </div>
+    {{/each}}
+
+    <div class="form-group">
+    <label for="new_type_dropdown" class="col-sm-2 control-label">New Type to Add</label>
+    <div class="col-sm-8">
+    <select class="new_type_dropdown form-control" style="width:200px" id="new_type_dropdown">
+      <option value=""></option>
+      {{#each new_type_options ..}}
+      <option value="{{this}}">{{this}}</option>
+      {{/each}}
+    </select>
+    <button type="button" class="new_type_dropdown_button btn btn-info" id="new_type_dropdown_button">Add Type Tag to This Site</button>
+    </div>
+    </div>
+
+    {{#if type.subscriber}}
+    {{!-- Output unmodifiable address info for subscriber --}}
+    <div class="form-group">
+      <label for="street_address" class="col-sm-2 control-label">Street Address</label><div class="col-sm-8"><p class="form-control-static">{{site_detail_subscriber_address type.subscriber}}</p></div>
+    </div>
+    <div class="form-group">
+      <label for="city" class="col-sm-2 control-label">City</label><div class="col-sm-8"><p class="form-control-static">{{site_detail_city type.subscriber}}</p></div>
+    </div>
+    {{else}}
+    {{!-- Output address fields for non-subscriber site--}}
+    <div class="form-group">
+      <label for="street_address" class="col-sm-2 control-label">Street Address</label><div class="col-sm-8"><input class="form-control" id="street_address" type="text" value="{{street_address}}" disabled></div>
+    </div>
+    <div class="form-group">
+      <label for="city" class="col-sm-2 control-label">City</label><div class="col-sm-8"><input class="form-control" id="city" type="text" value="{{city}}" disabled></div>
+    </div>
+    <div class="form-group">
+      <label for="state" class="col-sm-2 control-label">State</label><div class="col-sm-8"><input class="form-control" id="state" type="text" value="{{state}}" disabled></div>
+    </div>
+    {{/if}}
+
+    {{#each nodes_in_site}}
+    <div class="form-group">
+      <label class="col-sm-2 control-label" id="node_{{name}}">Node Name</label><div class="col-sm-8"><p class="form-control-static">{{type}}: {{name}} ({{hardware}})</p></div>
+    </div>
+    {{/each}}
+
+    <h4>Upload a site picture</h4>
+    <div class="form-group">
+      <label for="site-picture-label" class="col-sm-2 control-label">Site Picture Label:</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" id="site-picture-label"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="site-picture" class="col-sm-2 control-label">Choose File:</label>
+      <div class="col-sm-8">
+        <input type="file" id="site-picture">
+        <button type="submit" id="upload-picture" class="btn btn-info">Upload Picture</button>
+        <p id="status" class="help-block"></p>
+        <div class="hidden" style="width:300px;" id="preview"><img style="width:300px;" src=""/></div>
+      </div>
+    </div>
+  </form>
   </div>
-</div>
-{{/each}}
 
-<div class="form-group">
-<label for="new_type_dropdown" class="col-sm-2 control-label">New Type to Add</label>
-<div class="col-sm-8">
-<select class="new_type_dropdown form-control" style="width:200px" id="new_type_dropdown">
-  <option value=""></option>
-  {{#each new_type_options ..}}
-  <option value="{{this}}">{{this}}</option>
-  {{/each}}
-</select>
-<button type="button" class="new_type_dropdown_button btn btn-info" id="new_type_dropdown_button">Add Type Tag to This Site</button>
-</div>
-</div>
+  <div class="tab-pane" id="pictures">
+    <div class="container">
+      {{#each picturesList}}
+      <div class="picture-container">
+        <label>{{label}}</label>
+        <img src="{{url}}" />
+      </div>
+      {{/each}}
+    </div>
+  </div>
 
-{{#if type.subscriber}}
-{{!-- Output unmodifiable address info for subscriber --}}
-<div class="form-group">
-  <label for="street_address" class="col-sm-2 control-label">Street Address</label><div class="col-sm-8"><p class="form-control-static">{{site_detail_subscriber_address type.subscriber}}</p></div>
 </div>
-<div class="form-group">
-  <label for="city" class="col-sm-2 control-label">City</label><div class="col-sm-8"><p class="form-control-static">{{site_detail_city type.subscriber}}</p></div>
-</div>
-{{else}}
-{{!-- Output address fields for non-subscriber site--}}
-<div class="form-group">
-  <label for="street_address" class="col-sm-2 control-label">Street Address</label><div class="col-sm-8"><input class="form-control" id="street_address" type="text" value="{{street_address}}" disabled></div>
-</div>
-<div class="form-group">
-  <label for="city" class="col-sm-2 control-label">City</label><div class="col-sm-8"><input class="form-control" id="city" type="text" value="{{city}}" disabled></div>
-</div>
-<div class="form-group">
-  <label for="state" class="col-sm-2 control-label">State</label><div class="col-sm-8"><input class="form-control" id="state" type="text" value="{{state}}" disabled></div>
-</div>
-{{/if}}
-
-{{#each nodes_in_site}}
-<div class="form-group">
-  <label class="col-sm-2 control-label" id="node_{{name}}">Node Name</label><div class="col-sm-8"><p class="form-control-static">{{type}}: {{name}} ({{hardware}})</p></div>
-</div>
-{{/each}}
-
-</form>
 </template>

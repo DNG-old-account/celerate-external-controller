@@ -50,6 +50,8 @@ oauth2@1.1.0
 oauth@1.1.0
 observe-sequence@1.0.2
 ordered-dict@1.0.0
+peerlibrary:aws-sdk@2.0.17_2
+peerlibrary:blocking@0.4.2
 rajit:accounts-ui-bootstrap-3@0.3.10
 random@1.0.0
 reactive-dict@1.0.3
