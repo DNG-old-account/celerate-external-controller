@@ -1,184 +1,4 @@
-<template name="order_form">
-  <div class="well">
-    <form role="form">
-      {{#with subscriberInfo}}
-      <div class="order-form">
-        <div class="row">
-          <div class="col-xs-5">
-            <h2>Order Form</h2>
-          </div>
-        </div>
-        <div class="row org-details">
-          <div class="col-xs-5">
-            <div class="org-name">
-              DeNovo Group
-            </div>
-            <div class="address">
-              521 Bonnie Dr.
-            </div>
-            <div class="city">
-              El Cerrito, CA 94530
-            </div>
-            <div class="phone">
-              Phone: (707) 278 8899
-            </div>
-            <div class="website">
-              <a href="http://furtherreach.net">www.furtherreach.net</a>
-            </div>
-          </div>
-        </div><!-- /.row -->
-        <div class="row description-billing">
-          <div class="col-xs-8">
-            <div class="form-header">
-              Description
-            </div>
-            <div class="installation-description">
-              Installation of Further Reach antenna and initiation of broadband Internet service:   
-            </div>
-            <div class="plan-name">
-              Plan: {{planInfo.label}}
-            </div>
-          </div>
-          <div class="col-xs-4">
-            <div class="form-header">
-              Bill To
-            </div>
-            <div class="billing-information">
-              <div class="billing-name">
-                {{billingInfo.contact.first_name}} {{billingInfo.contact.last_name}}
-              </div>
-              <div class="billing-street">
-                {{billingInfo.contact.street_address}}
-              </div>
-              <div class="billing-city-state-zip">
-                {{billingInfo.contact.city}}, {{billingInfo.contact.state}} {{billingInfo.contact.zip_code}}
-              </div>
-              <div class="billing-phone">
-                {{billingInfo.contact.mobile}} {{billingInfo.contact.landline}}
-              </div>
-              <div class="billing-email">
-                {{billingInfo.contact.email}}
-              </div>
-            </div>
-          </div>
-        </div><!-- /.row -->
-        <div class="row one-time-pricing">
-          <div class="col-xs-4 item-details">
-            <div class="form-header">
-              Service and Labor
-            </div>
-            <div class="installation-detail">
-              Standard Installation (includes antenna, access point, Ethernet cable, 3 hour labor)      
-            </div>
-          </div>
-          <div class="col-xs-2 type-details">
-            <div class="form-header">
-              Type
-            </div>
-          </div>
-          <div class="col-xs-2 quantity-details">
-            <div class="form-header">
-              Quantity
-            </div>
-            <div class="quantity">
-              1
-            </div>
-          </div>
-          <div class="col-xs-2 rate-details">
-            <div class="form-header">
-              Rate
-            </div>
-            <div class="installation-rate">
-              ${{billingInfo.billingDetails.installation.standard_installation}}
-            </div>
-          </div>
-          <div class="col-xs-2 totals">
-            <div class="form-header">
-              Totals
-            </div>
-            <div class="installation-total">
-              ${{billingInfo.billingDetails.installation.standard_installation}}
-            </div>
-          </div>
-        </div><!-- ./row -->
-        <div class="row installation-price-totals">
-          <div class="col-xs-2 col-xs-offset-8 bold">
-            Total:
-          </div>
-          <div class="col-xs-2">
-            ${{billingInfo.billingDetails.installation.standard_installation}}
-          </div>
-        </div><!-- /.row -->
-        <div class="row recurring-pricing">
-          <div class="col-xs-4 item-details">
-            <div class="form-header">
-              Monthly Payments
-            </div>
-            <div class="internet-detail">
-              Broadband Internet
-            </div>
-          </div>
-          <div class="col-xs-2 col-xs-offset-4 recurring-type-details">
-            <div class="form-header">
-              Type
-            </div>
-            <div class="recurring-type-detail">
-              {{planInfo.label}}
-            </div>
-            <div class="bold">
-              Total:
-            </div>
-          </div>
-          <div class="col-xs-2 recurring-rates">
-            <div class="form-header">
-              Monthly Rate
-            </div>
-            <div class="recurring-rate">
-              ${{planInfo.monthly}}
-            </div>
-            <div>
-              ${{planInfo.monthly}}
-            </div>
-          </div>
-        </div><!-- ./row -->
-        <div class="row notes-row">
-          <div class="col-xs-12">
-            <div>
-              Notes:
-            </div>
-            <ol class="notes-list">
-              <li>
-                Initial monthly service is pro rated based on number of days provided service in that month beginning from the day of installation
-              </li>
-              <li>
-                Broadband Internet service is billed at the end of each month
-              </li>
-              <li>
-                Standard Installation cost can be financed and paid in (6) monthly installments instead of one time payment
-              </li>
-              <li>
-                Standard installation includes antenna, access point and up to three hours of installation time. Additional labor is billed at $50/hr.
-              </li>
-            </ol>
-          </div>
-        </div><!-- ./row.notes-row -->
-      </div><!-- /.order-form -->
-      <a href="http://furtherreach.net/customeragreement" target="_new">Customer Agreement</a>
-      {{#if subscriberInfo.agreedToTerms}}
-        <h4>Has Agreed to Terms</h4>
-        <input type="checkbox" id="agree-to-terms" checked={{subscriberInfo.agreedToTerms}} class="hidden"> 
-      {{else}}
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" id="agree-to-terms" checked={{subscriberInfo.agreedToTerms}}> By checking the box to the left, you agree that you have read, understand, had the option to print, and accept the terms and conditions of this agreement
-          </label>
-        </div>
-      {{/if}}
-      <button type="submit" id="pay-for-installation" class="btn btn-default">Submit</button>
-      {{/with}}
-    </form>
-  </div>
-</template>
+
 <template name="customer_dashboard">
 <body>
   <div class="navbar navbar-default" role="navigation">
@@ -189,16 +9,200 @@
       {{/if}}
     </div>
   </div>
-
-  <div class="container">
+  <div class="container customer-dashboard-container">
     <div class="row">
       <div class="col-xs-12">
-        <h2>Further Reach Customer Dashboard</h2>
-        {{#if subscriberInfo}}
-        {{> order_form subscriberInfo}}
+        <div class="page-header">
+          <h1>Further Reach Customer Dashboard</h1>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        {{#if subscriberInfo.agreedToTerms}}
+        {{else}}
+        <div class="agreement-info-container">
+          {{> agreement_info }}
+        </div>
         {{/if}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="payments-info-container">
+          {{> payments_info }}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-6">
+        <div class="plan-info-container">
+          {{> plan_info }}
+        </div>
+      </div>
+      <div class="col-xs-6">
+        <div class="subscriber-info-container">
+          {{> subscriber_info }}
+        </div>
       </div>
     </div>
   </div>
 </body>
+</template>
+
+<template name="subscriber_info">
+<div class="panel panel-primary contact-info-panel">
+  <div class="panel-heading">
+    <h2>Contact Information</h2>
+  </div>
+  <div class="panel-body">
+    <div class="col-xs-12">
+      <div class="row">
+        <div class="col-xs-12">
+          <h3 class="sub-header">{{ subscriberInfo.first_name }} {{ subscriberInfo.last_name }}</h3>
+        </div>
+      </div>
+      {{> contact_snippet subscriberInfo }}
+      {{#if subscriberInfo.contactInfo}}
+        {{#each subscriberInfo.contactInfo}}
+        <h4>{{ capitalize this.type }}</h4>
+        {{> contact_snippet this }}
+      {{/each}}
+      {{/if}}
+      <button class="btn btn-success edit-contact-info">Edit Info</button>
+    </div>
+  </div>
+</div>
+</template>
+
+<template name="contact_snippet">
+{{#if showName}}
+<div class="row">
+  <div class="col-xs-2">
+    <label>Name</label>
+  </div>
+  <div class="col-xs-10">
+    <div>
+      {{ this.first_name }} {{ this.last_name }}
+    </div>
+  </div>
+</div>
+{{/if}}
+{{#if showEmail}}
+<div class="row">
+  <div class="col-xs-2">
+    <label>Email</label>
+  </div>
+  <div class="col-xs-10">
+    <div>
+      {{#if this.prior_email}}
+      {{ this.prior_email }}
+      {{else}}
+      {{#if this.email}}
+        {{ this.email }}
+      {{/if}}
+      {{/if}}
+    </div>
+  </div>
+</div>
+{{/if}}
+{{#if showAddress}}
+<div class="row">
+  <div class="col-xs-2">
+    <label>Address</label>
+  </div>
+  <div class="col-xs-10">
+    <div>
+      {{ this.street_address }}
+    </div>
+    <div>
+      {{ this.city }}, {{ this.state }} {{ this.zip_code }}
+    </div>
+  </div>
+</div>
+{{/if}}
+</template>
+
+<template name="agreement_info">
+<div class="panel panel-warning">
+  <div class="panel-heading">
+    <h2>Customer Agreement</h2>
+  </div>
+  <div class="panel-body">
+    <div class="col-xs-12">
+      <div class="row">
+        <div class="col-xs-12">
+          You haven't agreed to the terms and conditions yet! Click below to view them.
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <button class="btn btn-success terms-conditions">Terms and Conditions</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
+
+<template name="payments_info">
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h2>Payment Info</h2>
+  </div>
+  <div class="panel-body">
+    <div class="col-xs-12">
+      {{#if showCharges }}
+      <h3 class="sub-header">Charges</h3>
+      {{#each paymentInfo.charges}}
+      <div class="row charge-row">
+        <div class="col-xs-2 charge-date">
+          Date: {{ this.dateCreatedString }} 
+        </div>
+        <div class="col-xs-10">
+          <div class="row">
+            <div class="col-xs-12">
+              Amount: ${{ this.dollarAmount }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              Description: {{ this.description }}
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+      {{/if}}
+    </div>
+  </div>
+</div>
+<div class="json-dump">
+  <pre>
+    {{{json paymentInfo}}}
+  </pre>
+</div>
+</template>
+<template name="plan_info">
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h2>Your Plan</h2>
+  </div>
+  <div class="panel-body">
+    <div class="col-xs-12">
+      <h3 class="sub-header">{{ planInfo.label }}</h3>
+      <div class="row">
+        <div class="col-xs-12">
+          <label>Monthly Price:</label> ${{planInfo.monthly}}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <label>Details:</label>
+          {{ planInfo.details }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </template>

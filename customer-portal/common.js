@@ -21,8 +21,38 @@ Handlebars.registerHelper('toupper', function(obj) {
   return obj.toUpperCase();
 });
 
+Handlebars.registerHelper('capitalize', function(obj) {
+  if (typeof obj !== "string") {
+    return obj
+  }
+  obj = obj.trim();
+  return obj.slice(0, 1).toUpperCase() + obj.slice(1);
+});
+
 Handlebars.registerHelper('json', function(obj) {
-  return JSON.stringify(obj);
+  function syntaxHighlight(json) {
+      if (typeof json != 'string') {
+           json = JSON.stringify(json, undefined, 2);
+      }
+      json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+          var cls = 'number';
+          if (/^"/.test(match)) {
+              if (/:$/.test(match)) {
+                  cls = 'key';
+              } else {
+                  cls = 'string';
+              }
+          } else if (/true|false/.test(match)) {
+              cls = 'boolean';
+          } else if (/null/.test(match)) {
+              cls = 'null';
+          }
+          return '<span class="' + cls + '">' + match + '</span>';
+      });
+  }
+  var str = JSON.stringify(obj, undefined, 4);
+  return syntaxHighlight(str);
 });
 
 Handlebars.registerHelper('key_value', function(context, options) {
@@ -42,3 +72,14 @@ Handlebars.registerHelper('selected_if_empty', function(val) {
   if (!val || val == "") return "selected";
   return "";
 });
+
+Number.prototype.formatMoney = function(c, d, t){
+  var n = this, 
+      c = isNaN(c = Math.abs(c)) ? 2 : c, 
+      d = d == undefined ? "." : d, 
+      t = t == undefined ? "," : t, 
+      s = n < 0 ? "-" : "", 
+      i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "", 
+      j = (j = i.length) > 3 ? j % 3 : 0;
+  return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+};

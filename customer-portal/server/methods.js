@@ -23,6 +23,15 @@ Meteor.methods({
   getSubscriber: function (token) {
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
     var sub = Subscribers.findOne(subId); // TODO: Add selector for not certain fields
+    sub.contactInfo = [];
+    if (typeof sub.contacts === 'object') {
+      _.each(sub.contacts, function(c) {
+        contactObj = Contacts.findOne(c.contact_id);
+        contactObj.type = c.type;
+        sub.contactInfo.push(contactObj);
+      });
+    }
+
     return sub;
   },
 

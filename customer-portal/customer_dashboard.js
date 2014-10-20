@@ -3,13 +3,14 @@ if (Meteor.isServer) {
 }
 if (Meteor.isClient) {
 
-  Template.order_form.subscriberInfo = Template.customer_dashboard.subscriberInfo = function() {
+  Template.subscriber_info.subscriberInfo = Template.customer_dashboard.subscriberInfo = function() {
     var authToken = Session.get('authToken');
     Meteor.call('getSubscriber', authToken, function(err, result) {
       if (!err && typeof result === 'object') {
         if (typeof result.terms === "object" && result.terms.agreed) {
           result.agreedToTerms = true;
         }
+        result.billing_info = _.omit(result.billing_info, 'charges');
         Session.set('subscriber', result);
       }
     });
@@ -17,17 +18,50 @@ if (Meteor.isClient) {
 
   };
 
-  Template.order_form.billingInfo = function() {
+  Template.payments_info.paymentInfo = function() {
+    console.log(this);
     var authToken = Session.get('authToken');
-    Meteor.call('billingInfo', authToken, function(err, result) {
+    Meteor.call('getSubscriber', authToken, function(err, result) {
       if (!err && typeof result === 'object') {
-        Session.set('billingInfo', result);
+        if (typeof result.terms === "object" && result.terms.agreed) {
+          result.agreedToTerms = true;
+        }
+        var billingInfo = result.billing_info;
+        if (typeof billingInfo.charges === 'object') {
+          _.each(billingInfo.charges, function(charge) {
+            var dateString = moment(billingInfo.created).format('M/D/YYYY');
+            charge.dateCreatedString = dateString;
+            charge.dollarAmount = (charge.amount / 100).formatMoney(2, '.', ',');;
+          });
+        }
+        Session.set('paymentInfo', result.billing_info);
       }
     });
-    return Session.get('billingInfo');
+    return Session.get('paymentInfo');
   };
 
-  Template.order_form.planInfo = function() {
+  Template.payments_info.showCharges = function() {
+    console.log(this);
+    var paymentInfo = Session.get('paymentInfo');
+    return (typeof paymentInfo === 'object' && typeof paymentInfo.charges === 'object');
+  };
+
+  Template.contact_snippet.showEmail = function() {
+    return (typeof this.prior_email === 'string' || typeof this.email === 'string');
+  };
+
+  Template.contact_snippet.showAddress = function() {
+    return typeof this.street_address === 'string' && 
+           typeof this.city === 'string' &&
+           typeof this.state === 'string' &&
+           typeof this.zip_code === 'string';
+  };
+
+  Template.contact_snippet.showName = function() {
+    return !(_.has(this, 'contactInfo')) 
+  };
+
+  Template.plan_info.planInfo = function() {
     var authToken = Session.get('authToken');
     Meteor.call('planInfo', authToken, function(err, result) {
       var thisSub = Session.get('subscriber');
@@ -41,28 +75,21 @@ if (Meteor.isClient) {
     return Session.get('planInfo');
   };
 
+  Template.agreement_info.events({ 
+    'click button.terms-conditions': function (evt) {
+      console.log(this);
+      console.log(evt);
+      var authToken = Session.get('authToken');
+      Router.go('/customer_agreement/' + authToken);
+    }
+  });
+
   Template.customer_dashboard.events({
     'click': function (evt) {
       console.log(evt);
       console.log(this);
       var thisSub = this;
-      if (evt.target.id === 'pay-for-installation') {
-        evt.preventDefault();
-        if (!$('#agree-to-terms').prop('checked')) {
-          bootbox.alert("Need to agree to terms");
-          return false;
-        }
-        dbUpdate = {};
-        dbUpdate.terms = {
-          agreed: true,
-          date: new Date()
-        };
-        thisSub.terms = dbUpdate.terms; // TODO: Feels a little hacky - maxb
-        Subscribers.update(thisSub._id, {$set: dbUpdate}); 
-        Session.set('subscriber', thisSub);
-        var authToken = Session.get('authToken');
-        Router.go('/payments/' + authToken);
-      }
+      var authToken = Session.get('authToken');
     }
   });
 
