@@ -19,22 +19,28 @@ if (Meteor.isClient) {
   });
 
   Template.subscriber_overview.subscribers = function () {
-    var query = {};
+    var subquery = [];
     if (Session.get("subscriber_search_input") != null && !Session.equals("subscriber_search_input", "")) {
       console.log("Searching for: ["+Session.get("subscriber_search_input")+"]");
-      var subquery = [];
       for (s in search_fields) {
         var field_query = {};
         field_query[search_fields[s]] = { '$regex': Session.get("subscriber_search_input"), '$options': 'i'};
         subquery.push(field_query);
       }
+    }
 
-      archived_subscribers_dep.depend();
-      var show_archived = $("#show_archived_subscribers").prop('checked');
-      if (show_archived) {
+    var query = {};
+    archived_subscribers_dep.depend();
+    var show_archived = $("#show_archived_subscribers").prop('checked');
+    if (show_archived) {
+      if (subquery.length > 0) {
         query = {$or: subquery};
-      } else {
+      }
+    } else {
+      if (subquery.length > 0) {
         query = {$and: [ {$or: subquery}, {'archived' : {$exists: false}} ]};
+      } else {
+        query = {'archived' : {$exists: false}};
       }
     }
 

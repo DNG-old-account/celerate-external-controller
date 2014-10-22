@@ -199,8 +199,9 @@ if (Meteor.isClient) {
 
     return [ { field: "priority", label: "Priority", value: this.priority, options: priority_options },
              { field: "current_provider", label: "Current Provider", value: this.current_provider, options: provider_options },
-             { field: "relay_site", label: "Relay Site", value: this.relay_site },
+             { field: "relay_site", label: "Willing to be Relay Site", value: this.relay_site },
              { field: "time_availability", label: "Time Availability", value: this.time_availability },
+             { field: "bts_to_use", label: "BTS to use", value: this.bts_to_use },
              { field: "notes", label: "Notes", value: this.notes },
              { field: "signup_date", label: "Signup Date", value: this.signup_date }
            ];
