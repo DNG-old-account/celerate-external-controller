@@ -4,6 +4,7 @@ if (Meteor.isClient) {
   var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "priority_sort": "priority", "city_sort": "city", "community_sort": "community", "mapped_sort": "lat"};
 
   var archived_subscribers_dep = new Tracker.Dependency;
+  var non_archived_subscribers_dep = new Tracker.Dependency;
 
   Meteor.startup(function() {
     Session.set("primary_sort_field_subscribers", "status_sort");
@@ -31,20 +32,30 @@ if (Meteor.isClient) {
 
     var query = {};
     archived_subscribers_dep.depend();
+    non_archived_subscribers_dep.depend();
     var show_archived = $("#show_archived_subscribers").prop('checked');
-    if (show_archived) {
+    var show_non_archived = $("#show_non_archived_subscribers").prop('checked');
+    if (show_archived && show_non_archived) {
       if (subquery.length > 0) {
         query = {$or: subquery};
       }
-    } else {
+    } else if (show_archived && !show_non_archived) {
       if (subquery.length > 0) {
-        query = {$and: [ {$or: subquery}, {'archived' : {$exists: false}} ]};
+        query = {$and: [ {$or: subquery}, {'archived' : {$exists: true}} ]};
+      } else {
+        query = {'archived' : true};
+      }
+    } else if (!show_archived && show_non_archived) {
+      if (subquery.length > 0) {
+        query = {$and: [ {$or: subquery}, {$or: [{'archived' : {$exists: false}}, {'archived' : false}]} ]};
       } else {
         query = {'archived' : {$exists: false}};
       }
+    } else {
+      query = {'bogus_query' : true};
     }
 
-    var include_fields = {'first_name': 1, 'last_name': 1, 'priority': 1, 'status': 1, 'street_address': 1, 'city': 1, 'community': 1, 'lat': 1, 'lng': 1};
+    var include_fields = {'first_name': 1, 'last_name': 1, 'priority': 1, 'status': 1, 'street_address': 1, 'city': 1, 'community': 1, 'lat': 1, 'lng': 1, 'archived': 1};
 
     var result = Subscribers.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")});
     Session.set("subscriber_count", result.count());
@@ -83,8 +94,11 @@ if (Meteor.isClient) {
         $('#subscriber_details_modal').modal({show:true})
       });
     },
-    'click .show_archived_subscribers': function (evt) {
+    'click #show_archived_subscribers': function (evt) {
       archived_subscribers_dep.changed();
+    },
+    'click #show_non_archived_subscribers': function (evt) {
+      non_archived_subscribers_dep.changed();
     },
     'click .show_map': function (evt) {
       console.log(evt);

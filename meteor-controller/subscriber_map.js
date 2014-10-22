@@ -47,10 +47,11 @@ if (Meteor.isClient) {
       markers = {};
 
       var subscriber_to_color = function (subscriber) {
-        if (subscriber.status == "new lead") return "yellow";
-        if (subscriber.status == "connected") return "green";
-        if (subscriber.status == "no coverage") return "red";
-        return "purple";
+        if (subscriber.archived) return "_black";
+        if (subscriber.status == "new lead") return "_yellow";
+        if (subscriber.status == "connected") return "_green";
+        if (subscriber.status == "no coverage") return ""; // red is default marker color
+        return "_purple";
       };
 
       var bounds = new google.maps.LatLngBounds();
@@ -64,7 +65,7 @@ if (Meteor.isClient) {
           markers[subscriber._id] = new google.maps.Marker({
             position: latlng,
             title: name,
-            icon: 'http://maps.google.com/mapfiles/ms/icons/' + subscriber_to_color(subscriber) + '-dot.png',
+            icon: 'http://maps.google.com/mapfiles/marker' + subscriber_to_color(subscriber) + '.png',
             map: map
           });
 
