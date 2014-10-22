@@ -71,6 +71,12 @@ if (Meteor.isClient) {
     return subscriber;
   };
 
+  Template.subscriber_overview.created = function () {
+    Tracker.afterFlush(function () {
+      archived_subscribers_dep.changed();
+    });
+  };
+
   var subscriber_search_input_timeout = false;
   var subscriber_search_input_lag_ms = 1000;
   Template.subscriber_overview.events({

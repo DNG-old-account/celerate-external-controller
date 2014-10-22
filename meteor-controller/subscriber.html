@@ -41,13 +41,25 @@
   </div>
 
   <div class="subscriber-table-header">
-    <span class="glyphicon glyphicon-search"></span>
-    <span class="badge">{{subscriber_count}}</span>
-    <input class="subscriber_search_input" id="subscriber_search_input" type="search" placeholder="Search subscribers" value="">
-    <div class="checkbox"><label><input type="checkbox" id="show_archived_subscribers">Show Archived Subscribers</label></div>
-    <div class="checkbox"><label><input type="checkbox" id="show_non_archived_subscribers" checked>Show Non-archived Subscribers</label></div>
-    <div class="show_map checkbox"><label><input type="checkbox" id="show_map" checked>Show Map</label></div>
-    <button type="button" class="new_user_button btn btn-warning" id="new_user_button">Add New User</button>
+    <div class="row">
+      <div class="col-md-3">
+        <span class="glyphicon glyphicon-search"></span>
+        <span class="badge">{{subscriber_count}}</span>
+        <input class="subscriber_search_input" id="subscriber_search_input" type="search" placeholder="Search subscribers" value="">
+      </div>
+      <div class="col-md-2">
+        <div class="checkbox"><label><input type="checkbox" id="show_archived_subscribers">Show Archived</label></div>
+      </div>
+      <div class="col-md-2">
+        <div class="checkbox"><label><input type="checkbox" id="show_non_archived_subscribers" checked>Show Non-archived</label></div>
+      </div>
+      <div class="col-md-2">
+        <div class="show_map checkbox"><label><input type="checkbox" id="show_map" checked>Show Map</label></div>
+      </div>
+      <div class="col-md-3">
+        <button type="button" class="new_user_button btn btn-warning" id="new_user_button">Add New User</button>
+      </div>
+    </div>
   </div>
   {{#if true}}
     {{> subscriber_map}}
