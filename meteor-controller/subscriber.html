@@ -80,7 +80,7 @@
   {{/if}}
   <div class="table_responsive">
     <table class="table table-striped">
-      <thead><tr><th class="name_header" style="cursor:pointer;">Full Name</th><th class="status_header" style="cursor:pointer;">Status</th><th class="priority_header" style="cursor:pointer;">Priority</th><th class="address_header">Street Address</th><th class="city_header" style="cursor:pointer;">City</th><th class="community_header" style="cursor:pointer;">Community</th><th class="mapped_header" style="cursor:pointer;">Mapped</th><th class="edit_row_column"></th></tr></thead>
+      <thead><tr><th class="name_header" style="cursor:pointer;">Full Name</th><th class="status_header" style="cursor:pointer;">Status</th><th class="priority_header" style="cursor:pointer;">Priority</th><th class="address_header">Street Address</th><th class="city_header" style="cursor:pointer;">City</th><th>Email</th><th class="community_header" style="cursor:pointer;">Community</th><th class="mapped_header" style="cursor:pointer;">Mapped</th><th class="edit_row_column"></th></tr></thead>
       <tbody>
         {{#each subscribers}}
         {{> subscriber}}
@@ -98,6 +98,7 @@
   <td>{{priority}}</td>
   <td>{{street_address}}</td>
   <td>{{city}}</td>
+  <td>{{prior_email}}</td>
   <td>{{community}}</td>
   <td>{{#if lat}}Yes{{else}}No{{/if}}</td>
   <td><span class="glyphicon-pencil glyphicon edit-row" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Edit"></span></td>

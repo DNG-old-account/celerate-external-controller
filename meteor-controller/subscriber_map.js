@@ -47,7 +47,7 @@ if (Meteor.isClient) {
       markers = {};
 
       var subscriber_to_color = function (subscriber) {
-        if (subscriber.archived) return "_black";
+        if (subscriber.archived == "true") return "_black";
         if (subscriber.status == "new lead") return "_yellow";
         if (subscriber.status == "connected") return "_green";
         if (subscriber.status == "no coverage") return ""; // red is default marker color

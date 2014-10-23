@@ -48,7 +48,7 @@ if (Meteor.isClient) {
       query = {$and: subquery};
     }
 
-    var include_fields = {'first_name': 1, 'last_name': 1, 'priority': 1, 'status': 1, 'street_address': 1, 'city': 1, 'community': 1, 'lat': 1, 'lng': 1, 'archived': 1};
+    var include_fields = {'first_name': 1, 'last_name': 1, 'priority': 1, 'status': 1, 'street_address': 1, 'city': 1, 'community': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1};
 
     var result = Subscribers.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")});
     Session.set("subscriber_count", result.count());
