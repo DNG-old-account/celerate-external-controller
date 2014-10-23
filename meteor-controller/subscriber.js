@@ -1,5 +1,4 @@
 if (Meteor.isClient) {
-  var search_fields = ["status", "first_name", "last_name", "priority", "city", "community", "street_address"];
   var sort_fields = ["status_sort", "name_sort", "priority_sort", "city_sort", "community_sort", "mapped_sort"];
   var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "priority_sort": "priority", "city_sort": "city", "community_sort": "community", "mapped_sort": "lat"};
 
@@ -17,42 +16,36 @@ if (Meteor.isClient) {
 
     Session.set("selected_subscriber", null);
     Session.set("subscriber_search_input", "");
+    Session.set("subscriber_search_fields", {});
   });
+
+  Template.subscriber_overview.searchable_fields = function () {
+    return [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "community", "prior_email", "archived", "current_provider" ];
+  };
+
+  Template.subscriber_overview.current_search_fields = function () {
+    var current_search_fields = Session.get("subscriber_search_fields");
+    return current_search_fields;
+  };
 
   Template.subscriber_overview.subscribers = function () {
     var subquery = [];
-    if (Session.get("subscriber_search_input") != null && !Session.equals("subscriber_search_input", "")) {
-      console.log("Searching for: ["+Session.get("subscriber_search_input")+"]");
-      for (s in search_fields) {
+    if (Session.get("subscriber_search_fields") != null) {
+      var current_search_fields = Session.get("subscriber_search_fields");
+      if (Session.get("subscriber_search_input").length > 0) {
+        var search_field = $("#search_tag").val().trim();
+        current_search_fields[search_field] = Session.get("subscriber_search_input");
+      }
+
+      for (s in current_search_fields) {
         var field_query = {};
-        field_query[search_fields[s]] = { '$regex': Session.get("subscriber_search_input"), '$options': 'i'};
+        field_query[s] = { '$regex': current_search_fields[s], '$options': 'i' };
         subquery.push(field_query);
       }
     }
-
-    var query = {};
-    archived_subscribers_dep.depend();
-    non_archived_subscribers_dep.depend();
-    var show_archived = $("#show_archived_subscribers").prop('checked');
-    var show_non_archived = $("#show_non_archived_subscribers").prop('checked');
-    if (show_archived && show_non_archived) {
-      if (subquery.length > 0) {
-        query = {$or: subquery};
-      }
-    } else if (show_archived && !show_non_archived) {
-      if (subquery.length > 0) {
-        query = {$and: [ {$or: subquery}, {'archived' : {$exists: true}} ]};
-      } else {
-        query = {'archived' : true};
-      }
-    } else if (!show_archived && show_non_archived) {
-      if (subquery.length > 0) {
-        query = {$and: [ {$or: subquery}, {$or: [{'archived' : {$exists: false}}, {'archived' : false}]} ]};
-      } else {
-        query = {'archived' : {$exists: false}};
-      }
-    } else {
-      query = {'bogus_query' : true};
+    query = {};
+    if (subquery.length > 0) {
+      query = {$and: subquery};
     }
 
     var include_fields = {'first_name': 1, 'last_name': 1, 'priority': 1, 'status': 1, 'street_address': 1, 'city': 1, 'community': 1, 'lat': 1, 'lng': 1, 'archived': 1};
@@ -89,6 +82,25 @@ if (Meteor.isClient) {
           subscriber_search_input_timeout = false;
         }, subscriber_search_input_lag_ms);
       }
+    },
+    'click #add_search_field': function (evt) {
+      var search_value = $("#subscriber_search_input").val().trim();
+      console.log("search_value: " + search_value);
+      var search_field = $("#search_tag").val().trim();
+      console.log("search_field: " + search_field);
+
+      var current_search_fields = Session.get("subscriber_search_fields");
+      current_search_fields[search_field] = search_value;
+      Session.set("subscriber_search_fields", current_search_fields);
+
+      // Clear the subscriber input box since we've grabbed it.
+      $("#subscriber_search_input").val("");
+      Session.set("subscriber_search_input", "");
+    },
+    'click .delete_search_field': function (evt) {
+      var current_search_fields = Session.get("subscriber_search_fields");
+      delete current_search_fields[this.key];
+      Session.set("subscriber_search_fields", current_search_fields);
     },
     'click .new_user_button': function (evt) {
       var newId = new Meteor.Collection.ObjectID();

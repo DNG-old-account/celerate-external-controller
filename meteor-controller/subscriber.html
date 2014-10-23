@@ -42,21 +42,35 @@
 
   <div class="subscriber-table-header">
     <div class="row">
+      <div class="col-md-2">
+        {{#each key_value current_search_fields}}
+        <h3><span class="delete_search_field label label-default">{{key}}: {{value}}</span></h3>
+        {{/each}}
+      </div>
+    </div>
+
+    <div class="row">
       <div class="col-md-3">
+        <select class="form-control" id="search_tag">
+          {{#each searchable_fields}}
+          <option value="{{this}}">{{this}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <button type="button" class="btn btn-success" id="add_search_field">Add Search Field</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8">
         <span class="glyphicon glyphicon-search"></span>
         <span class="badge">{{subscriber_count}}</span>
         <input class="subscriber_search_input" id="subscriber_search_input" type="search" placeholder="Search subscribers" value="">
       </div>
       <div class="col-md-2">
-        <div class="checkbox"><label><input type="checkbox" id="show_archived_subscribers">Show Archived</label></div>
-      </div>
-      <div class="col-md-2">
-        <div class="checkbox"><label><input type="checkbox" id="show_non_archived_subscribers" checked>Show Non-archived</label></div>
-      </div>
-      <div class="col-md-2">
         <div class="show_map checkbox"><label><input type="checkbox" id="show_map" checked>Show Map</label></div>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-2">
         <button type="button" class="new_user_button btn btn-warning" id="new_user_button">Add New User</button>
       </div>
     </div>
