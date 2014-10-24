@@ -27,7 +27,7 @@ if (Meteor.isClient) {
     }
     console.log("query: " + JSON.stringify(query));
 
-    var include_fields = {'name': 1, 'make': 1, 'model': 1, 'features': 1};
+    var include_fields = {'name': 1, 'make': 1, 'model': 1, 'ports': 1 };
 
     var query_options = {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_hardware")};
     console.log(JSON.stringify(query_options));

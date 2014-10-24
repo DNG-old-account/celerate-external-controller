@@ -107,7 +107,7 @@ if (Meteor.isClient) {
       var id = this._id;
       bootbox.confirm("Are you sure you want to archive this subscriber?", function(result) {
         if (result) {
-          Subscribers.update(id, {$set: {archived: true}});
+          Subscribers.update(id, {$set: {archived: "true"}});
         }
       }); 
     },
@@ -142,7 +142,7 @@ if (Meteor.isClient) {
 
   Template.subscriber_details.basic_info_fields = function () {
     var subscriber_type_options = ["residential", "business", "non profit organization"];
-    var status_options = ["connected", "new lead", "no coverage"];
+    var status_options = ["connected", "new lead", "no coverage", "deferred", "not interested"];
     var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
     var plan_options = ["beta-free", "nonprofit-free", "relay-free", "landuse-free", "limited", "essential", "performance", "ultra", "silver", "gold"];
 
@@ -194,14 +194,19 @@ if (Meteor.isClient) {
 
   };
 
+  Template.subscriber_details.is_archived = function () {
+    return this.archived == "true";
+  };
+
   Template.subscriber_details.scheduling_fields = function () {
     var priority_options = ["high", "medium", "low", "none", "unknown"];
     var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
 
     return [ { field: "priority", label: "Priority", value: this.priority, options: priority_options },
              { field: "current_provider", label: "Current Provider", value: this.current_provider, options: provider_options },
-             { field: "relay_site", label: "Relay Site", value: this.relay_site },
+             { field: "relay_site", label: "Willing to be Relay Site", value: this.relay_site },
              { field: "time_availability", label: "Time Availability", value: this.time_availability },
+             { field: "bts_to_use", label: "BTS to use", value: this.bts_to_use },
              { field: "notes", label: "Notes", value: this.notes },
              { field: "signup_date", label: "Signup Date", value: this.signup_date }
            ];
