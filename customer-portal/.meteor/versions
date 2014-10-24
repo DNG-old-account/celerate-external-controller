@@ -19,6 +19,7 @@ deps@1.0.4
 ejson@1.0.3
 fastclick@1.0.0
 follower-livedata@1.0.1
+furtherreach:settings@1.0.0
 geojson-utils@1.0.0
 google@1.1.0
 handlebars@1.0.0
@@ -48,6 +49,7 @@ mizzao:timesync@0.2.2
 mizzao:user-status@0.6.2
 mobile-status-bar@1.0.0
 mongo@1.0.6
+mrt:moment-timezone@0.2.1
 mrt:moment@2.8.1
 npm-container@1.0.0
 oauth2@1.1.0

@@ -49,7 +49,7 @@ if (Meteor.isClient) {
           key: Meteor.settings.public.stripe.publicKey,
           image: '/FurtherReachLogo.png',
           token: function(stripeToken) {
-            Meteor.call('chargeCard', authToken, stripeToken, stripeConfig, function(err, result) {
+            Meteor.call('chargeCard', authToken, stripeToken, stripeConfig, 'installation', function(err, result) {
               console.log(err);
               console.log(result);
               if (err || result.error) {

@@ -35,7 +35,7 @@ Meteor.methods({
     return sub;
   },
 
-  chargeCard: function(token, stripeToken, stripeConfig) {
+  chargeCard: function(token, stripeToken, stripeConfig, type) {
     var stripe = Meteor.npmRequire('stripe')(Meteor.settings.stripe.privateKey);
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
     var thisSub = Subscribers.findOne(subId);
@@ -55,11 +55,113 @@ Meteor.methods({
 
     console.log(result);
     if (!result.error && !result.result.err) {
-      Subscribers.update(thisSub._id, {$set: {'billing_info.installation.paid': true }});
+      if (type === 'installation') {
+        Subscribers.update(thisSub._id, {$set: {'billing_info.installation.paid': true }});
+      } else if (type === 'monthly') {
+        var monthlyPayment = {
+          amount: stripeConfig.amount,
+          start_date: stripeConfig.billingPeriodStartDate,
+          end_date: stripeConfig.billingPeriodEndDate,
+        };
+        Subscribers.update(thisSub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
+      }
       Subscribers.update(thisSub._id, {$push: {'billing_info.charges': result.result}});
     }
     return result;
 
+  },
+
+  requiredPayments: function(token) {
+    var result = {};
+    var subId = new Meteor.Collection.ObjectID(authenticate(token));
+    var sub = Subscribers.findOne(subId);
+
+    // If a subscriber doesn't have billing info yet, we can just create it here
+    // TODO: this should really be code that's shared with controller - we don't want
+    // to have to change this in both places!!
+    // We can use a package for this!
+    if (typeof sub.billing_info !== 'object') {
+      // Create default billing info
+      var billing = {
+        installation: {
+          standard_installation: '150',
+          additional_equipment: [],
+          additional_labor: [],
+          paid: false
+        },
+        charges: [],
+        monthly_payments: []
+      };
+      db_update = {};
+      db_update['billing_info'] = billing;
+      Subscribers.update(this._id, {$set: db_update}); 
+    }
+
+    result.monthlyPayments = [];
+    //TODO: In order to test appropriately I've 
+    //      set it up to start billing a few weeks early of the next month
+    var startOfThisMonth = moment().tz('America/Los_Angeles').add(2, 'weeks').add(2, 'months').startOf('month'); 
+    result.required = false;
+
+    if (sub.status === 'connected' && 
+        moment(sub.activation_date).isValid() &&
+        typeof sub.plan === 'string') {
+      var activationDate = moment(sub.activation_date).tz('America/Los_Angeles');
+      var dateCursor = moment(startOfThisMonth);
+      var firstMonthEver = moment(activationDate).startOf('month');
+
+      while (dateCursor.isAfter(firstMonthEver)) {
+
+        var monthlyPayment = {};
+        monthlyPayment.required = true;
+        monthlyPayment.startDate = moment(dateCursor).subtract(1, 'months');
+        monthlyPayment.endDate = moment(dateCursor).subtract(1, 'days');
+        if (monthlyPayment.startDate.isBefore(activationDate)) {
+          monthlyPayment.startDate = moment(activationDate);
+        }
+
+        if (typeof sub.billing_info.monthly_payments === 'object') {
+          _.each(sub.billing_info.monthly_payments, function(payment) {
+            if (moment(payment.startDate).isValid() && 
+                monthlyPayment.startDate.isSame(moment(payment.start_date), 'day')) {
+              monthlyPayment.required = false;
+              monthlyPayment.startDate = moment(payment.start_date).tz('America/Los_Angeles');
+              monthlyPayment.endDate = moment(payment.end_date).tz('America/Los_Angeles');
+            }
+          });
+        }
+
+        if (monthlyPayment.required) {
+          var monthlyPaymentAmount = FRSettings.billing.plans[sub.plan].monthly;
+          monthlyPayment.label = FRSettings.billing.plans[sub.plan].label;
+
+          if (monthlyPayment.startDate.isBefore(activationDate)) {
+            var diff = Math.abs(monthlyPayment.startDate.diff(activationDate, 'days'));
+            var daysInMonth = startOfThisMonth.daysInMonth();
+            monthlyPayment.amount = (monthlyPaymentAmount * ((daysInMonth - diff) / daysInMonth)).formatMoney();
+            monthlyPayment.startDate = moment(activationDate);
+          } else {
+            monthlyPayment.amount = monthlyPaymentAmount;
+          }
+        }
+        // We have to translate back into Date obj for Meteor client <--> server
+        monthlyPayment.startDate = monthlyPayment.startDate.format();
+        monthlyPayment.endDate = monthlyPayment.endDate.format();
+        result.monthlyPayments.push(monthlyPayment);
+        dateCursor.subtract(1, 'months');
+      }
+    }
+
+
+    console.log(result.monthlyPayments);
+    _.each(result.monthlyPayments, function(payment) {
+      if (payment.required) {
+        result.required = true;
+      }
+    });
+
+    result.installation = sub.billing_info.installation;
+    return result;
   },
 
   billingInfo: function(token) {
@@ -96,54 +198,7 @@ Meteor.methods({
   },
 
   planInfo: function(token) {
-    var plans = {
-      "beta-free": {
-        "label": "Beta Free",
-        "monthly": 0,
-      },
-      "nonprofit-free": {
-        "label": "Non-profit Free",
-        "monthly": 0,
-      },
-      "relay-free": {
-        "label": "Relay Free",
-        "monthly": 0,
-      },
-      "landuse-free": {
-        "label": "Landuse Free",
-        "monthly": 0,
-      },
-      "limited": {
-        "label": "Limited",
-        "monthly": 30,
-        "details": "Burst speeds up to 4Mb/s"
-      },
-      "essential": {
-        "label": "Essential",
-        "monthly": 70,
-        "details": "Min: 4Mb/s Max: 8Mb/s"
-      },
-      "performance": {
-        "label": "Performance",
-        "monthly": 100,
-        "details": "Min: 8Mb/s Max: 15Mb/s"
-      },
-      "ultra": {
-        "label": "Ultra",
-        "monthly": 130,
-        "details": "Min: 15Mb/s Max: 30Mb/s"
-      },
-      "silver": {
-        "label": "Silver",
-        "monthly": 130,
-        "details": "Min: 15Mb/s Max: 30Mb/s"
-      },
-      "gold": {
-        "label": "Gold",
-        "monthly": 200,
-        "details": "Min: 40Mb/s Max: 60Mb/s"
-      },
-    }
+    var plans = FRSettings.billing.plans;
     return plans;
   }
 });

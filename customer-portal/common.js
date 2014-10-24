@@ -63,6 +63,14 @@ Handlebars.registerHelper('key_value', function(context, options) {
   return result;
 });
 
+Handlebars.registerHelper('key_value', function(context, options) {
+  var result = [];
+  _.each(context, function(value, key, list){
+    result.push({key:key, value:value});
+  })
+  return result;
+});
+
 Handlebars.registerHelper('selected_if_equal', function(val1, val2) {
   if (val1 == val2) return "selected";
   return "";
@@ -71,6 +79,10 @@ Handlebars.registerHelper('selected_if_equal', function(val1, val2) {
 Handlebars.registerHelper('selected_if_empty', function(val) {
   if (!val || val == "") return "selected";
   return "";
+});
+
+Handlebars.registerHelper("formatDate", function(datetime, format) {
+  return moment(datetime).format(format);
 });
 
 Number.prototype.formatMoney = function(c, d, t){

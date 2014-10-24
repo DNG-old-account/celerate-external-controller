@@ -19,6 +19,16 @@
     </div>
     <div class="row">
       <div class="col-xs-12">
+        {{#if subscriberInfo.plan}}
+        {{else}}
+        <div class="no-plan-warning-container">
+          {{> plan_warning }}
+        </div>
+        {{/if}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
         {{#if subscriberInfo.agreedToTerms}}
         {{else}}
         <div class="agreement-info-container">
@@ -27,6 +37,7 @@
         {{/if}}
       </div>
     </div>
+    {{#if subscriberInfo.plan}}
     <div class="row">
       <div class="col-xs-12">
         <div class="payments-info-container">
@@ -46,6 +57,7 @@
         </div>
       </div>
     </div>
+    {{/if}}
   </div>
 </body>
 </template>
@@ -69,7 +81,6 @@
         {{> contact_snippet this }}
       {{/each}}
       {{/if}}
-      <button class="btn btn-success edit-contact-info">Edit Info</button>
     </div>
   </div>
 </div>
@@ -123,6 +134,24 @@
 {{/if}}
 </template>
 
+<template name="plan_warning">
+<div class="panel panel-warning">
+  <div class="panel-heading">
+    <h2>No Plan Selected</h2>
+  </div>
+  <div class="panel-body">
+    <div class="col-xs-12">
+      <div class="row">
+        <div class="col-xs-12">
+          You haven't chosen a plan! Please contact support@furtherreach.net and inform them of your choice. To see a 
+          list of plans, you can visit <a href="http://furtherreach.net/#plans">FurtherReach.net</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
+
 <template name="agreement_info">
 <div class="panel panel-warning">
   <div class="panel-heading">
@@ -150,14 +179,48 @@
   <div class="panel-heading">
     <h2>Payment Info</h2>
   </div>
+
   <div class="panel-body">
     <div class="col-xs-12">
+      {{#if requiredPayments.required }}
+      <h3 class="sub-header">Make a Payment</h3>
+      {{#each key_value requiredPayments.monthlyPayments}}
+      {{#if value.required}}
+      <div class="row payment-row">
+        <div class="col-xs-5 payment-start-date">
+          <div class="row">
+            <div class="col-xs-12">
+              Period of {{ formatDate value.startDate "MM/DD/YYYY" }} - {{ formatDate value.endDate "MM/DD/YYYY"}}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              Plan: {{ value.label }}
+            </div>
+          </div>
+        </div>
+        <div class="col-xs-7">
+          <div class="row">
+            <div class="col-xs-12">
+              ${{ value.amount }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              <button data-index="{{key}}" class="btn btn-success pay-monthly">Pay With Credit Card</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/if}}
+      {{/each}}
+      {{/if}}
       {{#if showCharges }}
-      <h3 class="sub-header">Charges</h3>
+      <h3 class="sub-header">Previous Charges</h3>
       {{#each paymentInfo.charges}}
       <div class="row charge-row">
         <div class="col-xs-2 charge-date">
-          Date: {{ this.dateCreatedString }} 
+          {{ this.dateCreatedString }} 
         </div>
         <div class="col-xs-10">
           <div class="row">
@@ -170,6 +233,11 @@
               Description: {{ this.description }}
             </div>
           </div>
+          <div class="row">
+            <div class="col-xs-12">
+              Card: {{ this.card.brand}} ending in {{ this.card.last4 }}
+            </div>
+          </div>
         </div>
       </div>
       {{/each}}
@@ -177,12 +245,8 @@
     </div>
   </div>
 </div>
-<div class="json-dump">
-  <pre>
-    {{{json paymentInfo}}}
-  </pre>
-</div>
 </template>
+
 <template name="plan_info">
 <div class="panel panel-primary">
   <div class="panel-heading">

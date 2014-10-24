@@ -10,7 +10,7 @@ if (Meteor.isClient) {
         if (typeof result.terms === "object" && result.terms.agreed) {
           result.agreedToTerms = true;
         }
-        result.billing_info = _.omit(result.billing_info, 'charges');
+        //result.billing_info = _.omit(result.billing_info, 'charges');
         Session.set('subscriber', result);
       }
     });
@@ -40,11 +40,81 @@ if (Meteor.isClient) {
     return Session.get('paymentInfo');
   };
 
+  Template.payments_info.requiredPayments = function() {
+    var authToken = Session.get('authToken');
+    Meteor.call('requiredPayments', authToken, function(err, result) {
+      if (!err && typeof result === 'object') {
+        Session.set('requiredPayments', result);
+      }
+    });
+    return Session.get('requiredPayments');
+  };
+
   Template.payments_info.showCharges = function() {
     console.log(this);
     var paymentInfo = Session.get('paymentInfo');
-    return (typeof paymentInfo === 'object' && typeof paymentInfo.charges === 'object');
+    return (typeof paymentInfo === 'object' && 
+            typeof paymentInfo.charges === 'object' &&
+            paymentInfo.charges.length > 0);
   };
+
+  Template.payments_info.rendered = function() {
+    var authToken = Session.get('authToken');
+    Meteor.call('billingInfo', authToken, function(err, result) {
+      if (!err && typeof result === 'object') {
+        Session.set('billingInfo', result);
+      }
+    });
+    $.getScript('https://checkout.stripe.com/checkout.js', function() {
+
+    });
+  };
+
+  Template.payments_info.events({ 
+    'click button.pay-monthly': function (evt) {
+      var thisSub = Session.get('subscriber');
+      var billingInfo = Session.get('billingInfo');
+      var requiredPayments = Session.get('requiredPayments');
+      var authToken = Session.get('authToken');
+      //TODO: figure out charges amount and dates!!
+      var index = $(evt.target).data('index');
+      var amount = requiredPayments.monthlyPayments[index].amount;
+      var billingPeriodEndDate = requiredPayments.monthlyPayments[index].endDate;
+      var billingPeriodStartDate = requiredPayments.monthlyPayments[index].startDate;
+
+      var stripeConfig = {
+        name: 'Further Reach',
+        description: 'Monthly payment for period of ' + 
+                      moment(billingPeriodStartDate).format('MM/DD/YYYY') + ' to ' + 
+                      moment(billingPeriodEndDate).format('MM/DD/YYYY'),
+        allowRememberMe: false,
+        email: billingInfo.contact.email,
+        billingPeriodStartDate: billingPeriodStartDate,
+        billingPeriodEndDate: billingPeriodEndDate,
+        amount: (amount * 100) // Stripe does it by cents
+      };
+
+      var handler = StripeCheckout.configure({
+        key: Meteor.settings.public.stripe.publicKey,
+        image: '/FurtherReachLogo.png',
+        token: function(stripeToken) {
+          Meteor.call('chargeCard', authToken, stripeToken, stripeConfig, 'monthly', function(err, result) {
+            console.log(err);
+            console.log(result);
+            if (err || result.error) {
+              bootbox.alert('There seems to have been an error processing your card.');
+            } else {
+              bootbox.alert('Your payment has been processed. An email has been sent to you for your records');
+              $('.btn').on('click', function(evt) {
+                window.location.reload(true);
+              });
+            }
+          });
+        }
+      });
+      handler.open(stripeConfig);
+    }
+  });
 
   Template.contact_snippet.showEmail = function() {
     return (typeof this.prior_email === 'string' || typeof this.email === 'string');
@@ -63,9 +133,10 @@ if (Meteor.isClient) {
 
   Template.plan_info.planInfo = function() {
     var authToken = Session.get('authToken');
+    var thisSub = Session.get('subscriber');
     Meteor.call('planInfo', authToken, function(err, result) {
-      var thisSub = Session.get('subscriber');
       if (!err && typeof result === 'object' && 
+          typeof thisSub === 'object' && 
           typeof thisSub.plan !== 'undefined' && 
           result[thisSub.plan] !== 'undefined') {
 

@@ -18,5 +18,7 @@ meteorhacks:async
 
 
 npm-container
+furtherreach:settings
 mrt:moment
+mrt:moment-timezone
 

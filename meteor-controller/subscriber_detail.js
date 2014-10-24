@@ -181,7 +181,8 @@ if (Meteor.isClient) {
           additional_labor: [],
           paid: false
         },
-        charges: []
+        charges: [],
+        monthly_payments: []
       };
       db_update = {};
       db_update['billing_info'] = billing;
