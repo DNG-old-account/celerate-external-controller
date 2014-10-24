@@ -193,6 +193,10 @@ if (Meteor.isClient) {
 
   };
 
+  Template.subscriber_details.is_archived = function () {
+    return this.archived == "true";
+  };
+
   Template.subscriber_details.scheduling_fields = function () {
     var priority_options = ["high", "medium", "low", "none", "unknown"];
     var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
