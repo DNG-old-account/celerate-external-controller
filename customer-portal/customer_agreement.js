@@ -46,7 +46,7 @@ if (Meteor.isClient) {
       console.log(evt);
       console.log(this);
       var thisSub = this;
-      if (evt.target.id === 'pay-for-installation') {
+      if (evt.target.id === 'agree-to-terms-button') {
         evt.preventDefault();
         if (!$('#agree-to-terms').prop('checked')) {
           bootbox.alert("Need to agree to terms");
@@ -61,7 +61,7 @@ if (Meteor.isClient) {
         Subscribers.update(thisSub._id, {$set: dbUpdate}); 
         Session.set('subscriber', thisSub);
         var authToken = Session.get('authToken');
-        Router.go('/payments/' + authToken);
+        Router.go('/' + authToken);
       }
     }
   });

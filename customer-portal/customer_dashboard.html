@@ -39,16 +39,26 @@
       </div> 
     </div>
     {{else}}
+    {{#if subscriberInfo.activation_date}}
+    {{else}}
     <div class="row">
       <div class="col-xs-12">
-        {{#if subscriberInfo.plan}}
-        {{else}}
+        <div class="not-connected-warning-container">
+          {{> not_connected_warning }}
+        </div>
+      </div>
+    </div>
+    {{/if}}
+    {{#if subscriberInfo.plan}}
+    {{else}}
+    <div class="row">
+      <div class="col-xs-12">
         <div class="no-plan-warning-container">
           {{> plan_warning }}
         </div>
-        {{/if}}
       </div>
     </div>
+    {{/if}}
     <div class="row">
       <div class="col-xs-12">
         {{#if subscriberInfo.agreedToTerms}}
@@ -60,6 +70,7 @@
       </div>
     </div>
     {{#if subscriberInfo.plan}}
+    {{#if subscriberInfo.activation_date}}
     <div class="row">
       <div class="col-xs-12">
         <div class="payments-info-container">
@@ -79,6 +90,7 @@
         </div>
       </div>
     </div>
+    {{/if}}
     {{/if}}
     {{/if}}
   </div>
@@ -160,6 +172,24 @@
   </div>
 </div>
 {{/if}}
+</template>
+
+<template name="not_connected_warning">
+<div class="panel panel-warning">
+  <div class="panel-heading">
+    <h2>Not Connected</h2>
+  </div>
+  <div class="panel-body">
+    <div class="col-xs-12">
+      <div class="row">
+        <div class="col-xs-12">
+          According to our systems, you haven't been connected yet! 
+          Please contact <a href="mailto:support@furtherreach.net">support@furtherreach.net</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </template>
 
 <template name="plan_warning">

@@ -120,7 +120,7 @@ Meteor.methods({
     result.monthlyPayments = [];
     //TODO: In order to test appropriately I've 
     //      set it up to start billing a few weeks early of the next month
-    var startOfThisMonth = moment().tz('America/Los_Angeles').add(2, 'weeks').add(2, 'months').startOf('month'); 
+    var startOfThisMonth = moment().tz('America/Los_Angeles').add(10, 'days').startOf('month'); 
     result.required = false;
 
     if (sub.status === 'connected' && 
