@@ -17,6 +17,28 @@
         </div>
       </div>
     </div>
+    {{#if loading}}
+    <div class="throbber-container">
+      <div id="floatingCirclesG">
+        <div class="f_circleG" id="frotateG_01">
+        </div>
+        <div class="f_circleG" id="frotateG_02">
+        </div>
+        <div class="f_circleG" id="frotateG_03">
+        </div>
+        <div class="f_circleG" id="frotateG_04">
+        </div>
+        <div class="f_circleG" id="frotateG_05">
+        </div>
+        <div class="f_circleG" id="frotateG_06">
+        </div>
+        <div class="f_circleG" id="frotateG_07">
+        </div>
+        <div class="f_circleG" id="frotateG_08">
+        </div>
+      </div> 
+    </div>
+    {{else}}
     <div class="row">
       <div class="col-xs-12">
         {{#if subscriberInfo.plan}}
@@ -58,7 +80,13 @@
       </div>
     </div>
     {{/if}}
+    {{/if}}
   </div>
+  <!-- <div class="json-dump"> -->
+  <!--   <pre> -->
+  <!--     {{{ json subscriberInfo }}} -->
+  <!--   </pre> -->
+  <!-- </div> -->
 </body>
 </template>
 
@@ -207,7 +235,7 @@
           </div>
           <div class="row">
             <div class="col-xs-12">
-              <button data-index="{{key}}" class="btn btn-success pay-monthly">Pay With Credit Card</button>
+              <button id="pay-monthly" data-index="{{key}}" class="btn btn-success pay-with-card">Pay With Credit Card</button>
             </div>
           </div>
         </div>
@@ -215,6 +243,40 @@
       {{/if}}
       {{/each}}
       {{/if}}
+      {{#if requiredPayments.installation.paid}}
+      {{else}}
+      <div class="row payment-row">
+        <div class="col-xs-5 payment-start-date">
+          <div class="row">
+            <div class="col-xs-12">
+              Standard Installation
+            </div>
+          </div>
+        </div>
+        <div class="col-xs-7">
+          <div class="row">
+            <div class="col-xs-12">
+              {{#if requiredPayments.installation.installments}}
+              Remaining installation amount: {{requiredPayments.installation.remaining_amount}}
+              {{else}}
+              ${{ requiredPayments.installation.standard_installation }}
+              {{/if}}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              {{#if requiredPayments.installation.installments}}
+              <button id="pay-installation-installment" class="btn btn-warning pay-with-card">Pay Installment With Credit Card</button>
+              {{else}}
+              <button id="pay-installation" class="btn btn-success pay-with-card">Pay With Credit Card</button>
+              <button id="pay-installation-installment" class="btn btn-warning pay-with-card">Pay Installment With Credit Card</button>
+              {{/if}}
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/if}}
+      {{#if paymentInfo}}
       {{#if showCharges }}
       <h3 class="sub-header">Previous Charges</h3>
       {{#each paymentInfo.charges}}
@@ -241,6 +303,7 @@
         </div>
       </div>
       {{/each}}
+      {{/if}}
       {{/if}}
     </div>
   </div>

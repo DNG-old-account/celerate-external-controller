@@ -3,6 +3,10 @@ if (Meteor.isServer) {
 }
 if (Meteor.isClient) {
 
+  Template.customer_dashboard.loading = function() {
+    return Session.get('loading');
+  };
+
   Template.subscriber_info.subscriberInfo = Template.customer_dashboard.subscriberInfo = function() {
     var authToken = Session.get('authToken');
     Meteor.call('getSubscriber', authToken, function(err, result) {
@@ -15,7 +19,6 @@ if (Meteor.isClient) {
       }
     });
     return Session.get('subscriber');
-
   };
 
   Template.payments_info.paymentInfo = function() {
@@ -51,7 +54,6 @@ if (Meteor.isClient) {
   };
 
   Template.payments_info.showCharges = function() {
-    console.log(this);
     var paymentInfo = Session.get('paymentInfo');
     return (typeof paymentInfo === 'object' && 
             typeof paymentInfo.charges === 'object' &&
@@ -71,44 +73,71 @@ if (Meteor.isClient) {
   };
 
   Template.payments_info.events({ 
-    'click button.pay-monthly': function (evt) {
+    'click button.pay-with-card': function (evt) {
       var thisSub = Session.get('subscriber');
       var billingInfo = Session.get('billingInfo');
       var requiredPayments = Session.get('requiredPayments');
       var authToken = Session.get('authToken');
+      var typeOfCharge;
       //TODO: figure out charges amount and dates!!
-      var index = $(evt.target).data('index');
-      var amount = requiredPayments.monthlyPayments[index].amount;
-      var billingPeriodEndDate = requiredPayments.monthlyPayments[index].endDate;
-      var billingPeriodStartDate = requiredPayments.monthlyPayments[index].startDate;
+      if (evt.target.id === 'pay-monthly') {
+        typeOfCharge = 'monthly';
+        var index = $(evt.target).data('index');
+        var amount = requiredPayments.monthlyPayments[index].amount;
+        var billingPeriodEndDate = requiredPayments.monthlyPayments[index].endDate;
+        var billingPeriodStartDate = requiredPayments.monthlyPayments[index].startDate;
 
-      var stripeConfig = {
-        name: 'Further Reach',
-        description: 'Monthly payment for period of ' + 
-                      moment(billingPeriodStartDate).format('MM/DD/YYYY') + ' to ' + 
-                      moment(billingPeriodEndDate).format('MM/DD/YYYY'),
-        allowRememberMe: false,
-        email: billingInfo.contact.email,
-        billingPeriodStartDate: billingPeriodStartDate,
-        billingPeriodEndDate: billingPeriodEndDate,
-        amount: (amount * 100) // Stripe does it by cents
-      };
+        var stripeConfig = {
+          name: 'Further Reach',
+          description: 'Monthly payment for period of ' + 
+                        moment(billingPeriodStartDate).format('MM/DD/YYYY') + ' to ' + 
+                        moment(billingPeriodEndDate).format('MM/DD/YYYY'),
+          allowRememberMe: false,
+          email: billingInfo.contact.email,
+          billingPeriodStartDate: billingPeriodStartDate,
+          billingPeriodEndDate: billingPeriodEndDate,
+          amount: (amount * 100) // Stripe does it by cents
+        };
+      } else if (evt.target.id === 'pay-installation') {
+        typeOfCharge = 'installation';
+        var amount = requiredPayments.installation.standard_installation;
+        var stripeConfig = {
+          name: 'Further Reach',
+          description: 'Standard Installation',
+          allowRememberMe: false,
+          email: billingInfo.contact.email,
+          amount: (amount * 100) // Stripe does it by cents
+        };
+      } else if (evt.target.id === 'pay-installation-installment') {
+        typeOfCharge = 'installation-installment';
+        var amount = FRSettings.billing.installmentAmount;
+        var stripeConfig = {
+          name: 'Further Reach',
+          description: 'Standard Installation Installment',
+          allowRememberMe: false,
+          email: billingInfo.contact.email,
+          amount: (amount * 100) // Stripe does it by cents
+        };
+      }
 
       var handler = StripeCheckout.configure({
         key: Meteor.settings.public.stripe.publicKey,
         image: '/FurtherReachLogo.png',
         token: function(stripeToken) {
-          Meteor.call('chargeCard', authToken, stripeToken, stripeConfig, 'monthly', function(err, result) {
+          Session.set('loading', true);
+          Meteor.call('chargeCard', authToken, stripeToken, stripeConfig, typeOfCharge, function(err, result) {
+            Session.set('loading', false);
             console.log(err);
             console.log(result);
             if (err || result.error) {
               bootbox.alert('There seems to have been an error processing your card.');
+              Session.set('loading', true);
             } else {
               bootbox.alert('Your payment has been processed. An email has been sent to you for your records');
-              $('.btn').on('click', function(evt) {
-                window.location.reload(true);
-              });
             }
+            $('.btn').on('click', function(evt) {
+              //window.location.reload(true);
+            });
           });
         }
       });

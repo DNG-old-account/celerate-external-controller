@@ -1,9 +1,7 @@
 // Write your package code here!
 FRSettings = {
   "billing": {
-    "absoluteDates": {
-      "start": "2014-10-01T07:00:00.000Z"
-    },
+    "installmentAmount": 40,
     "plans": {
       "beta-free": {
         "label": "Beta Free",

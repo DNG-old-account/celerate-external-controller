@@ -54,12 +54,31 @@ Meteor.methods({
     });
 
     console.log(result);
+    var dollarAmount = stripeConfig.amount / 100;
+
     if (!result.error && !result.result.err) {
       if (type === 'installation') {
         Subscribers.update(thisSub._id, {$set: {'billing_info.installation.paid': true }});
+      } else if (type === 'installation-installment') {
+        var installmentPayment = {
+          amount: dollarAmount,
+          charge_date: moment().tz('America/Los_Angeles').toISOString()
+        }
+        Subscribers.update(thisSub._id, {$set: {'billing_info.installation.installments': true }});
+        Subscribers.update(thisSub._id, {$push: {'billing_info.installation.installment_payments': installmentPayment }});
+        var totalPaid = _.reduce(thisSub.billing_info.installation.installment_payments, function(sum, payment) {
+          return sum + payment.amount;
+        }, 0);
+
+        thisSub = Subscribers.find(this_sub._id);
+        console.log('total paid = ' + totalPaid);
+
+        if (totalPaid >= thisSub.billing_info.installation.standard_installation) {
+          Subscribers.update(thisSub._id, {$set: {'billing_info.installation.paid': true }});
+        }
       } else if (type === 'monthly') {
         var monthlyPayment = {
-          amount: stripeConfig.amount,
+          amount: dollarAmount,
           start_date: stripeConfig.billingPeriodStartDate,
           end_date: stripeConfig.billingPeriodEndDate,
         };
@@ -87,7 +106,8 @@ Meteor.methods({
           standard_installation: '150',
           additional_equipment: [],
           additional_labor: [],
-          paid: false
+          paid: false,
+          installments: false
         },
         charges: [],
         monthly_payments: []
@@ -145,15 +165,13 @@ Meteor.methods({
           }
         }
         // We have to translate back into Date obj for Meteor client <--> server
-        monthlyPayment.startDate = monthlyPayment.startDate.format();
-        monthlyPayment.endDate = monthlyPayment.endDate.format();
+        monthlyPayment.startDate = monthlyPayment.startDate.toISOString();
+        monthlyPayment.endDate = monthlyPayment.endDate.toISOString();
         result.monthlyPayments.push(monthlyPayment);
         dateCursor.subtract(1, 'months');
       }
     }
 
-
-    console.log(result.monthlyPayments);
     _.each(result.monthlyPayments, function(payment) {
       if (payment.required) {
         result.required = true;
@@ -161,6 +179,13 @@ Meteor.methods({
     });
 
     result.installation = sub.billing_info.installation;
+    if (result.installation.installments) {
+      var totalPaid = _.reduce(result.installation.installment_payments, function(sum, payment) {
+        return sum + payment.amount;
+      }, 0);
+      result.installation.remaining_amount = result.installation.standard_installation - totalPaid;
+    }
+
     return result;
   },
 
