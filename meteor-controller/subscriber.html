@@ -42,11 +42,11 @@
 
   <div class="subscriber-table-header">
     <div class="row">
+      {{#each key_value current_search_fields}}
       <div class="col-md-2">
-        {{#each key_value current_search_fields}}
         <h3><span class="delete_search_field label label-default">{{key}}: {{value}}</span></h3>
-        {{/each}}
       </div>
+      {{/each}}
     </div>
 
     <div class="row">
