@@ -1,6 +1,6 @@
 if (Meteor.isClient) {
-  var sort_fields = ["status_sort", "name_sort", "priority_sort", "city_sort", "community_sort", "mapped_sort"];
-  var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "priority_sort": "priority", "city_sort": "city", "community_sort": "community", "mapped_sort": "lat"};
+  var sort_fields = ["status_sort", "name_sort", "city_sort", "community_sort", "mapped_sort"];
+  var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "city_sort": "city", "community_sort": "community", "mapped_sort": "lat"};
 
   var archived_subscribers_dep = new Tracker.Dependency;
   var non_archived_subscribers_dep = new Tracker.Dependency;
@@ -9,7 +9,6 @@ if (Meteor.isClient) {
     Session.set("primary_sort_field_subscribers", "status_sort");
     Session.set("status_sort", -1);
     Session.set("name_sort", 1);
-    Session.set("priority_sort", 1);
     Session.set("city_sort", 1);
     Session.set("community_sort", 1);
     Session.set("mapped_sort", 1);
@@ -48,7 +47,7 @@ if (Meteor.isClient) {
       query = {$and: subquery};
     }
 
-    var include_fields = {'first_name': 1, 'last_name': 1, 'priority': 1, 'status': 1, 'street_address': 1, 'city': 1, 'community': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1};
+    var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'community': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1};
 
     var result = Subscribers.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")});
     Session.set("subscriber_count", result.count());
@@ -141,10 +140,6 @@ if (Meteor.isClient) {
     'click .status_header': function () {
       Session.set("status_sort", -1 * Session.get("status_sort"));
       Session.set("primary_sort_field_subscribers", "status_sort");
-    },
-    'click .priority_header': function () {
-      Session.set("priority_sort", -1 * Session.get("priority_sort"));
-      Session.set("primary_sort_field_subscribers", "priority_sort");
     },
     'click .city_header': function () {
       Session.set("city_sort", -1 * Session.get("city_sort"));
