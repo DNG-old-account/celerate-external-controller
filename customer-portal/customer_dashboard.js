@@ -131,7 +131,7 @@ if (Meteor.isClient) {
             console.log(result);
             if (err || result.error) {
               bootbox.alert('There seems to have been an error processing your card.');
-              Session.set('loading', true);
+              window.location.reload(true);
             } else {
               bootbox.alert('Your payment has been processed. An email has been sent to you for your records');
             }
