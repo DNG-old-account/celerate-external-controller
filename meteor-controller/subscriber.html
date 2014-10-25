@@ -80,7 +80,7 @@
   {{/if}}
   <div class="table_responsive">
     <table class="table table-striped">
-      <thead><tr><th class="name_header" style="cursor:pointer;">Full Name</th><th class="status_header" style="cursor:pointer;">Status</th><th class="address_header">Street Address</th><th class="city_header" style="cursor:pointer;">City</th><th>Email</th><th class="community_header" style="cursor:pointer;">Community</th><th class="mapped_header" style="cursor:pointer;">Mapped</th><th class="edit_row_column"></th></tr></thead>
+      <thead><tr><th class="name_header" style="cursor:pointer;">Full Name</th><th class="status_header" style="cursor:pointer;">Status</th><th class="address_header">Street Address</th><th class="city_header" style="cursor:pointer;">City</th><th>Plan</th><th>Install Paid</th><th>Email</th><th class="community_header" style="cursor:pointer;">Community</th><th class="mapped_header" style="cursor:pointer;">Mapped</th><th class="edit_row_column"></th></tr></thead>
       <tbody>
         {{#each subscribers}}
         {{> subscriber}}
@@ -97,6 +97,8 @@
   <td>{{status}}</td>
   <td>{{street_address}}</td>
   <td>{{city}}</td>
+  <td>{{plan}}</td>
+  <td>{{#if billing_info.installation.paid}}Yes{{else}}No{{/if}}</td>
   <td>{{prior_email}}</td>
   <td>{{community}}</td>
   <td>{{#if lat}}Yes{{else}}No{{/if}}</td>
