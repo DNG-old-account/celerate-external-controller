@@ -1,6 +1,6 @@
 if (Meteor.isClient) {
-  var sort_fields = ["status_sort", "name_sort", "city_sort", "community_sort", "mapped_sort"];
-  var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "city_sort": "city", "community_sort": "community", "mapped_sort": "lat"};
+  var sort_fields = ["status_sort", "name_sort", "city_sort", "mapped_sort"];
+  var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "city_sort": "city", "mapped_sort": "lat"};
 
   var archived_subscribers_dep = new Tracker.Dependency;
   var non_archived_subscribers_dep = new Tracker.Dependency;
@@ -10,7 +10,6 @@ if (Meteor.isClient) {
     Session.set("status_sort", -1);
     Session.set("name_sort", 1);
     Session.set("city_sort", 1);
-    Session.set("community_sort", 1);
     Session.set("mapped_sort", 1);
 
     Session.set("selected_subscriber", null);
@@ -19,7 +18,7 @@ if (Meteor.isClient) {
   });
 
   Template.subscriber_overview.searchable_fields = function () {
-    return [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "community", "prior_email", "archived", "current_provider" ];
+    return [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "prior_email", "archived", "current_provider" ];
   };
 
   Template.subscriber_overview.current_search_fields = function () {
@@ -47,7 +46,7 @@ if (Meteor.isClient) {
       query = {$and: subquery};
     }
 
-    var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'community': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'billing_info': 1};
+    var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'billing_info': 1};
 
     var result = Subscribers.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")});
     Session.set("subscriber_count", result.count());
@@ -144,10 +143,6 @@ if (Meteor.isClient) {
     'click .city_header': function () {
       Session.set("city_sort", -1 * Session.get("city_sort"));
       Session.set("primary_sort_field_subscribers", "city_sort");
-    },
-    'click .community_header': function () {
-      Session.set("community_sort", -1 * Session.get("community_sort"));
-      Session.set("primary_sort_field_subscribers", "community_sort");
     },
     'click .mapped_header': function () {
       Session.set("mapped_sort", -1 * Session.get("mapped_sort"));
