@@ -21,7 +21,7 @@ if (Meteor.isClient) {
     return Session.get('subscriber');
   };
 
-  Template.payments_info.paymentInfo = function() {
+  Template.payment_history.paymentInfo = Template.required_payments.paymentInfo = function() {
     console.log(this);
     var authToken = Session.get('authToken');
     Meteor.call('getSubscriber', authToken, function(err, result) {
@@ -43,7 +43,11 @@ if (Meteor.isClient) {
     return Session.get('paymentInfo');
   };
 
-  Template.payments_info.requiredPayments = function() {
+  Template.required_payments.installmentAmount = function() {
+    return FRSettings.billing.installmentAmount;
+  };
+
+  Template.required_payments.requiredPayments = function() {
     var authToken = Session.get('authToken');
     Meteor.call('requiredPayments', authToken, function(err, result) {
       if (!err && typeof result === 'object') {
@@ -53,14 +57,14 @@ if (Meteor.isClient) {
     return Session.get('requiredPayments');
   };
 
-  Template.payments_info.showCharges = function() {
+  Template.payment_history.showCharges = Template.required_payments.showCharges = function() {
     var paymentInfo = Session.get('paymentInfo');
     return (typeof paymentInfo === 'object' && 
             typeof paymentInfo.charges === 'object' &&
             paymentInfo.charges.length > 0);
   };
 
-  Template.payments_info.rendered = function() {
+  Template.required_payments.rendered = function() {
     var authToken = Session.get('authToken');
     Meteor.call('billingInfo', authToken, function(err, result) {
       if (!err && typeof result === 'object') {
@@ -72,72 +76,74 @@ if (Meteor.isClient) {
     });
   };
 
-  Template.payments_info.events({ 
-    'click button.pay-with-card': function (evt) {
+  Template.required_payments.events({ 
+    'click #make-payment': function (evt) {
       var thisSub = Session.get('subscriber');
       var billingInfo = Session.get('billingInfo');
       var requiredPayments = Session.get('requiredPayments');
       var authToken = Session.get('authToken');
       var typeOfCharge;
-      //TODO: figure out charges amount and dates!!
-      if (evt.target.id === 'pay-monthly') {
-        typeOfCharge = 'monthly';
-        var index = $(evt.target).data('index');
-        var amount = requiredPayments.monthlyPayments[index].amount;
-        var billingPeriodEndDate = requiredPayments.monthlyPayments[index].endDate;
-        var billingPeriodStartDate = requiredPayments.monthlyPayments[index].startDate;
+      var amount = 0;
+      var typesOfCharges = [];
 
-        var stripeConfig = {
+      var stripeConfig = {
           name: 'Further Reach',
-          description: 'Monthly payment for period of ' + 
-                        moment(billingPeriodStartDate).format('MM/DD/YYYY') + ' to ' + 
-                        moment(billingPeriodEndDate).format('MM/DD/YYYY'),
           allowRememberMe: false,
           email: billingInfo.contact.email,
-          billingPeriodStartDate: billingPeriodStartDate,
-          billingPeriodEndDate: billingPeriodEndDate,
-          amount: (amount * 100) // Stripe does it by cents
-        };
-      } else if (evt.target.id === 'pay-installation') {
-        typeOfCharge = 'installation';
-        var amount = requiredPayments.installation.standard_installation;
-        var stripeConfig = {
-          name: 'Further Reach',
-          description: 'Standard Installation',
-          allowRememberMe: false,
-          email: billingInfo.contact.email,
-          amount: (amount * 100) // Stripe does it by cents
-        };
-      } else if (evt.target.id === 'pay-installation-installment') {
-        typeOfCharge = 'installation-installment';
-        var amount = FRSettings.billing.installmentAmount;
-        var stripeConfig = {
-          name: 'Further Reach',
-          description: 'Standard Installation Installment',
-          allowRememberMe: false,
-          email: billingInfo.contact.email,
-          amount: (amount * 100) // Stripe does it by cents
-        };
+          description: '',
       }
+      if (requiredPayments.dueToDate.required) {
+        typesOfCharges.push('monthly');
+        var monthlyAmount = requiredPayments.dueToDate.amount;
+        var billingPeriodEndDate = requiredPayments.dueToDate.endDate;
+        var billingPeriodStartDate = requiredPayments.dueToDate.startDate;
+
+        stripeConfig.description += 'Monthly payment for period of ' + 
+                        moment(billingPeriodStartDate).format('MM/DD/YYYY') + ' to ' + 
+                        moment(billingPeriodEndDate).format('MM/DD/YYYY') + '. \n',
+        stripeConfig.billingPeriodStartDate = billingPeriodStartDate,
+        stripeConfig.billingPeriodEndDate = billingPeriodEndDate,
+        amount += monthlyAmount;
+
+      } 
+      if (!requiredPayments.installation.paid) { 
+        var installationAmount;
+
+        if ($('#installment-choices').val() === 'installment') {
+          typesOfCharges.push('installment');
+          installationAmount = parseFloat(FRSettings.billing.installmentAmount);
+          stripeConfig.description += 'Standard Installation Installment';
+          amount += installationAmount;
+
+        } else {
+          typesOfCharges.push('installation');
+          installationAmount = parseFloat(requiredPayments.installation.standard_installation);
+          stripeConfig.description += 'Standard Installation';
+          amount += installationAmount;
+        }
+      }
+
+      //TODO: figure out better description stuff
+
+      stripeConfig.amount = amount * 100; // Stripe does it by cents
 
       var handler = StripeCheckout.configure({
         key: Meteor.settings.public.stripe.publicKey,
         image: '/FurtherReachLogo.png',
         token: function(stripeToken) {
           Session.set('loading', true);
-          Meteor.call('chargeCard', authToken, stripeToken, stripeConfig, typeOfCharge, function(err, result) {
+          Meteor.call('chargeCard', authToken, stripeToken, stripeConfig, typesOfCharges, function(err, result) {
             Session.set('loading', false);
             console.log(err);
             console.log(result);
             if (err || result.error) {
               bootbox.alert('There seems to have been an error processing your card.');
-              window.location.reload(true);
+              $('.btn').on('click', function(evt) {
+                window.location.reload(true);
+              });
             } else {
               bootbox.alert('Your payment has been processed. An email has been sent to you for your records');
             }
-            $('.btn').on('click', function(evt) {
-              //window.location.reload(true);
-            });
           });
         }
       });

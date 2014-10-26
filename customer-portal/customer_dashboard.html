@@ -72,13 +72,6 @@
     {{#if subscriberInfo.plan}}
     {{#if subscriberInfo.activation_date}}
     <div class="row">
-      <div class="col-xs-12">
-        <div class="payments-info-container">
-          {{> payments_info }}
-        </div>
-      </div>
-    </div>
-    <div class="row">
       <div class="col-xs-6">
         <div class="plan-info-container">
           {{> plan_info }}
@@ -87,6 +80,21 @@
       <div class="col-xs-6">
         <div class="subscriber-info-container">
           {{> subscriber_info }}
+        </div>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="payments-info-container">
+          {{> required_payments }}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="payments-info-container">
+          {{> payment_history }}
         </div>
       </div>
     </div>
@@ -232,83 +240,17 @@
 </div>
 </template>
 
-<template name="payments_info">
+<template name="payment_history">
+{{#if paymentInfo}}
+{{#if showCharges }}
 <div class="panel panel-primary">
   <div class="panel-heading">
-    <h2>Payment Info</h2>
+    <h2>Payment History</h2>
   </div>
 
   <div class="panel-body">
     <div class="col-xs-12">
-      {{#if requiredPayments.required }}
-      <h3 class="sub-header">Make a Payment</h3>
-      {{#each key_value requiredPayments.monthlyPayments}}
-      {{#if value.required}}
-      <div class="row payment-row">
-        <div class="col-xs-5 payment-start-date">
-          <div class="row">
-            <div class="col-xs-12">
-              Period of {{ formatDate value.startDate "MM/DD/YYYY" }} - {{ formatDate value.endDate "MM/DD/YYYY"}}
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-xs-12">
-              Plan: {{ value.label }}
-            </div>
-          </div>
-        </div>
-        <div class="col-xs-7">
-          <div class="row">
-            <div class="col-xs-12">
-              ${{ value.amount }}
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-xs-12">
-              <button id="pay-monthly" data-index="{{key}}" class="btn btn-success pay-with-card">Pay With Credit Card</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      {{/if}}
-      {{/each}}
-      {{/if}}
-      {{#if requiredPayments.installation.paid}}
-      {{else}}
-      <div class="row payment-row">
-        <div class="col-xs-5 payment-start-date">
-          <div class="row">
-            <div class="col-xs-12">
-              Standard Installation
-            </div>
-          </div>
-        </div>
-        <div class="col-xs-7">
-          <div class="row">
-            <div class="col-xs-12">
-              {{#if requiredPayments.installation.installments}}
-              Remaining installation amount: {{requiredPayments.installation.remaining_amount}}
-              {{else}}
-              ${{ requiredPayments.installation.standard_installation }}
-              {{/if}}
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-xs-12">
-              {{#if requiredPayments.installation.installments}}
-              <button id="pay-installation-installment" class="btn btn-warning pay-with-card">Pay Installment With Credit Card</button>
-              {{else}}
-              <button id="pay-installation" class="btn btn-success pay-with-card">Pay With Credit Card</button>
-              <button id="pay-installation-installment" class="btn btn-warning pay-with-card">Pay Installment With Credit Card</button>
-              {{/if}}
-            </div>
-          </div>
-        </div>
-      </div>
-      {{/if}}
-      {{#if paymentInfo}}
-      {{#if showCharges }}
-      <h3 class="sub-header">Previous Charges</h3>
+      <h3 class="sub-header">Charges</h3>
       {{#each paymentInfo.charges}}
       <div class="row charge-row">
         <div class="col-xs-2 charge-date">
@@ -333,11 +275,96 @@
         </div>
       </div>
       {{/each}}
-      {{/if}}
-      {{/if}}
     </div>
   </div>
 </div>
+{{/if}}
+{{/if}}
+</template>
+
+
+<template name="required_payments">
+{{#if requiredPayments.required }}
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h2>Bill</h2>
+  </div>
+
+  <div class="panel-body">
+    <h3 class="sub-header">Make a Payment</h3>
+    <div class="col-xs-12">
+      {{#if requiredPayments.dueToDate.required }}
+      <div class="row payment-row">
+        <div class="col-xs-5 payment-start-date">
+          {{#each requiredPayments.dueToDate.payments}}
+          <div class="row monthly-period-dates">
+            <div class="col-xs-12">
+              Period of {{ formatDate this.startDate "MM/DD/YYYY" }} - {{ formatDate this.endDate "MM/DD/YYYY"}}
+            </div>
+          </div>
+          <div class="row monthly-period-plan">
+            <div class="col-xs-12">
+              Plan: {{ this.plan.label }}
+            </div>
+          </div>
+          {{/each}}
+        </div>
+        <div class="col-xs-7">
+          <div class="row">
+            <div class="col-xs-12">
+              ${{ requiredPayments.dueToDate.amount }}
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/if}}
+      {{#if requiredPayments.installation.paid}}
+      {{else}}
+      <div class="row payment-row">
+        <div class="col-xs-5 payment-start-date">
+          <div class="row">
+            <div class="col-xs-12">
+              Standard Installation
+            </div>
+          </div>
+        </div>
+        <div class="col-xs-7">
+          <div class="row">
+            <div class="col-xs-12">
+              {{#if requiredPayments.installation.installments}}
+              Remaining installation amount: ${{requiredPayments.installation.remaining_amount}}
+              {{else}}
+              ${{ requiredPayments.installation.standard_installation }}
+              {{/if}}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              <select id="installment-choices" class="form-control">
+                <option value="full">
+                  Pay full installation 
+                  {{#if requiredPayments.installation.remaining_amount}} 
+                  - {{requiredPayments.installation.remaining_amount}} 
+                  {{/if}}
+                </option>
+                <option value="installment">
+                  Pay installment - {{installmentAmount}}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+     {{/if}}
+      <div class="row">
+        <div class="col-xs-12">
+          <button id="make-payment" class="btn btn-success make-payment">Make a Payment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{{/if}}
 </template>
 
 <template name="plan_info">

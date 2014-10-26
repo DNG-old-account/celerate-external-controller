@@ -35,7 +35,7 @@ Meteor.methods({
     return sub;
   },
 
-  chargeCard: function(token, stripeToken, stripeConfig, type) {
+  chargeCard: function(token, stripeToken, stripeConfig, typesOfCharges) {
     var stripe = Meteor.npmRequire('stripe')(Meteor.settings.stripe.privateKey);
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
     var thisSub = Subscribers.findOne(subId);
@@ -55,28 +55,47 @@ Meteor.methods({
 
     console.log(result);
     var dollarAmount = stripeConfig.amount / 100;
+    var installmentAmount = FRSettings.billing.installmentAmount;
 
     if (!result.error && !result.result.err) {
-      if (type === 'installation') {
+      console.log('types of charges');
+      console.log(typesOfCharges);
+      if (_.contains(typesOfCharges, 'installation')) {
+        console.log('installation payment');
         Subscribers.update(thisSub._id, {$set: {'billing_info.installation.paid': true }});
-      } else if (type === 'installation-installment') {
+      }
+      if (_.contains(typesOfCharges, 'installment')) {
+        console.log('installment payment');
         var installmentPayment = {
-          amount: dollarAmount,
+          amount: installmentAmount,
           charge_date: moment().tz('America/Los_Angeles').toISOString()
         }
         Subscribers.update(thisSub._id, {$set: {'billing_info.installation.installments': true }});
         Subscribers.update(thisSub._id, {$push: {'billing_info.installation.installment_payments': installmentPayment }});
+
+        thisSub = Subscribers.findOne(thisSub._id);
+        console.log('This Sub');
+        console.log(thisSub);
+
+        console.log(thisSub.billing_info.installation.installment_payments);
+
         var totalPaid = _.reduce(thisSub.billing_info.installation.installment_payments, function(sum, payment) {
-          return sum + payment.amount;
+          return sum + parseFloat(payment.amount);
         }, 0);
 
-        thisSub = Subscribers.find(this_sub._id);
-        console.log('total paid = ' + totalPaid);
+        console.log("total paid = ");
+        console.log(totalPaid);
 
-        if (totalPaid >= thisSub.billing_info.installation.standard_installation) {
+        console.log("standard installation = ");
+        console.log(parseFloat(thisSub.billing_info.installation.standard_installation));
+
+
+        if (totalPaid >= parseFloat(thisSub.billing_info.installation.standard_installation)) {
+          console.log('totalPaid is really >= standard_isntallation???');
           Subscribers.update(thisSub._id, {$set: {'billing_info.installation.paid': true }});
         }
-      } else if (type === 'monthly') {
+      } 
+      if (_.contains(typesOfCharges, 'monthly')) {
         var monthlyPayment = {
           amount: dollarAmount,
           start_date: stripeConfig.billingPeriodStartDate,
@@ -153,7 +172,8 @@ Meteor.methods({
 
         if (monthlyPayment.required) {
           var monthlyPaymentAmount = FRSettings.billing.plans[sub.plan].monthly;
-          monthlyPayment.label = FRSettings.billing.plans[sub.plan].label;
+          var monthlyPaymentPlan = FRSettings.billing.plans[sub.plan];
+          monthlyPayment.plan = FRSettings.billing.plans[sub.plan];
 
           if (monthlyPayment.startDate.isBefore(activationDate) || monthlyPayment.startDate.isSame(activationDate, 'day')) {
             var startOfMonth = moment(activationDate).startOf('month');
@@ -179,12 +199,39 @@ Meteor.methods({
       }
     });
 
+    var dueToDate = {
+      startDate: moment().add(10, 'years'),
+      endDate: moment().subtract(10, 'years'),
+      amount: 0,
+      payments: [],
+      required: false,
+    };
+    _.each(result.monthlyPayments, function(payment) {
+      if (payment.required) {
+        dueToDate.required = true;
+        dueToDate.amount += parseFloat(payment.amount);
+        dueToDate.payments.push(payment);
+        if (moment(dueToDate.startDate).isAfter(moment(payment.startDate))) {
+          dueToDate.startDate = moment(payment.startDate).toISOString();
+        }
+        if (moment(dueToDate.endDate).isBefore(moment(payment.endDate))) {
+          dueToDate.endDate = moment(payment.endDate).toISOString();
+        }
+      }
+    });
+
+    result.dueToDate = dueToDate;
+
     result.installation = sub.billing_info.installation;
     if (result.installation.installments) {
       var totalPaid = _.reduce(result.installation.installment_payments, function(sum, payment) {
         return sum + payment.amount;
       }, 0);
       result.installation.remaining_amount = result.installation.standard_installation - totalPaid;
+    }
+
+    if (!result.installation.paid) {
+      result.required = true;
     }
 
     return result;

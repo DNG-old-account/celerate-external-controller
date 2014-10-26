@@ -1,7 +1,7 @@
 // Write your package code here!
 FRSettings = {
   "billing": {
-    "installmentAmount": 40,
+    "installmentAmount": 25,
     "plans": {
       "beta-free": {
         "label": "Beta Free",
