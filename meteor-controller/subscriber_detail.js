@@ -200,12 +200,13 @@ if (Meteor.isClient) {
   Template.subscriber_details.scheduling_fields = function () {
     var priority_options = ["high", "medium", "low", "none", "unknown"];
     var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
+    var bts_options = [ "RJ-N", "RJ-W", "RJ-E", "LH-E", "10M-W", "BH-N", "BH-E", "PAHS-SW", "PAHS-SE", "PAES-W", "PAES-S", "TH-W", "TH-E" ];
 
     return [ { field: "priority", label: "Priority", value: this.priority, options: priority_options },
              { field: "current_provider", label: "Current Provider", value: this.current_provider, options: provider_options },
              { field: "relay_site", label: "Willing to be Relay Site", value: this.relay_site },
              { field: "time_availability", label: "Time Availability", value: this.time_availability },
-             { field: "bts_to_use", label: "BTS to use", value: this.bts_to_use },
+             { field: "bts_to_use", label: "BTS to use", value: this.bts_to_use, options: bts_options },
              { field: "notes", label: "Notes", value: this.notes },
              { field: "signup_date", label: "Signup Date", value: this.signup_date }
            ];
