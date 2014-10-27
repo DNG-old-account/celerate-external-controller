@@ -145,11 +145,19 @@ Meteor.methods({
     if (sub.status === 'connected' && 
         moment(sub.activation_date).isValid() &&
         typeof sub.plan === 'string') {
-      var activationDate = moment(sub.activation_date).tz('America/Los_Angeles');
-      var dateCursor = moment(startOfThisMonth);
-      var firstMonthEver = moment(activationDate).startOf('month');
 
-      while (dateCursor.isAfter(firstMonthEver)) {
+      var activationDate = moment.tz(sub.activation_date, 'America/Los_Angeles');
+      var dateCursor = moment(startOfThisMonth);
+      var firstDayOfBilling = moment.tz(FRSettings.billing.firstDayOfBilling, 'America/Los_Angeles');
+
+      if (activationDate.isAfter(firstDayOfBilling) || 
+          activationDate.isSame(firstDayOfBilling, 'day')) {
+        var firstMonthEver = moment(activationDate).startOf('month');
+      } else {
+        var firstMonthEver = moment(firstDayOfBilling);
+      }
+
+      while (dateCursor.isAfter(firstMonthEver) && !dateCursor.isSame(firstMonthEver, 'day')) {
 
         var monthlyPayment = {};
         monthlyPayment.required = true;
@@ -206,6 +214,7 @@ Meteor.methods({
       payments: [],
       required: false,
     };
+
     _.each(result.monthlyPayments, function(payment) {
       if (payment.required) {
         dueToDate.required = true;

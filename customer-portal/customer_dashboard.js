@@ -7,6 +7,15 @@ if (Meteor.isClient) {
     return Session.get('loading');
   };
 
+  Template.subscriber_info.connected = Template.customer_dashboard.connected = function() {
+    var sub = Session.get('subscriber');
+
+    if (typeof sub === 'object' && sub.status === 'connected' && moment(sub.activation_date).isValid()) {
+      return true;
+    }
+    return false;
+  };
+    
   Template.subscriber_info.subscriberInfo = Template.customer_dashboard.subscriberInfo = function() {
     var authToken = Session.get('authToken');
     Meteor.call('getSubscriber', authToken, function(err, result) {
