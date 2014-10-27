@@ -47,6 +47,34 @@ if (Meteor.isClient) {
     return FRSettings.billing.installmentAmount;
   };
 
+  var calcTotalPayment = function() {
+    var requiredPayments = Session.get('requiredPayments');
+    var total = 0;
+    if (requiredPayments.required) {
+      if (!requiredPayments.installation.paid) {
+        if ($('#installment-choices').val() === 'installment') {
+          total += FRSettings.billing.installmentAmount;
+        } else {
+          if (requiredPayments.installation.installments && !isNaN(parseFloat(requiredPayments.installation.remaining_amount))) {
+            total += parseFloat(requiredPayments.installation.remaining_amount);
+          } else {
+            total += parseFloat(requiredPayments.installation.standard_installation);
+          }
+        }
+      }
+      if (requiredPayments.dueToDate.required && !isNaN(parseFloat(requiredPayments.dueToDate.total))) {
+        total += parseFloat(requiredPayments.dueToDate.total);
+      }
+    } 
+    Session.set('totalPayment', total);
+  };
+
+  Template.required_payments.totalPayment = function() {
+    calcTotalPayment();
+    var totalPayment = Session.get('totalPayment');
+    return totalPayment;
+  }
+
   Template.required_payments.requiredPayments = function() {
     var authToken = Session.get('authToken');
     Meteor.call('requiredPayments', authToken, function(err, result) {
@@ -77,14 +105,18 @@ if (Meteor.isClient) {
   };
 
   Template.required_payments.events({ 
+    'change #installment-choices': function(evt) {
+      calcTotalPayment();
+    },
+
     'click #make-payment': function (evt) {
       var thisSub = Session.get('subscriber');
       var billingInfo = Session.get('billingInfo');
       var requiredPayments = Session.get('requiredPayments');
       var authToken = Session.get('authToken');
       var typeOfCharge;
-      var amount = 0;
       var typesOfCharges = [];
+      var amount = Session.get('totalPayment');
 
       var stripeConfig = {
           name: 'Further Reach',
@@ -94,16 +126,14 @@ if (Meteor.isClient) {
       }
       if (requiredPayments.dueToDate.required) {
         typesOfCharges.push('monthly');
-        var monthlyAmount = requiredPayments.dueToDate.amount;
         var billingPeriodEndDate = requiredPayments.dueToDate.endDate;
         var billingPeriodStartDate = requiredPayments.dueToDate.startDate;
 
         stripeConfig.description += 'Monthly payment for period of ' + 
                         moment(billingPeriodStartDate).format('MM/DD/YYYY') + ' to ' + 
-                        moment(billingPeriodEndDate).format('MM/DD/YYYY') + '. \n',
-        stripeConfig.billingPeriodStartDate = billingPeriodStartDate,
-        stripeConfig.billingPeriodEndDate = billingPeriodEndDate,
-        amount += monthlyAmount;
+                        moment(billingPeriodEndDate).format('MM/DD/YYYY') + '. \n';
+        stripeConfig.billingPeriodStartDate = billingPeriodStartDate;
+        stripeConfig.billingPeriodEndDate = billingPeriodEndDate;
 
       } 
       if (!requiredPayments.installation.paid) { 
@@ -113,19 +143,17 @@ if (Meteor.isClient) {
           typesOfCharges.push('installment');
           installationAmount = parseFloat(FRSettings.billing.installmentAmount);
           stripeConfig.description += 'Standard Installation Installment';
-          amount += installationAmount;
 
         } else {
           typesOfCharges.push('installation');
           installationAmount = parseFloat(requiredPayments.installation.standard_installation);
           stripeConfig.description += 'Standard Installation';
-          amount += installationAmount;
         }
       }
 
       //TODO: figure out better description stuff
 
-      stripeConfig.amount = amount * 100; // Stripe does it by cents
+      stripeConfig.amount = parseInt(amount * 100, 10); // Stripe does it by cents
 
       var handler = StripeCheckout.configure({
         key: Meteor.settings.public.stripe.publicKey,
