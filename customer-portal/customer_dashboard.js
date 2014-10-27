@@ -71,8 +71,8 @@ if (Meteor.isClient) {
           }
         }
       }
-      if (requiredPayments.dueToDate.required && !isNaN(parseFloat(requiredPayments.dueToDate.total))) {
-        total += parseFloat(requiredPayments.dueToDate.total);
+      if (requiredPayments.dueToDate.required && !isNaN(parseFloat(requiredPayments.dueToDate.amount))) {
+        total += parseFloat(requiredPayments.dueToDate.amount);
       }
     } 
     Session.set('totalPayment', total);
