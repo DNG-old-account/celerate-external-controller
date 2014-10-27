@@ -11,25 +11,25 @@ Router.map(function() {
 
   this.route('hardware_page', {
     path: '/hardware',
-    // onBeforeAction: checkUser
+    onBeforeAction: checkUser
   });
   this.route('hardware_details', {path: '/hardware_details/:_id', data: function() { return Hardware.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
 
   this.route('site_page', {
     path: '/site',
-    // onBeforeAction: checkUser
+    onBeforeAction: checkUser
   });
   this.route('site_details', {path: '/site_details/:_id', data: function() { return Sites.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
 
   this.route('node_page', {
     path: '/node',
-    // onBeforeAction: checkUser
+    onBeforeAction: checkUser
   });
   this.route('node_details', {path: '/node_details/:_id', data: function() { return Nodes.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
 
   this.route('subscriber_page', {
     path: '/subscriber',
-    // onBeforeAction: checkUser
+    onBeforeAction: checkUser
   });
   this.route('subscriber_details', {path: '/subscriber_details/:_id', data: function() { return Subscribers.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
 });
