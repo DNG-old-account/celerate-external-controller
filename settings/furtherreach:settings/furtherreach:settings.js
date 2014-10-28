@@ -28,27 +28,27 @@ FRSettings = {
       "essential": {
         "label": "Essential",
         "monthly": 70,
-        "details": "Min: 4Mb/s Max: 8Mb/s"
+        "details": "Min: 4Mb/s Typical: 8Mb/s"
       },
       "performance": {
         "label": "Performance",
         "monthly": 100,
-        "details": "Min: 8Mb/s Max: 15Mb/s"
+        "details": "Min: 8Mb/s Typical: 15Mb/s"
       },
       "ultra": {
         "label": "Ultra",
         "monthly": 130,
-        "details": "Min: 15Mb/s Max: 30Mb/s"
+        "details": "Min: 15Mb/s Typical: 30Mb/s"
       },
       "silver": {
         "label": "Silver",
         "monthly": 130,
-        "details": "Min: 15Mb/s Max: 30Mb/s"
+        "details": "Min: 15Mb/s Typical: 30Mb/s"
       },
       "gold": {
         "label": "Gold",
         "monthly": 200,
-        "details": "Min: 40Mb/s Max: 60Mb/s"
+        "details": "Min: 40Mb/s Typical: 60Mb/s"
       },
     }
   },
