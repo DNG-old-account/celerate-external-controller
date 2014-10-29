@@ -354,11 +354,15 @@
                 <option value="full">
                   Pay full installation 
                   {{#if requiredPayments.installation.remaining_amount}} 
-                  - {{requiredPayments.installation.remaining_amount}} 
+                  - ${{requiredPayments.installation.remaining_amount}} 
                   {{/if}}
                 </option>
                 <option value="installment">
-                  Pay installment - {{installmentAmount}}
+                  {{#if requiredPayments.installments}}
+                  Pay installment - ${{installmentAmount}}
+                  {{else}}
+                  Pay installment - (6 payments of ${{installmentAmount}} each)
+                  {{/if}}
                 </option>
               </select>
             </div>
