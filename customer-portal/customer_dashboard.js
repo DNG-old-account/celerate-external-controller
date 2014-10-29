@@ -166,7 +166,7 @@ if (Meteor.isClient) {
 
       var handler = StripeCheckout.configure({
         key: Meteor.settings.public.stripe.publicKey,
-        image: '/FurtherReachLogo.png',
+        image: '/FR_stripe_logo.png',
         token: function(stripeToken) {
           Session.set('loading', true);
           Meteor.call('chargeCard', authToken, stripeToken, stripeConfig, typesOfCharges, function(err, result) {

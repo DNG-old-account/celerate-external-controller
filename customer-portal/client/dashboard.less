@@ -7,6 +7,7 @@ body {
   padding-top: 0px;
   overflow-x: hidden;
   min-height: 400px;
+  font-family: "Roboto Slab","Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
 /*
@@ -18,6 +19,14 @@ body {
   border-bottom: 1px solid #eee;
 }
 
+a {
+  color: #569e26;
+}
+
+a:hover, a:active, a:focus {
+  color: #569e26;
+}
+
 .bold {
   font-weight: 700;
 }
@@ -25,6 +34,39 @@ body {
 .glyphicon.edit-row {
   cursor: pointer;
 }
+
+/* 
+ * Navbar
+ */
+.navbar.navbar-default {
+  
+  background-color: #fff; 
+  min-height: 50px;
+
+  .navbar-brand {
+    height: inherit;
+    min-height: 50px;
+  }
+}
+
+/*
+ * Footer
+ */
+
+.footer {
+  text-align: center;
+  line-height: 24px;
+  margin-bottom: 20px;
+
+  .copyright {
+    font-family: Montserrat,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+
+  .site {
+    font-size: 1.2em;
+  }
+}
+
 
 /* 
  * JSON Prettifying for Debugging
