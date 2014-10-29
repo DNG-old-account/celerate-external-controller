@@ -65,7 +65,7 @@ Meteor.methods({
         currency: "usd",
         card: stripeToken.id,
         description: stripeConfig.description,
-        receipt_email: stripeConfig.email
+        receipt_email: stripeConfig.email,
       }, function(err, charge) {
         done(err, charge);
       });

@@ -270,22 +270,19 @@
         <div class="col-xs-2 charge-date">
           {{ this.dateCreatedString }} 
         </div>
-        <div class="col-xs-10">
-          <div class="row">
-            <div class="col-xs-12">
-              <span class="bolded-label">Amount:</span> ${{ this.dollarAmount }}
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-xs-12">
-              <span class="bolded-label">Description:</span> {{ this.description }}
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-xs-12">
-              <span class="bolded-label">Card:</span> {{ this.card.brand}} ending in {{ this.card.last4 }}
-            </div>
-          </div>
+        <div class="col-xs-2">
+          {{#if paymentInfo.metadata.receipt_number}}
+          <span class="bolded-label">{{paymentInfo.metadata.receipt_number}}</span>
+          {{/if}} 
+        </div>
+        <div class="col-xs-2">
+          <span class="bolded-label">Amount:</span> ${{ this.dollarAmount }}
+        </div>
+        <div class="col-xs-4">
+          <span class="bolded-label">Description:</span> {{ this.description }}
+        </div>
+        <div class="col-xs-2">
+          <span class="bolded-label">Card:</span> {{ this.card.brand}} ending in {{ this.card.last4 }}
         </div>
       </div>
       {{/each}}
