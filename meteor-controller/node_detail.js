@@ -70,27 +70,86 @@ if (Meteor.isClient) {
     return Sites.find({}, {sort: {name: 1}});
   };
 
-  Template.node_details.site_name = function() {
+  Template.node_details.site_name = function () {
     console.log(this);
     var site_query = Sites.findOne(new Meteor.Collection.ObjectID(this.site));
     console.log(site_query);
-    if (site_query) { return site_query.name; }
+    if (site_query) {
+      return site_query.name;
+    }
+
     return "";
+  };
+
+  Template.node_details.ports_from_hardware = function () {
+    console.log(this);
+    var hardware_query = Hardware.findOne({name: this.hardware});
+    if (hardware_query) {
+      return hardware_query.ports;
+    }
+
+    return [];
+  };
+
+  Template.node_details.per_port_fields = function () {
+    console.log("per_port_fields");
+    console.log(this);
+
+    var remote_node_value = "";
+    var remote_port_value = "";
+
+    var remote_node_options = Nodes.find({}).map(function(item, index, cursor) {
+      return { value: item._id._str, label: item.name };
+    });
+
+    var remote_port_options = [];
+    if (this.node_instance.ports && this.node_instance.ports[this.context.name]) {
+      if (this.node_instance.ports[this.context.name].remote_node) {
+        remote_node_value = this.node_instance.ports[this.context.name].remote_node;
+        remote_port_options = _.map(Hardware.findOne({name: remote_node_value}).ports, function (item) {
+          return { value: item.name, label: item.name + " " + item.type };
+        });
+      }
+
+      if (this.node_instance.ports[this.context.name].remote_port) {
+        remote_port_value = this.node_instance.ports[this.context.name].remote_port;
+      }
+    }
+
+    var ip_value = "";
+    if (this.node_instance.ports && this.node_instance.ports[this.context.name] && this.node_instance.ports[this.context.name].ip) {
+      ip_value = this.node_instance.ports[this.context.name].ip;
+    }
+
+    return [ { field: "ports." + this.context.name + ".ip", label: "IP", value: ip_value },
+             { field: "ports." + this.context.name + ".remote_node", label: "Remote Node", value: remote_node_value, options: true, options_custom_view: remote_node_options },
+             { field: "ports." + this.context.name + ".remote_port", label: "Remote Port", value: remote_port_value, options: true, options_custom_view: remote_port_options },
+           ];
   };
 
   Template.node_details.node_fields = function () {
     var type_options = ["client", "cpe", "ap", "base_station", "core", "other"];
     var status_options = ["operational", "failed", "undeployed"];
 
-    var hardware_options = Template.node_details.hardware_options().map(function(item, index, cursor) { return { value: item.name, label: (item.make + "/" + item.model) }; });
+    var hardware_options = Template.node_details.hardware_options().map(function(item, index, cursor) {
+      return { value: item.name, label: (item.make + "/" + item.model + " (" + item.name + ")") };
+    });
 
-    var site_options = Template.node_details.site_options().map(function(item, index, cursor) { return { value: item._id._str, label: item.name }; });
+    var site_options = Template.node_details.site_options().map(function(item, index, cursor) {
+      var type_str = "";
+      if (item.type != null) {
+        type_str = "(" + _.keys(item.type).toString() + ")";
+      }
+      return { value: item._id._str, label: (item.name + " " + type_str) };
+    });
 
     return [ { field: "name", label: "Name", value: this.name },
              { field: "hardware", label: "Hardware", value: this.hardware, options: true, options_custom_view: hardware_options },
              { field: "type", label: "Type", value: this.type, options: type_options },
+             { field: "site", label: "Site", value: this.site, options: true, options_custom_view: site_options },
              { field: "status", label: "Status", value: this.status, options: status_options },
-             { field: "site", label: "Site", value: this.site, options: true, options_custom_view: site_options }
+             { field: "mac", label: "MAC", value: this.mac },
+             { field: "ports", label: "Ports", value: this.ports, display_ports: true },
            ];
   };
 

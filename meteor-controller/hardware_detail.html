@@ -8,39 +8,39 @@
 {{#each hardware_fields}}
 
 {{#if display_ports}}
-<div class="well">
-{{#with ..}}
-<button type="button" class="add-port btn btn-success">Add Port</button>
-{{/with}}
-<ul class="nav nav-pills" role="tablist">
-  {{#each value}}
-  <li><a href="#port_{{name}}" role="tab" data-toggle="tab">Port {{name}} ({{type}})</a></li>
-  {{/each}}
-</ul>
-<div class="tab-content">
-{{#each value}}
-<div class="tab-pane" id="port_{{name}}">
-{{#each key_value_without_index this}}
-<div class="form-group">
-  <div class="container-fluid">
-    <div class="col-xs-2"><label for="ports.{{../index}}.{{key}}" class="control-label">{{key}}</label></div>
-    <div class="col-xs-8"><input class="form-control" id="ports.{{../index}}.{{key}}" type="text" value="{{value}}" disabled></div>
-    {{#with ../../..}}
-    <div class="col-xs-2">
-      <span class="glyphicon-pencil glyphicon" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Edit" id="edit"></span>
-      <span class="glyphicon-save glyphicon text-gray" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Save" id="save"></span>
-    </div>
+  <div class="well">
+    {{#with ..}}
+    <button type="button" class="add-port btn btn-success">Add Port</button>
     {{/with}}
+    <ul class="nav nav-pills" role="tablist">
+      {{#each value}}
+      <li><a href="#port_{{name}}" role="tab" data-toggle="tab">Port {{name}} ({{type}})</a></li>
+      {{/each}}
+    </ul>
+    <div class="tab-content">
+      {{#each value}}
+      <div class="tab-pane" id="port_{{name}}">
+        {{#each key_value_without_index this}}
+        <div class="form-group">
+          <div class="container-fluid">
+            <div class="col-xs-2"><label for="ports.{{../index}}.{{key}}" class="control-label">{{key}}</label></div>
+            <div class="col-xs-8"><input class="form-control" id="ports.{{../index}}.{{key}}" type="text" value="{{value}}" disabled></div>
+            {{#with ../../..}}
+            <div class="col-xs-2">
+              <span class="glyphicon-pencil glyphicon" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Edit" id="edit"></span>
+              <span class="glyphicon-save glyphicon text-gray" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Save" id="save"></span>
+            </div>
+            {{/with}}
+          </div>
+        </div>
+        {{/each}}
+        {{#with context=this hardware_instance=../..}}
+        <button type="button" class="delete-port btn btn-danger" id="{{context.name}}">Delete Port {{context.name}}</button>
+        {{/with}}
+      </div>
+      {{/each}}
+    </div>
   </div>
-</div>
-{{/each}}
-{{#with context=this hardware_instance=../..}}
-<button type="button" class="delete-port btn btn-danger" id="{{context.name}}">Delete Port {{context.name}}</button>
-{{/with}}
-</div>
-{{/each}}
-</div>
-</div>
 {{else}}
 <div class="form-group">
   <div class="container-fluid">
