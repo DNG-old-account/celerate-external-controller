@@ -8,6 +8,7 @@ Package.onUse(function(api) {
   api.versionsFrom('0.9.0');
   api.addFiles('furtherreach:settings.js');
   api.export('FRSettings');
+  api.export('FRMethods');
 });
 
 Package.onTest(function(api) {

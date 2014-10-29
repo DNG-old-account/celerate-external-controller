@@ -1,5 +1,11 @@
 // In your server code: define a method that the client can call
 Meteor.methods({
+  generateAuthToken: function (subscriber_id) {
+    var result = FRMethods.generateAuthToken(subscriber_id,
+                                             Meteor.settings.serverAuthToken.encryptionKey,
+                                             Meteor.settings.serverAuthToken.MACKey);
+    return result;
+  },
   sendEmail: function (to, from, subject, text) {
     check([to, from, subject, text], [String]);
 
@@ -42,7 +48,6 @@ Meteor.methods({
   },
 
   signS3Upload: function(file, key) {
-
     var params = {
       Bucket: 'celerate-external-controller-uploads',
       Key: key,

@@ -19,6 +19,13 @@
       "secret": "SECRET"
     }
   },
+  "serverAuthToken": {
+    "encryptionKey" : "", // 16 byte base64 encoded key
+    "MACKey" : "", // another 16 byte base64 encoded key
+    "tokenDaysValid" : 1,
+    "encryptionMode" : "AES-128-CTR",
+    "hashMode" : "sha1"
+  },
   "public": {
     "stripe": {
       "publicKey": "pk_test_6pRNASCoBOKtIshFeQd4XMUh" // This is a stripe demo key

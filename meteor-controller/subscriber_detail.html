@@ -3,7 +3,7 @@
 <div class="alert alert-warning" role="alert"><strong>Warning:</strong> This is an ARCHIVED Subscriber</div>
 {{/if}}
 
-<button type="button" class="btn btn-success" id="user_billing_setup_button">User Billing Setup</button>
+<a href="{{user_billing_link}}" role="button" class="btn btn-success" target="_blank">User Billing Setup</a>
 {{#if is_archived}}
 {{else}}
 <button type="button" class="archive_subscriber_button btn btn-warning">Archive Subscriber</button>

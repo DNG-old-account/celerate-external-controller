@@ -1,7 +1,25 @@
 // In your server code: define a method that the client can call
+var crypto = Npm.require('crypto');
 
-var authenticate = function(token) {
-  return token;
+var authenticate = function(mergedToken) {
+  // Split the token into a token and a tag.
+  var s = mergedToken.split("+");
+  if (s.length != 3) {
+    throw new Meteor.Error("invalid-auth-token", "Couldn't split merged token into three pieces: " + mergedToken);
+  }
+
+  var iv = s[0];
+  var token = s[1];
+  var tag = s[2];
+  var p = FRMethods.processAuthToken(iv, token, tag,
+                                     Meteor.settings.serverAuthToken.encryptionKey,
+                                     Meteor.settings.serverAuthToken.MACKey);
+  if (p.err) {
+    console.log(err);
+    throw new Meteor.Error("invalid-auth-token", p.err);
+  }
+
+  return p.subscriber_id;
 }
 
 Meteor.methods({

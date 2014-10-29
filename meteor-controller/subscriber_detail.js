@@ -79,16 +79,6 @@ if (Meteor.isClient) {
     'click .user_google_account_setup_button': function (evt) {
       window.open("https://admin.google.com/AdminHome?fral=1#UserList:org=45257bl2kp4lkp");
     },
-    'click #user_billing_setup_button': function (evt) {
-      var id = this._id;
-      // Try/Catch to allow for customerPortal or url to be undefined
-      try {
-        var win = window.open(Meteor.settings.public.urls.customerPortal +  id, '_blank');
-        win.focus();
-      } catch (e) {
-      }
-
-    },
     'click #update_billing': function (evt) {
       // TODO: Doesn't have a handler for other equipment or labor
       evt.preventDefault();
@@ -126,6 +116,31 @@ if (Meteor.isClient) {
     }
   });
 
+  var getUserBillingLink = function (subscriber_id) {
+    console.log("about to call generateAuthToken with " + subscriber_id);
+    Meteor.call('generateAuthToken', subscriber_id, function (err, result) {
+      if (err) {
+        console.log("generateAuthToken call failed: " + err);
+      } else {
+        console.log("Called generateAuthToken, got: " + JSON.stringify(result));
+        if (typeof result !== 'object') {
+          console.log("generateAuthToken didn't return object");
+        } else if (result.err) {
+          console.log("generateAuthToken error occurred: " + result.err);
+        } else {
+          var user_link = Meteor.settings.public.urls.customerPortal + result.iv + "+" + result.token + "+" + result.tag;
+          console.log("setting user billing link " + user_link);
+          Session.set("user_billing_link", user_link);
+        }
+      }
+    });
+  };
+
+  Template.subscriber_details.user_billing_link = function () {
+    console.log("re-getting user billing link: " + Session.get("user_billing_link"));
+    return Session.get("user_billing_link");
+  };
+
   Template.subscriber_details.cpe_options = function () {
     return Nodes.find({ type: 'cpe' });
   };
@@ -141,6 +156,9 @@ if (Meteor.isClient) {
   };
 
   Template.subscriber_details.basic_info_fields = function () {
+    // Set up the user billing link, since we know we have a subscriber id now.
+    getUserBillingLink(this._id._str);
+
     var subscriber_type_options = ["residential", "business", "non profit organization"];
     var status_options = ["connected", "new lead", "no coverage", "deferred", "not interested"];
     var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
@@ -211,4 +229,5 @@ if (Meteor.isClient) {
              { field: "signup_date", label: "Signup Date", value: this.signup_date }
            ];
   };
+
 }

@@ -15,4 +15,5 @@ mizzao:user-status
 service-configuration
 peerlibrary:aws-sdk
 furtherreach:settings
+mrt:moment
 
