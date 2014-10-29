@@ -21,6 +21,7 @@ if (Meteor.isClient) {
         db_update = {};
         db_update[formelement.id] = formelement.value;
         Nodes.update(this._id, {$set: db_update}); 
+
         formelement.disabled = true;
 
         // Toggle the icon visual state.
@@ -106,8 +107,16 @@ if (Meteor.isClient) {
     if (this.node_instance.ports && this.node_instance.ports[this.context.name]) {
       if (this.node_instance.ports[this.context.name].remote_node) {
         remote_node_value = this.node_instance.ports[this.context.name].remote_node;
-        remote_port_options = _.map(Hardware.findOne({name: remote_node_value}).ports, function (item) {
-          return { value: item.name, label: item.name + " " + item.type };
+        var remote_node = Nodes.findOne(new Meteor.Collection.ObjectID(remote_node_value));
+        var remote_node_hardware = Hardware.findOne({name: remote_node.hardware});
+
+        // Only show remote ports of the same type.
+        var port_type_to_match = this.context.type;
+        var matching_ports = _.filter(remote_node_hardware.ports, function(p) {
+          return p.type === port_type_to_match;
+        });
+        remote_port_options = _.map(matching_ports, function (item) {
+          return { value: item.name, label: item.name + " (" + item.type + ")" };
         });
       }
 
