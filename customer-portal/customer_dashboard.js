@@ -174,12 +174,16 @@ if (Meteor.isClient) {
             console.log(err);
             console.log(result);
             if (err || result.error) {
-              bootbox.alert('There seems to have been an error processing your card.');
+              bootbox.alert('There seems to have been an error processing your card. If this persists, please contact support@furtherreach.net');
               $('.btn').on('click', function(evt) {
                 window.location.reload(true);
               });
             } else {
-              bootbox.alert('Your payment has been processed. An email has been sent to you for your records');
+              var notification = 'Your payment has been processed. An email has been sent to you for your records.'
+              if (typeof result.receipt_number === "string") {
+                notification += 'Your receipt number is ' + result.receipt_number;
+              }
+              bootbox.alert(notification);
             }
           });
         }
