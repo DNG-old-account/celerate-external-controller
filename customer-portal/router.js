@@ -10,19 +10,8 @@ var checkAdmin = function(pause) {
 Router.onBeforeAction('loading');
 Router.map(function() {
 
-  this.route('payments', {
-    path: '/payments/:_authToken',
-    onBeforeAction: checkAdmin,
-    action: function() {
-      var thisRoute = this;
-      Session.set('authToken', thisRoute.params._authToken);
-      thisRoute.render('payments');
-    }
-  });
-
   this.route('customer_agreement', {
     path: 'customer_agreement/:_authToken',
-    onBeforeAction: checkAdmin,
     action: function() {
       var thisRoute = this;
       Session.set('authToken', thisRoute.params._authToken);
@@ -32,7 +21,6 @@ Router.map(function() {
 
   this.route('customer_dashboard', {
     path: '/:_authToken',
-    onBeforeAction: checkAdmin,
     action: function() {
       var thisRoute = this;
       Session.set('authToken', thisRoute.params._authToken);
@@ -42,7 +30,6 @@ Router.map(function() {
 
   this.route('error', {
     path: 'error/:_authToken',
-    onBeforeAction: checkAdmin,
     action: function() {
       var thisRoute = this;
       Session.set('authToken', thisRoute.params._authToken);
