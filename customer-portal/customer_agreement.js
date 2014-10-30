@@ -15,6 +15,8 @@ if (Meteor.isClient) {
           result.agreedToTerms = true;
         }
         Session.set('subscriber', result);
+      } else if (err){
+        Router.go('/error/' + authToken);
       }
     });
     return Session.get('subscriber');
@@ -26,6 +28,8 @@ if (Meteor.isClient) {
     Meteor.call('billingInfo', authToken, function(err, result) {
       if (!err && typeof result === 'object') {
         Session.set('billingInfo', result);
+      } else if (err){
+        Router.go('/error/' + authToken);
       }
     });
     return Session.get('billingInfo');
@@ -40,6 +44,8 @@ if (Meteor.isClient) {
           result[thisSub.plan] !== 'undefined') {
 
         Session.set('planInfo', result[thisSub.plan]);
+      } else if (err){
+        Router.go('/error/' + authToken);
       }
     });
     return Session.get('planInfo');

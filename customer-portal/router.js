@@ -40,4 +40,14 @@ Router.map(function() {
     }
   });
 
+  this.route('error', {
+    path: 'error/:_authToken',
+    onBeforeAction: checkAdmin,
+    action: function() {
+      var thisRoute = this;
+      Session.set('authToken', thisRoute.params._authToken);
+      thisRoute.render('error');
+    }
+  });
+
 });

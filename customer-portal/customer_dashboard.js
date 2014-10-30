@@ -25,6 +25,8 @@ if (Meteor.isClient) {
         }
         //result.billing_info = _.omit(result.billing_info, 'charges');
         Session.set('subscriber', result);
+      } else {
+        Router.go('/error/' + authToken);
       }
     });
     return Session.get('subscriber');
@@ -47,6 +49,8 @@ if (Meteor.isClient) {
           });
         }
         Session.set('paymentInfo', result.billing_info);
+      } else {
+        Router.go('/error/' + authToken);
       }
     });
     return Session.get('paymentInfo');
@@ -89,6 +93,8 @@ if (Meteor.isClient) {
     Meteor.call('requiredPayments', authToken, function(err, result) {
       if (!err && typeof result === 'object') {
         Session.set('requiredPayments', result);
+      } else {
+        Router.go('/error/' + authToken);
       }
     });
     return Session.get('requiredPayments');
@@ -106,6 +112,8 @@ if (Meteor.isClient) {
     Meteor.call('billingInfo', authToken, function(err, result) {
       if (!err && typeof result === 'object') {
         Session.set('billingInfo', result);
+      } else if (err){
+        Router.go('/error/' + authToken);
       }
     });
     $.getScript('https://checkout.stripe.com/checkout.js', function() {
@@ -217,6 +225,8 @@ if (Meteor.isClient) {
           result[thisSub.plan] !== 'undefined') {
 
         Session.set('planInfo', result[thisSub.plan]);
+      } else {
+        Router.go('/error/' + authToken);
       }
     });
     return Session.get('planInfo');
