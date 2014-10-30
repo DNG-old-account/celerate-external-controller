@@ -130,10 +130,9 @@
 </template>
 
 <template name="contact_snippet">
-{{#if showName}}
 <div class="row">
   <div class="col-xs-2">
-    <label>Name</label>
+    <label>Name:</label>
   </div>
   <div class="col-xs-10">
     <div>
@@ -141,11 +140,9 @@
     </div>
   </div>
 </div>
-{{/if}}
-{{#if showEmail}}
 <div class="row">
   <div class="col-xs-2">
-    <label>Email</label>
+    <label>Email:</label>
   </div>
   <div class="col-xs-10">
     <div>
@@ -159,11 +156,9 @@
     </div>
   </div>
 </div>
-{{/if}}
-{{#if showAddress}}
 <div class="row">
   <div class="col-xs-2">
-    <label>Address</label>
+    <label>Address:</label>
   </div>
   <div class="col-xs-10">
     <div>
@@ -171,6 +166,29 @@
     </div>
     <div>
       {{ this.city }}, {{ this.state }} {{ this.zip_code }}
+    </div>
+  </div>
+</div>
+{{#if this.landline}}
+<div class="row">
+  <div class="col-xs-2">
+    <label>Landline:</label>
+  </div>
+  <div class="col-xs-10">
+    <div>
+      {{ this.landline }}
+    </div>
+  </div>
+</div>
+{{/if}}
+{{#if this.mobile}}
+<div class="row">
+  <div class="col-xs-2">
+    <label>Mobile:</label>
+  </div>
+  <div class="col-xs-10">
+    <div>
+      {{ this.mobile }}
     </div>
   </div>
 </div>
