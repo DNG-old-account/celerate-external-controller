@@ -1,6 +1,7 @@
 <template name="customer_agreement">
 <body>
-{{> header}}
+<div class="page-wrap">
+  {{> header}}
   <ol class="breadcrumb">
     <li><a href="{{dashboardLink}}">Dashboard</a></li>
     <li class="active">Customer Agreement</li>
@@ -23,7 +24,9 @@
         {{/if}}
       </div>
     </div>
-   </div>
+  </div>
+</div>
+{{> footer}}
 </body>
 </template>
 
@@ -209,6 +212,5 @@
     </div>
   </div>
 </div>
-{{> footer}}
 </template>
 
