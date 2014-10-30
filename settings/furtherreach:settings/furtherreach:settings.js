@@ -123,7 +123,7 @@ FRMethods = {
 
     var plaintext = decipher.update(token, input_encoding='hex', output_encoding='ascii');
     plaintext += decipher.final(output_encoding='ascii');
-    console.log("got plaintext [" + plaintext + "]");
+    // console.log("got plaintext [" + plaintext + "]");
 
     var m = plaintext.split("+");
     if (m.length != 2) {
@@ -138,8 +138,19 @@ FRMethods = {
 
     // Token is valid, return subscriber id.
     var result = { 'err': null, 'subscriber_id': m[0] };
-    console.log("processAuthToken result " + JSON.stringify(result));
+    // console.log("processAuthToken result " + JSON.stringify(result));
 
     return result;
+  },
+  generateSubscriberAccountId: function(subscriber_id) {
+    // Given a subscriber_id string, returns a likely-unique account ID string.
+    var crypto = Npm.require('crypto');
+
+    var hash = crypto.createHash(Meteor.settings.serverAuthToken.hashMode);
+    hash.update(subscriber_id, 'ascii');
+
+    var account_id = hash.digest('hex').substr(0,10);
+
+    return account_id;
   }
 };
