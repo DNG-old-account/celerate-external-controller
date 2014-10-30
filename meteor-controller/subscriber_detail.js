@@ -163,6 +163,7 @@ if (Meteor.isClient) {
     var status_options = ["connected", "new lead", "no coverage", "deferred", "not interested"];
     var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
     var plan_options = ["beta-free", "nonprofit-free", "relay-free", "landuse-free", "limited", "essential", "performance", "ultra", "silver", "gold"];
+    var discount_options = ["nonprofit", "relay", "core-site", "landuse"];
 
     return [ { field: "first_name", label: "First Name", value: this.first_name },
              { field: "last_name", label: "Last Name", value: this.last_name },
@@ -179,6 +180,9 @@ if (Meteor.isClient) {
              { field: "prior_email", label: "Prior Email", value: this.prior_email },
              { field: "status", label: "Status", value: this.status, options: status_options },
              { field: "plan", label: "Plan", value: this.plan, options: plan_options },
+             { field: "discount", label: "Discount", value: this.discount, options: discount_options },
+             { field: "discount_start_date", label: "Discount Start Date", value: this.discount_start_date },
+             { field: "discount_end_date", label: "Discount End Date", value: this.discount_end_date },
              { field: "username", label: "Username", value: this.username },
              { field: "max_speed", label: "Max Speed", value: this.max_speed },
              { field: "activation_date", label: "Activation Date", value: this.activation_date },
@@ -219,12 +223,13 @@ if (Meteor.isClient) {
   Template.subscriber_details.scheduling_fields = function () {
     var priority_options = ["high", "medium", "low", "none", "unknown"];
     var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
+    var bts_options = [ "RJ-N", "RJ-W", "RJ-E", "LH-E", "10M-W", "BH-N", "BH-E", "PAHS-SW", "PAHS-SE", "PAES-W", "PAES-S", "TH-W", "TH-E" ];
 
     return [ { field: "priority", label: "Priority", value: this.priority, options: priority_options },
              { field: "current_provider", label: "Current Provider", value: this.current_provider, options: provider_options },
              { field: "relay_site", label: "Willing to be Relay Site", value: this.relay_site },
              { field: "time_availability", label: "Time Availability", value: this.time_availability },
-             { field: "bts_to_use", label: "BTS to use", value: this.bts_to_use },
+             { field: "bts_to_use", label: "BTS to use", value: this.bts_to_use, options: bts_options },
              { field: "notes", label: "Notes", value: this.notes },
              { field: "signup_date", label: "Signup Date", value: this.signup_date }
            ];

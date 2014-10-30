@@ -7,8 +7,72 @@
 <hr>
 
 <form class="form-horizontal" role="form">
-{{#if isIterable node_fields}}
-  {{#each node_fields}}
+{{#each node_fields}}
+{{#if display_ports}}
+<div class="well">
+  <ul class="nav nav-pills" role="tablist">
+    {{#with ..}}
+    {{#each ports_from_hardware}}
+    <li><a href="#port_{{name}}" role="tab" data-toggle="tab">Port {{name}} ({{type}})</a></li>
+    {{/each}}
+    {{/with}}
+  </ul>
+  <div class="tab-content">
+    {{#with ..}}
+    {{#each ports_from_hardware}}
+    <div class="tab-pane" id="port_{{name}}">
+      {{#each key_value_without_index this}}
+      <div class="form-group">
+        <div class="container-fluid">
+          <div class="col-xs-2"><label for="ports.{{../index}}.{{key}}" class="control-label">{{key}}</label></div>
+          <div class="col-xs-8"><input class="form-control" id="ports.{{../index}}.{{key}}" type="text" value="{{value}}" readonly></div>
+        </div>
+      </div>
+      {{/each}}
+      {{#with context=this node_instance=..}}
+      {{#each per_port_fields}}
+      <div class="form-group">
+        <div class="container-fluid">
+          <div class="col-xs-2"><label for="{{field}}" class="control-label">{{label}}</label></div>
+          {{#if options}}
+          {{#if isIterable options_custom_view}}
+          <div class="col-xs-8"><select class="form-control" id="{{field}}" disabled>
+              <option value="" {{selected_if_empty ../value}}></option>
+              {{#each options_custom_view}}
+              <option value="{{this.value}}" {{selected_if_equal this.value ../value}}>{{this.label}}</option>
+              {{/each}}
+          </select></div>
+          {{else}}
+          {{#if isIterable options}}
+          <div class="col-xs-8">
+            <select class="form-control" id="{{field}}" disabled>
+              <option value="" {{selected_if_empty ../value}}></option>
+              {{#each options}}
+              <option value="{{this}}" {{selected_if_equal this ../value}}>{{this}}</option>
+              {{/each}}
+            </select>
+          </div>
+          {{/if}}
+          {{/if}}
+          {{else}}
+          <div class="col-xs-8"><input class="form-control" id="{{field}}" type="text" value="{{value}}" disabled></div>
+          {{/if}}
+          {{#with ../node_instance}}
+          <div class="col-xs-2">
+            <span class="glyphicon-pencil glyphicon" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Edit" id="edit"></span>
+            <span class="glyphicon-save glyphicon text-gray" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Save" id="save"></span>
+          </div>
+          {{/with}}
+        </div>
+      </div>
+      {{/each}}
+      {{/with}}
+    </div>
+    {{/each}}
+    {{/with}}
+  </div>
+</div>
+{{else}}
     <div class="form-group">
       <div class="container-fluid">
         <div class="col-xs-2"><label for="{{field}}" class="control-label">{{label}}</label></div>
@@ -43,7 +107,7 @@
         {{/with}}
       </div>
     </div>
-  {{/each}}
 {{/if}}
+{{/each}}
 </form>
 </template>

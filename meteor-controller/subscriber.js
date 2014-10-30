@@ -18,7 +18,7 @@ if (Meteor.isClient) {
   });
 
   Template.subscriber_overview.searchable_fields = function () {
-    return [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "prior_email", "archived", "current_provider" ];
+    return [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "prior_email", "archived", "current_provider", "bts_to_use" ];
   };
 
   Template.subscriber_overview.current_search_fields = function () {

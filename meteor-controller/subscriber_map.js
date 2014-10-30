@@ -57,6 +57,7 @@ if (Meteor.isClient) {
       var bounds = new google.maps.LatLngBounds();
 
       Template.subscriber_overview.subscribers().forEach(function (subscriber) {
+        try {
         if ('lat' in subscriber && subscriber['lat'].trim().length > 0 && 'lng' in subscriber && subscriber['lng'].trim().length > 0) {
           var name = (subscriber.first_name ? subscriber.first_name : "") + " " + (subscriber.last_name ? subscriber.last_name : "");
           var latlng = new google.maps.LatLng(subscriber.lat, subscriber.lng);
@@ -74,6 +75,7 @@ if (Meteor.isClient) {
             (new google.maps.InfoWindow({ content: bubble_body })).open(map, markers[subscriber._id]);
           });
         }
+      } catch (e) { console.log("failed to map subscriber " + JSON.stringify(subscriber)); console.log(e); }
       });
 
       map.fitBounds(bounds);
