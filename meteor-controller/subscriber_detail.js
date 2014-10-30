@@ -145,6 +145,7 @@ if (Meteor.isClient) {
     var status_options = ["connected", "new lead", "no coverage", "deferred", "not interested"];
     var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
     var plan_options = ["beta-free", "nonprofit-free", "relay-free", "landuse-free", "limited", "essential", "performance", "ultra", "silver", "gold"];
+    var discount_options = ["nonprofit", "relay", "core-site", "landuse"];
 
     return [ { field: "first_name", label: "First Name", value: this.first_name },
              { field: "last_name", label: "Last Name", value: this.last_name },
@@ -161,6 +162,9 @@ if (Meteor.isClient) {
              { field: "prior_email", label: "Prior Email", value: this.prior_email },
              { field: "status", label: "Status", value: this.status, options: status_options },
              { field: "plan", label: "Plan", value: this.plan, options: plan_options },
+             { field: "discount", label: "Discount", value: this.discount, options: discount_options },
+             { field: "discount_start_date", label: "Discount Start Date", value: this.discount_start_date },
+             { field: "discount_end_date", label: "Discount End Date", value: this.discount_end_date },
              { field: "username", label: "Username", value: this.username },
              { field: "max_speed", label: "Max Speed", value: this.max_speed },
              { field: "activation_date", label: "Activation Date", value: this.activation_date },
