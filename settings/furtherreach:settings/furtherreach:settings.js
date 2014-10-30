@@ -3,6 +3,7 @@ FRSettings = {
   "billing": {
     "installmentAmount": 25,
     "firstDayOfBilling": '2014-10-01',
+    "endOfBetaInstallation": '2014-09-15',
     "plans": {
       "beta-free": {
         "label": "Beta Free",
