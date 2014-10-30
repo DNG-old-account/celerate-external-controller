@@ -4,7 +4,6 @@
 # but you can also edit it by hand.
 
 standard-app-packages
-autopublish
 insecure
 less
 mizzao:bootstrap-3
@@ -21,4 +20,3 @@ npm-container
 furtherreach:settings
 mrt:moment
 mrt:moment-timezone
-

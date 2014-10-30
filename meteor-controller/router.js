@@ -1,5 +1,5 @@
 var checkUser = function (pause) {
-  if (!Meteor.user() || !Meteor.user().services.google || (Meteor.user().services.google.email.indexOf("furtherreach.net") == -1 && Meteor.user().services.google.email.indexOf("denovogroup.org") == -1)) {
+  if (!Meteor.user() || !Meteor.user().services.google || (Meteor.user().services.google.email.indexOf("denovogroup.org") == -1)) {
     this.render('home_page');
     pause();
   }
