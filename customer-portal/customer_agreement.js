@@ -2,6 +2,10 @@ if (Meteor.isServer) {
 
 }
 if (Meteor.isClient) {
+  Template.customer_agreement.dashboardLink = function() {
+    var authToken = Session.get('authToken');
+    return '/' + authToken;
+  };
 
   Template.order_form.subscriberInfo = Template.customer_agreement.subscriberInfo = function() {
     var authToken = Session.get('authToken');
@@ -42,27 +46,26 @@ if (Meteor.isClient) {
   };
 
   Template.customer_agreement.events({
-    'click': function (evt) {
+    'click #agree-to-terms-button': function (evt) {
       console.log(evt);
       console.log(this);
-      var thisSub = this;
-      if (evt.target.id === 'agree-to-terms-button') {
-        evt.preventDefault();
-        if (!$('#agree-to-terms').prop('checked')) {
-          bootbox.alert("Need to agree to terms");
-          return false;
-        }
-        dbUpdate = {};
-        dbUpdate.terms = {
-          agreed: true,
-          date: new Date()
-        };
-        thisSub.terms = dbUpdate.terms; // TODO: Feels a little hacky - maxb
-        Subscribers.update(thisSub._id, {$set: dbUpdate}); 
-        Session.set('subscriber', thisSub);
-        var authToken = Session.get('authToken');
-        Router.go('/' + authToken);
+      var authToken = Session.get('authToken');
+      evt.preventDefault();
+      if (!$('#agree-to-terms').prop('checked')) {
+        bootbox.alert("Need to agree to terms");
+        return false;
       }
+      Meteor.call('agreeToTerms', authToken, function(err, result) {
+        if (err) {
+          bootbox.alert('There seems to have been an error. If this persists, please contact support@furtherreach.net');
+          $('.btn').on('click', function(evt) {
+            window.location.reload(true);
+          });
+        } else {
+          var authToken = Session.get('authToken');
+          Router.go('/' + authToken);
+        }
+      });
     }
   });
 

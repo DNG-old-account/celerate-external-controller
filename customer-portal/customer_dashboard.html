@@ -1,15 +1,7 @@
-
 <template name="customer_dashboard">
 <body>
-  <div class="navbar navbar-default" role="navigation">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="http://furtherreach.net">
-        <img src="/FR_header_logo.png" class="fr-logo">
-      </a>
-      <div class="clearfix"></div>
-    </div>
-    <div class="clearfix"></div>
-  </div>
+{{> header}}
+  
   <div class="container customer-dashboard-container">
     <div class="row">
       <div class="col-xs-12">
@@ -109,19 +101,7 @@
   <!--   </pre> -->
   <!-- </div> -->
 </body>
-<div class="footer">
-  <div class="container">
-    <div class="row">
-      <div class="col-md-12">
-        <div class="contact">
-          Contact us at <a href="mailto:support@furtherreach.net">support@furtherreach.net</a> or (707) 278-8899
-        </div>
-        <div class="copyright">Copyright © Further Reach 2014</div>
-        <div class="site"><a href="http://furtherreach.net">http://furtherreach.net</a></div>
-      </div>
-    </div>
-  </div>
-</div>
+{{> footer}}
 </template>
 
 <template name="subscriber_info">

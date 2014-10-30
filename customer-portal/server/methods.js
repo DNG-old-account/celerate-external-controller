@@ -127,6 +127,18 @@ Meteor.methods({
 
   },
 
+  agreeToTerms: function(token) {
+    var subId = new Meteor.Collection.ObjectID(authenticate(token));
+    var sub = Subscribers.findOne(subId);
+    dbUpdate = {};
+    dbUpdate.terms = {
+      agreed: true,
+      date: new Date()
+    };
+    Subscribers.update(sub._id, {$set: dbUpdate}); 
+    return sub;
+  },
+
   requiredPayments: function(token) {
     var result = {};
     var subId = new Meteor.Collection.ObjectID(authenticate(token));

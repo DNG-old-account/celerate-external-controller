@@ -1,13 +1,10 @@
 <template name="customer_agreement">
 <body>
-  <div class="navbar navbar-default" role="navigation">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">Celerate</a>
-      {{#if subscriberInfo}}
-        <p class="navbar-text pull-right">Signed in as {{subscriberInfo.first_name}} {{subscriberInfo.last_name}}</p>
-      {{/if}}
-    </div>
-  </div>
+{{> header}}
+  <ol class="breadcrumb">
+    <li><a href="{{dashboardLink}}">Dashboard</a></li>
+    <li class="active">Customer Agreement</li>
+  </ol>
 
   <div class="container">
     {{#if subscriberInfo.agreedToTerms}}
@@ -212,5 +209,6 @@
     </div>
   </div>
 </div>
+{{> footer}}
 </template>
 
