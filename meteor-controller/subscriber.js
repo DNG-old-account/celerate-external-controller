@@ -31,7 +31,7 @@ if (Meteor.isClient) {
     if (Session.get("subscriber_search_fields") != null) {
       var current_search_fields = Session.get("subscriber_search_fields");
       if (Session.get("subscriber_search_input").length > 0) {
-        var search_field = $("#search_tag").val().trim();
+        var search_field = Session.get("search_tag_selection");
         current_search_fields[search_field] = Session.get("subscriber_search_input");
       }
 
@@ -81,10 +81,13 @@ if (Meteor.isClient) {
         }, subscriber_search_input_lag_ms);
       }
     },
+    'change #search_tag': function (evt) {
+      Session.set("search_tag_selection", $("#search_tag").val().trim());
+    },
     'click #add_search_field': function (evt) {
       var search_value = $("#subscriber_search_input").val().trim();
       console.log("search_value: " + search_value);
-      var search_field = $("#search_tag").val().trim();
+      var search_field = Session.get("search_tag_selection");
       console.log("search_field: " + search_field);
 
       var current_search_fields = Session.get("subscriber_search_fields");
