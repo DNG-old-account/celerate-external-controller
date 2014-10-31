@@ -13,7 +13,7 @@ FRSettings = {
         return 0;
       },
       "relay": function(amount) {
-        var newAmt = amount - 30;
+        var newAmt = amount - 40;
         return (newAmt > 0) ? newAmt : 0;
       },
       "core-site": function(amount) {
