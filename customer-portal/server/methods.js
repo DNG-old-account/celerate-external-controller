@@ -15,7 +15,7 @@ var authenticate = function(mergedToken) {
                                      Meteor.settings.serverAuthToken.encryptionKey,
                                      Meteor.settings.serverAuthToken.MACKey);
   if (p.err) {
-    console.log(err);
+    console.log(p.err);
     throw new Meteor.Error("invalid-auth-token", p.err);
   }
 

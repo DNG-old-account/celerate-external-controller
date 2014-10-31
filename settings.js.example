@@ -22,7 +22,7 @@
   "serverAuthToken": {
     "encryptionKey" : "", // 16 byte base64 encoded key
     "MACKey" : "", // another 16 byte base64 encoded key
-    "tokenDaysValid" : 1,
+    "tokenDaysValid" : 21,
     "encryptionMode" : "AES-128-CTR",
     "hashMode" : "sha1"
   },
