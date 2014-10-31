@@ -144,7 +144,7 @@ if (Meteor.isClient) {
     var subscriber_type_options = ["residential", "business", "non profit organization"];
     var status_options = ["connected", "new lead", "no coverage", "deferred", "not interested"];
     var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
-    var plan_options = ["beta-free", "nonprofit-free", "relay-free", "landuse-free", "limited", "essential", "performance", "ultra", "silver", "gold"];
+    var plan_options = ["limited", "essential", "performance", "ultra", "silver", "gold"];
     var discount_options = ["nonprofit", "relay", "core-site", "landuse"];
 
     return [ { field: "first_name", label: "First Name", value: this.first_name },
