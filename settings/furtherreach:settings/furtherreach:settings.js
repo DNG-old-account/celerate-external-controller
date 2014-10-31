@@ -192,7 +192,7 @@ FREmails = {
              '\n\nA new bill for your Further Reach account is ready for viewing on the customer portal:\n' + 
              userLink + 
              '\nThere you can view your bill details, payment history, make a payment, and more.\n\n' +
-             'Please click on the link above to make a payment. ' + 
+             'Please click on the link above to make a payment. This link will remain valid for 3 weeks. ' + 
              'Note, if this is your first time accessing the customer portal please take the time to review and sign the Terms and Conditions, and verify your contact information.\n\n' +
              'Plan: ' + context.plan + '\n' + 
              'Account Number: ' + accountNum + '\n' + 
