@@ -101,9 +101,7 @@ Meteor.methods({
       var subject = emailObj.subject(sub);
       var accountId = FRMethods.generateSubscriberAccountId(subId);
 
-      //TODO: In order to test appropriately I've 
-      //      set it up to start billing 10 days early of the next month
-      var startOfThisMonth = moment().add(10, 'days').startOf('month'); 
+      var startOfThisMonth = moment().add(1, 'days').startOf('month'); 
       var billingDate = (startOfThisMonth.month() + 1) + '/15/' + startOfThisMonth.year();
 
       sub.billingDate = billingDate;
