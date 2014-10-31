@@ -16,4 +16,5 @@ service-configuration
 peerlibrary:aws-sdk
 furtherreach:settings
 mrt:moment
+email
 

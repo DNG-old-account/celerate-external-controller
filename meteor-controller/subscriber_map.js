@@ -82,5 +82,7 @@ if (Meteor.isClient) {
     });
   };
 
-  google.maps.event.addDomListener(window, 'load', Template.subscriber_map.rendered);
+  if (typeof google === 'object') {
+    google.maps.event.addDomListener(window, 'load', Template.subscriber_map.rendered);
+  }
 }

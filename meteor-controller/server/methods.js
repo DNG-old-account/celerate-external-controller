@@ -1,24 +1,46 @@
 // In your server code: define a method that the client can call
-Meteor.methods({
-  generateAuthToken: function (subscriber_id) {
-    var result = FRMethods.generateAuthToken(subscriber_id,
-                                             Meteor.settings.serverAuthToken.encryptionKey,
-                                             Meteor.settings.serverAuthToken.MACKey);
-    return result;
-  },
-  sendEmail: function (to, from, subject, text) {
-    check([to, from, subject, text], [String]);
 
-    // Let other method calls from the same client start running,
-    // without waiting for the email sending to complete.
-    this.unblock();
+var sendEmail = function (to, from, subject, text, tries) {
+  var numTries = FRSettings.email.retries;
+  tries = (typeof tries !== 'undefined') ? tries : 0;
 
+  check([to, from, subject, text], [String]);
+
+  try {
     Email.send({
       to: to,
       from: from,
       subject: subject,
       text: text
     });
+    console.log('Sent email to: ' + to);
+  } catch (e) {
+    console.log('Error sending email to: ' + to);
+    console.log('From: ' + from);
+    console.log('Subject: ' + subject);
+    console.log('Text: ' + text);
+    console.log(e);
+    if (tries < numTries) {
+      tries++;
+      sendEmail(to, from, subject, text, tries);
+    } else {
+      var errorSubject = 'Error Sending Email to: ' + to;
+      Email.send({
+        to: FRSettings.emails.notificationEmails,
+        from: from,
+        subject: subject,
+        text: text
+      });
+    }
+  }
+};
+
+Meteor.methods({
+  generateAuthToken: function (subscriber_id) {
+    var result = FRMethods.generateAuthToken(subscriber_id,
+                                             Meteor.settings.serverAuthToken.encryptionKey,
+                                             Meteor.settings.serverAuthToken.MACKey);
+    return result;
   },
 
   getPictures: function(site) {
@@ -59,5 +81,38 @@ Meteor.methods({
     signedUrl = s3.getSignedUrl('putObject', params);
 
     return signedUrl;
+  },
+
+  sendEmails: function(subscribers, emailKey) {
+
+    // Let other method calls from the same client start running,
+    // without waiting for the email sending to complete.
+    this.unblock();
+
+    var emailObj = FREmails[emailKey];
+    _.each(subscribers, function(subId) {
+      var subIdObj = new Meteor.Collection.ObjectID(subId);
+      var sub = Subscribers.findOne(subIdObj);
+
+      var authToken = Meteor.call('generateAuthToken', subId);
+      var userLink = Meteor.settings.public.urls.customerPortal + authToken.iv + "+" + authToken.token + "+" + authToken.tag;
+      var subject = emailObj.subject(sub);
+      var accountId = FRMethods.generateSubscriberAccountId(subId);
+      var body = emailObj.body(sub, userLink, accountId); 
+
+      if (typeof sub.prior_email === 'string') {
+        sendEmail(sub.prior_email, emailObj.from, subject, body);
+      }
+
+      if (typeof sub.contacts === 'object') {
+        _.each(sub.contacts, function(c) {
+          contactObj = Contacts.findOne(c.contact_id);
+          if (contactObj.type === 'billing' && typeof contactObj.email === 'string') {
+            sendEmail(contactObj.email, subject, body);
+          }
+        });
+      }
+    });
+    return true;
   }
 });

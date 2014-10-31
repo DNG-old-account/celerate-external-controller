@@ -9,6 +9,7 @@ Package.onUse(function(api) {
   api.addFiles('furtherreach:settings.js');
   api.export('FRSettings');
   api.export('FRMethods');
+  api.export('FREmails');
 });
 
 Package.onTest(function(api) {

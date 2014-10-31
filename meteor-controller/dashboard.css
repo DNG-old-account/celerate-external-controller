@@ -155,3 +155,10 @@ body {
 .text-gray {
   color: gray;
 }
+
+/* 
+ * Emails List
+ */
+#select-all-emails {
+  cursor: pointer;
+}

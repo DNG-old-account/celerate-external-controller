@@ -1,5 +1,9 @@
 // Write your package code here!
 FRSettings = {
+  email: {
+    retries: 3,
+    notificationEmails: 'support@furtherreach.net, max@denovogroup.org, barath@denovogroup.org'
+  },
   "billing": {
     "installmentAmount": 25,
     "firstDayOfBilling": '2014-10-01',
@@ -69,7 +73,7 @@ FRMethods = {
     // Create plaintext JSON object.
     var expiryday = moment().add(Meteor.settings.serverAuthToken.tokenDaysValid, 'days');
     var message = subscriber_id + "+" + expiryday.format('YYYY-MM-DD');
-    console.log("plaintext message " + message);
+    // console.log("plaintext message " + message);
     var plaintext = new Buffer(message, 'ascii');
     var rand = new Buffer(crypto.randomBytes(8), 'binary');
     var iv = new Buffer([0, 0, 0, 0,
@@ -95,7 +99,7 @@ FRMethods = {
     var tag = hmac.digest('hex');
 
     var result = { 'iv': rand.toString('hex'), 'token': ciphertext, 'tag': tag.substr(0, 16) };
-    console.log('generateAuthToken returning: ' + JSON.stringify(result));
+    // console.log('generateAuthToken returning: ' + JSON.stringify(result));
     return result;
   },
   processAuthToken: function(truncated_iv, token, tag, encryptionKey, MACKey) {
@@ -152,5 +156,31 @@ FRMethods = {
     var account_id = hash.digest('hex').substr(0,10);
 
     return account_id;
+  }
+};
+
+FREmails = {
+  firstOfMonth: {
+    slug: 'first-of-month',
+    label: 'First Of Month',
+    from: 'support@denovogroup.org',
+    subject: function(context) {
+      return 'Your Further Reach bill is ready to be viewed';
+    },
+    body: function(context, userLink, accountNum) {
+      return 'Dear ' + context.first_name + ' ' + context.last_name + 
+             '\n\nA new bill for your Further Reach account is ready for viewing on the customer portal:\n' + 
+             userLink + 
+             '\nThere you can view your bill details, payment history, make a payment, and more.\n\n' +
+             'Please click on the ' + userLink + ' link to make a payment. ' + 
+             'Note, if this is your first time accessing the customer portal please take the time to review and sign the Terms and Conditions, and verify your contact information.\n\n' +
+             'Plan: ' + context.plan + '\n' + 
+             'Account Number: ' + accountNum + '\n' + 
+             'User ID: ' + context.prior_email + '\n' + 
+             'Bill Amount: \n' + //TODO: add bill amount!!
+             'Due Date: \n' + //TODO: add due date!!!
+             '\n\n\nThank you for choosing FurtherReach!' + 
+             '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
+    }
   }
 };

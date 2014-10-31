@@ -27,6 +27,11 @@ Router.map(function() {
   });
   this.route('node_details', {path: '/node_details/:_id', data: function() { return Nodes.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
 
+  this.route('emails_page', {
+    path: '/emails_page',
+    onBeforeAction: checkUser
+  });
+
   this.route('subscriber_page', {
     path: '/subscriber',
     onBeforeAction: checkUser
