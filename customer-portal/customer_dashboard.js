@@ -148,13 +148,14 @@ if (Meteor.isClient) {
 
         stripeConfig.description += 'Monthly payment for period of ' + 
                         moment(billingPeriodStartDate).format('MM/DD/YYYY') + ' to ' + 
-                        moment(billingPeriodEndDate).format('MM/DD/YYYY') + '. \n';
+                        moment(billingPeriodEndDate).format('MM/DD/YYYY') + '';
         stripeConfig.billingPeriodStartDate = billingPeriodStartDate;
         stripeConfig.billingPeriodEndDate = billingPeriodEndDate;
 
       } 
       if (!requiredPayments.installation.paid) { 
         var installationAmount;
+        stripeConfig.description += (stripeConfig.description.trim() === '') ? '' : '; ';
 
         if ($('#installment-choices').val() === 'installment') {
           typesOfCharges.push('installment');
@@ -167,8 +168,6 @@ if (Meteor.isClient) {
           stripeConfig.description += 'Standard Installation';
         }
       }
-
-      //TODO: figure out better description stuff
 
       stripeConfig.amount = parseInt(amount * 100, 10); // Stripe does it by cents
 

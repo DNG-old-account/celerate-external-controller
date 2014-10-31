@@ -213,6 +213,15 @@ Meteor.methods({
               var diff = Math.abs(startOfMonth.diff(activationDate, 'days'));
               var daysInMonth = startOfMonth.daysInMonth();
               monthlyPayment.amount = (monthlyPaymentAmount * ((daysInMonth - diff) / daysInMonth)).formatMoney();
+              if (typeof sub.discount === 'string') {
+                var newAmount = FRSettings.billing.discounts[sub.discount](monthlyPayment.amount);
+                monthlyPayment.discount = {
+                  label: sub.discount,
+                  previousAmount: monthlyPayment.amount,
+                  amount: monthlyPayment.amount - newAmount
+                };
+                monthlyPayment.amount = newAmount;
+              }
               monthlyPayment.startDate = moment(activationDate);
             } else {
               monthlyPayment.amount = monthlyPaymentAmount;

@@ -4,11 +4,27 @@ FRSettings = {
     retries: 3,
     notificationEmails: 'support@furtherreach.net, max@denovogroup.org, barath@denovogroup.org'
   },
-  "billing": {
-    "installmentAmount": 25,
-    "firstDayOfBilling": '2014-10-01',
-    "endOfBetaInstallation": '2014-09-15',
-    "plans": {
+  billing: {
+    installmentAmount: 25,
+    firstDayOfBilling: '2014-10-01',
+    endOfBetaInstallation: '2014-09-15',
+    discounts: {
+      "nonprofit": function(amount) {
+        return 0;
+      },
+      "relay": function(amount) {
+        var newAmt = amount - 30;
+        return (newAmt > 0) ? newAmt : 0;
+      },
+      "core-site": function(amount) {
+        return 0;
+      },
+      "landuse": function(amount) {
+        return 0;
+      }
+    },
+
+    plans: {
       "beta-free": {
         "label": "Beta Free",
         "monthly": 0,

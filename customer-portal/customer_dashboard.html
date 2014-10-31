@@ -316,6 +316,23 @@
               <span class="bolded-label">Plan:</span> {{ this.plan.label }}
             </div>
           </div>
+          {{#if this.discount}}
+          <div class="row detail-row monthly-period-plan">
+            <div class="col-xs-12">
+              <span class="bolded-label">Discount:</span> {{ this.discount.label }}
+            </div>
+          </div>
+          <div class="row detail-row monthly-period-plan">
+            <div class="col-xs-12">
+              <span class="bolded-label">Original Amount:</span> ${{ this.discount.previousAmount }}
+            </div>
+          </div>
+          <div class="row detail-row monthly-period-plan">
+            <div class="col-xs-12">
+              <span class="bolded-label">Discount:</span> ${{ this.discount.amount }}
+            </div>
+          </div>
+          {{/if}}
           {{/each}}
         </div>
         <div class="col-xs-7">
