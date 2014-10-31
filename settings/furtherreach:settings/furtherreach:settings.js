@@ -168,17 +168,20 @@ FREmails = {
       return 'Your Further Reach bill is ready to be viewed';
     },
     body: function(context, userLink, accountNum) {
+      context.first_name = (typeof context.first_name === 'string') ? context.first_name : '';
+      context.last_name = (typeof context.last_name === 'string') ? context.last_name : '';
+      context.prior_email = (typeof context.prior_email === 'string') ? context.prior_email : '';
+      context.plan = (typeof context.plan === 'string') ? context.plan : '';
       return 'Dear ' + context.first_name + ' ' + context.last_name + 
              '\n\nA new bill for your Further Reach account is ready for viewing on the customer portal:\n' + 
              userLink + 
              '\nThere you can view your bill details, payment history, make a payment, and more.\n\n' +
-             'Please click on the ' + userLink + ' link to make a payment. ' + 
+             'Please click on the link above to make a payment. ' + 
              'Note, if this is your first time accessing the customer portal please take the time to review and sign the Terms and Conditions, and verify your contact information.\n\n' +
              'Plan: ' + context.plan + '\n' + 
              'Account Number: ' + accountNum + '\n' + 
              'User ID: ' + context.prior_email + '\n' + 
-             'Bill Amount: \n' + //TODO: add bill amount!!
-             'Due Date: \n' + //TODO: add due date!!!
+             'Due Date: ' + context.billingDate + '\n' + //TODO: add due date!!!
              '\n\n\nThank you for choosing FurtherReach!' + 
              '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
     }

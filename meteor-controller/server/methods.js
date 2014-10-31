@@ -22,7 +22,9 @@ var sendEmail = function (to, from, subject, text, tries) {
     console.log(e);
     if (tries < numTries) {
       tries++;
-      sendEmail(to, from, subject, text, tries);
+      Meteor.setTimeout(function() {
+        sendEmail(to, from, subject, text, tries);
+      }, 1000);
     } else {
       var errorSubject = 'Error Sending Email to: ' + to;
       Email.send({
@@ -88,8 +90,8 @@ Meteor.methods({
     // Let other method calls from the same client start running,
     // without waiting for the email sending to complete.
     this.unblock();
-
     var emailObj = FREmails[emailKey];
+
     _.each(subscribers, function(subId) {
       var subIdObj = new Meteor.Collection.ObjectID(subId);
       var sub = Subscribers.findOne(subIdObj);
@@ -98,6 +100,14 @@ Meteor.methods({
       var userLink = Meteor.settings.public.urls.customerPortal + authToken.iv + "+" + authToken.token + "+" + authToken.tag;
       var subject = emailObj.subject(sub);
       var accountId = FRMethods.generateSubscriberAccountId(subId);
+
+      //TODO: In order to test appropriately I've 
+      //      set it up to start billing 10 days early of the next month
+      var startOfThisMonth = moment().add(10, 'days').startOf('month'); 
+      var billingDate = (startOfThisMonth.month() + 1) + '/15/' + startOfThisMonth.year();
+
+      sub.billingDate = billingDate;
+
       var body = emailObj.body(sub, userLink, accountId); 
 
       if (typeof sub.prior_email === 'string') {
