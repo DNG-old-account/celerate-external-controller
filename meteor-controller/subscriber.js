@@ -31,7 +31,7 @@ if (Meteor.isClient) {
     if (Session.get("subscriber_search_fields") != null) {
       var current_search_fields = Session.get("subscriber_search_fields");
       if (Session.get("subscriber_search_input").length > 0) {
-        var search_field = $("#search_tag").val().trim();
+        var search_field = Session.get("search_tag_selection");
         current_search_fields[search_field] = Session.get("subscriber_search_input");
       }
 
@@ -46,7 +46,7 @@ if (Meteor.isClient) {
       query = {$and: subquery};
     }
 
-    var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'billing_info': 1};
+    var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'billing_info': 1, 'mobile': 1, 'landline': 1};
 
     var result = Subscribers.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")});
     Session.set("subscriber_count", result.count());
@@ -81,10 +81,13 @@ if (Meteor.isClient) {
         }, subscriber_search_input_lag_ms);
       }
     },
+    'change #search_tag': function (evt) {
+      Session.set("search_tag_selection", $("#search_tag").val().trim());
+    },
     'click #add_search_field': function (evt) {
       var search_value = $("#subscriber_search_input").val().trim();
       console.log("search_value: " + search_value);
-      var search_field = $("#search_tag").val().trim();
+      var search_field = Session.get("search_tag_selection");
       console.log("search_field: " + search_field);
 
       var current_search_fields = Session.get("subscriber_search_fields");
