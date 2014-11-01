@@ -304,7 +304,7 @@
     <div class="col-xs-12">
       {{#if requiredPayments.dueToDate.required }}
       <div class="row payment-row">
-        <div class="col-xs-5 payment-start-date">
+        <div class="col-xs-4 payment-start-date">
           {{#each requiredPayments.dueToDate.payments}}
           <div class="row detail-row monthly-period-dates">
             <div class="col-xs-12">
@@ -335,7 +335,7 @@
           {{/if}}
           {{/each}}
         </div>
-        <div class="col-xs-7">
+        <div class="col-xs-8">
           <div class="row">
             <div class="col-xs-12">
               ${{ requiredPayments.dueToDate.amount }}
@@ -347,14 +347,14 @@
       {{#if requiredPayments.installation.paid}}
       {{else}}
       <div class="row payment-row">
-        <div class="col-xs-5 payment-start-date">
+        <div class="col-xs-4 payment-start-date">
           <div class="row">
             <div class="col-xs-12">
               Standard Installation
             </div>
           </div>
         </div>
-        <div class="col-xs-7">
+        <div class="col-xs-4">
           <div class="row">
             <div class="col-xs-12">
               {{#if requiredPayments.installation.installments}}
