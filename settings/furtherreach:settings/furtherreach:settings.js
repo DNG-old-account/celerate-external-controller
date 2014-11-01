@@ -192,7 +192,7 @@ FREmails = {
              '\n\nA new bill for your Further Reach account is ready for viewing on the customer portal:\n' + 
              userLink + 
              '\nThere you can view your bill details, payment history, make a payment, and more.\n\n' +
-             'Please click on the link above to make a payment.' + 
+             'Please click on the link above to make a payment. ' + 
              'Note, if this is your first time accessing the customer portal please take the time to review and sign the Terms and Conditions, and verify your contact information.\n\n' +
              'Plan: ' + (context.plan.slice(0, 1).toUpperCase() + context.plan.slice(1)) + '\n' + // TODO: This is just capitalizing the first letter - we should move this to helpers
              'Account Number: ' + accountNum + '\n' + 
