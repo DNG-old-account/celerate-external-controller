@@ -15,6 +15,7 @@ if (Meteor.isClient) {
     Session.set("selected_subscriber", null);
     Session.set("subscriber_search_input", "");
     Session.set("subscriber_search_fields", {});
+    Session.set("search_tag_selection", "last_name");
   });
 
   Template.subscriber_overview.searchable_fields = function () {
