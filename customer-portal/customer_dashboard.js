@@ -79,6 +79,7 @@ if (Meteor.isClient) {
         total += parseFloat(requiredPayments.dueToDate.amount);
       }
     } 
+    total = total.formatMoney(2, '.', '');
     Session.set('totalPayment', total);
   };
 
