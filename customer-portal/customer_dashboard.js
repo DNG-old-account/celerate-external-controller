@@ -45,7 +45,7 @@ if (Meteor.isClient) {
           _.each(billingInfo.charges, function(charge) {
             var dateString = moment(billingInfo.created).format('M/D/YYYY');
             charge.dateCreatedString = dateString;
-            charge.dollarAmount = (charge.amount / 100).formatMoney(2, '.', ',');;
+            charge.dollarAmount = (charge.amount / 100).formatMoney(2, '.', ',');
           });
         }
         Session.set('paymentInfo', result.billing_info);
@@ -168,8 +168,9 @@ if (Meteor.isClient) {
           stripeConfig.description += 'Standard Installation';
         }
       }
-
-      stripeConfig.amount = parseInt(amount * 100, 10); // Stripe does it by cents
+      
+      var stripeAmount = (amount * 100).toFixed(2); // Stripe does it by cents
+      stripeConfig.amount = parseInt(stripeAmount, 10); 
 
       var handler = StripeCheckout.configure({
         key: Meteor.settings.public.stripe.publicKey,
