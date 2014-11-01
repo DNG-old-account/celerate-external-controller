@@ -8,7 +8,7 @@ elif [[ "$1" == "staging" ]]; then
   export ROOT_URL="http://staging.furtherreach.net:3002"
   echo "Starting celerate customer portal in staging mode at: " $ROOT_URL
 else
-  export ROOT_URL="https://celerate-controller.furtherreach.net"
+  export ROOT_URL="https://portal.furtherreach.net"
   echo "Starting celerate customer portal in prod mode at: " $ROOT_URL
 fi
 
