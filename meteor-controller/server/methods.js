@@ -28,7 +28,7 @@ var sendEmail = function (to, from, subject, text, tries) {
     } else {
       var errorSubject = 'Error Sending Email to: ' + to;
       Email.send({
-        to: FRSettings.emails.notificationEmails,
+        to: FRSettings.email.notificationEmails,
         from: from,
         subject: subject,
         text: text

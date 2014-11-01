@@ -44,32 +44,32 @@ FRSettings = {
       "limited": {
         "label": "Limited",
         "monthly": 30,
-        "details": "Burst speeds up to 4Mbs"
+        "details": "Burst speeds up to 4Mbps"
       },
       "essential": {
         "label": "Essential",
         "monthly": 70,
-        "details": "Min: 4Mbs Typical: 8Mbs"
+        "details": "Min: 4Mbps Typical: 8Mbps"
       },
       "performance": {
         "label": "Performance",
         "monthly": 100,
-        "details": "Min: 8Mbs Typical: 15Mbs"
+        "details": "Min: 8Mbps Typical: 15Mbps"
       },
       "ultra": {
         "label": "Ultra",
         "monthly": 130,
-        "details": "Min: 15Mbs Typical: 30Mbs"
+        "details": "Min: 15Mbps Typical: 30Mbps"
       },
       "silver": {
         "label": "Silver",
         "monthly": 130,
-        "details": "Min: 15Mbs Typical: 30Mbs"
+        "details": "Min: 15Mbps Typical: 30Mbps"
       },
       "gold": {
         "label": "Gold",
         "monthly": 200,
-        "details": "Min: 40Mbs Typical: 60Mbs"
+        "details": "Min: 40Mbps Typical: 60Mbps"
       },
     }
   },
@@ -179,7 +179,7 @@ FREmails = {
   firstOfMonth: {
     slug: 'first-of-month',
     label: 'First Of Month',
-    from: 'support@denovogroup.org',
+    from: 'Further Reach Billing <billing@furtherreach.net>',
     subject: function(context) {
       return 'Your Further Reach bill is ready to be viewed';
     },
@@ -194,7 +194,7 @@ FREmails = {
              '\nThere you can view your bill details, payment history, make a payment, and more.\n\n' +
              'Please click on the link above to make a payment.' + 
              'Note, if this is your first time accessing the customer portal please take the time to review and sign the Terms and Conditions, and verify your contact information.\n\n' +
-             'Plan: ' + context.plan + '\n' + 
+             'Plan: ' + (context.plan.slice(0, 1).toUpperCase() + context.plan.slice(1)) + '\n' + // TODO: This is just capitalizing the first letter - we should move this to helpers
              'Account Number: ' + accountNum + '\n' + 
              'User ID: ' + context.prior_email + '\n' + 
              'Due Date: ' + context.billingDate + '\n' + //TODO: add due date!!!
