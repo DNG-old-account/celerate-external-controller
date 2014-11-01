@@ -89,6 +89,10 @@ if (Meteor.isClient) {
     return totalPayment;
   }
 
+  Template.required_payments.paymentNeeded = function() {
+    return Session.get('totalPayment') > 0;
+  }
+
   Template.required_payments.requiredPayments = function() {
     var authToken = Session.get('authToken');
     Meteor.call('requiredPayments', authToken, function(err, result) {
