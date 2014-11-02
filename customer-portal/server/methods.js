@@ -217,7 +217,8 @@ Meteor.methods({
               monthlyPayment.amount = monthlyPaymentAmount;
             }
             // Check for and apply discount
-            if (typeof sub.discount === 'string') {
+            if (typeof sub.discount === 'string' && 
+                typeof FRSettings.billing.discounts[sub.discount] === 'function') {
               var newAmount = FRSettings.billing.discounts[sub.discount](monthlyPayment.amount);
               monthlyPayment.discount = {
                 label: sub.discount,
