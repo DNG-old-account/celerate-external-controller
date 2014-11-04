@@ -135,13 +135,11 @@ if (Meteor.isClient) {
       if (err) {
         console.log("generateAuthToken call failed: " + err);
       } else {
-        console.log("Called generateAuthToken, got: " + JSON.stringify(result));
-        if (typeof result !== 'object') {
-          console.log("generateAuthToken didn't return object");
-        } else if (result.err) {
-          console.log("generateAuthToken error occurred: " + result.err);
+        console.log("Called generateAuthToken, got: " + result);
+        if (!result) {
+          console.log("generateAuthToken failed.");
         } else {
-          var user_link = Meteor.settings.public.urls.customerPortal + result.iv + "+" + result.token + "+" + result.tag;
+          var user_link = Meteor.settings.public.urls.customerPortal + result;
           console.log("setting user billing link " + user_link);
           Session.set("user_billing_link", user_link);
         }

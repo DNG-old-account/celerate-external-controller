@@ -79,26 +79,23 @@ FRSettings = {
 };
 
 FRMethods = {
-  // Generates an authentication token and a MAC tag (encrypt-then-MAC) as hex strings given a subscriber id as a hex string and a server encryption key and MAC key as base64 strings.
+  // Generates a shortened auth token as a hex string given a subscriber id as a hex string and a server encryption key and MAC key as base64 strings.
+  // Returns null on failure.
   generateAuthToken: function (subscriber_id, encryptionKey, MACKey) {
     var crypto = Npm.require('crypto');
 
     if (!subscriber_id) {
       console.log("generateAuthToken subscriber_id is invalid: " + subscriber_id);
+      return null;
     }
 
     // Create plaintext JSON object.
     var expiryday = moment().add(Meteor.settings.serverAuthToken.tokenDaysValid, 'days');
-    var message = subscriber_id + "+" + expiryday.format('YYYY-MM-DD');
+    var expiryday_str = expiryday.format('YYYY-MM-DD');
+    var message = {"subscriber_id" : subscriber_id, "expiryday": expiryday_str};
     // console.log("plaintext message " + message);
-    var plaintext = new Buffer(message, 'ascii');
-    var rand = new Buffer(crypto.randomBytes(8), 'binary');
-    var iv = new Buffer([0, 0, 0, 0,
-                         0, 0, 0, 0,
-                         0, 0, 0, 0,
-                         0, 0, 0, 0]);
-
-    rand.copy(iv);
+    var plaintext = new Buffer(JSON.stringify(message), 'ascii');
+    var iv = new Buffer(crypto.randomBytes(16), 'binary');
 
     // Set up encryption.
     var cipher = crypto.createCipheriv(Meteor.settings.serverAuthToken.encryptionMode,
@@ -114,28 +111,47 @@ FRMethods = {
                                  new Buffer(MACKey, 'base64'));
     hmac.update(ciphertext);
     var tag = hmac.digest('hex');
+    var result = { 'iv': iv.toString('hex'), 'token': ciphertext, 'tag': tag };
 
-    var result = { 'iv': rand.toString('hex'), 'token': ciphertext, 'tag': tag.substr(0, 16) };
-    // console.log('generateAuthToken returning: ' + JSON.stringify(result));
-    return result;
+    // Shorten the auth token by hashing it.
+    var hash = crypto.createHash(Meteor.settings.serverAuthToken.hashMode);
+    hash.update(JSON.stringify(result), 'ascii');
+    var short_token = hash.digest('hex');
+
+    // Store the shortened auth token.
+    db_update = result;
+    db_update['short_token'] = short_token;
+    db_update['expiry_day'] = expiryday_str;
+    ShortAuthTokens.insert(db_update);
+
+    return short_token;
   },
-  processAuthToken: function(truncated_iv, token, tag, encryptionKey, MACKey) {
+  processAuthToken: function(short_token, encryptionKey, MACKey) {
     var crypto = Npm.require('crypto');
+
+    // Reverse the auth token shortening.
+    var long_token = ShortAuthTokens.findOne({'short_token': short_token});
+    if (!long_token) {
+      console.log("ShortAuthToken " + short_token + " not found.");
+      return { 'err': 'Token/tag invalid', 'subscriber_id': '' };
+    }
+
+    console.log("Long token: " + JSON.stringify(long_token));
+
+    var iv = long_token.iv;
+    var token = long_token.token;
+    var tag = long_token.tag;
 
     // Set up HMAC and check tag.
     var hmac = crypto.createHmac(Meteor.settings.serverAuthToken.hashMode,
                                  new Buffer(MACKey, 'base64'));
     hmac.update(token);
-    if (tag !== hmac.digest('hex').substr(0, 16)) {
+    if (tag !== hmac.digest('hex')) {
+      console.log("MAC tag " + tag + " doesn't match " + hmac.digest('hex'));
       return { 'err': 'Token/tag invalid', 'subscriber_id': '' };
     }
 
-    var trunc = new Buffer(truncated_iv, 'hex');
-    var iv = new Buffer([0, 0, 0, 0,
-                         0, 0, 0, 0,
-                         0, 0, 0, 0,
-                         0, 0, 0, 0], 'binary');
-    trunc.copy(iv);
+    var iv = new Buffer(iv, 'hex');
 
     // Decrypt token.
     var decipher = crypto.createDecipheriv(Meteor.settings.serverAuthToken.encryptionMode,
@@ -144,21 +160,21 @@ FRMethods = {
 
     var plaintext = decipher.update(token, input_encoding='hex', output_encoding='ascii');
     plaintext += decipher.final(output_encoding='ascii');
-    // console.log("got plaintext [" + plaintext + "]");
+    console.log("got plaintext [" + plaintext + "]");
 
-    var m = plaintext.split("+");
-    if (m.length != 2) {
+    var m = JSON.parse(plaintext);
+    if (!m || !m['subscriber_id'] || !m['expiryday']) {
       return { 'err': 'Unable to decode/decrypt embedded message properly.', 'subscriber_id': '' };
     }
 
     // Check expiration.
-    var expiryday = moment(m[1]);
+    var expiryday = moment(m.expiryday);
     if (expiryday.diff(moment(), 'days') < 0) {
       return { 'err': 'Token expired on ' + expiryday.format('YYYY-MM-DD'), 'subscriber_id': '' };
     }
 
     // Token is valid, return subscriber id.
-    var result = { 'err': null, 'subscriber_id': m[0] };
+    var result = { 'err': null, 'subscriber_id': m.subscriber_id };
     // console.log("processAuthToken result " + JSON.stringify(result));
 
     return result;
