@@ -1,4 +1,5 @@
 <template name="subscriber_details">
+<div class="subscriber-details-container">
 {{#if is_archived}}
 <div class="alert alert-warning" role="alert"><strong>Warning:</strong> This is an ARCHIVED Subscriber</div>
 {{/if}}
@@ -52,7 +53,7 @@
 
 <div class="tab-pane" id="billing_info">
   <div class="container">
-    <div class="has-agreed-to-terms"><h4>Has agreed to terms: {{terms_info.agreed_to_terms}}</h4></div>
+    <div class="agreed-to-terms"><h4>Has agreed to terms: {{{terms_info.agreed_to_terms}}}</h4></div>
     <form class="form-horizontal billing-form" role="form">
       <div class="form-group">
         <label for="billing_standard_installation" class="col-sm-2 control-label">Standard Installation:</label>
@@ -119,4 +120,5 @@
 
 </div>
 </form>
+</div>
 </template>

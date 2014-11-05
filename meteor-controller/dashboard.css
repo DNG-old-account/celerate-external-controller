@@ -166,3 +166,19 @@ body {
 #select-all-emails {
   cursor: pointer;
 }
+
+/* 
+ * Subscriber Details
+ */
+
+.subscriber-details-container .agreed-to-terms {
+  margin: 20px 0;
+}
+
+.subscriber-details-container .agreed-to-terms .glyphicon-remove {
+  color: #D03510;
+}
+
+.subscriber-details-container .agreed-to-terms .glyphicon-ok {
+  color: #1FA916;
+}

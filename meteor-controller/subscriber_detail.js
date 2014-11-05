@@ -147,8 +147,8 @@ if (Meteor.isClient) {
 
   Template.subscriber_details.terms_info = function () {
     return {
-      agreed_to_terms: (typeof this.terms === "object" && this.terms.agreed) ? "Yes: " + this.terms.date : "No"
-    }
+      agreed_to_terms: (typeof this.terms === "object" && this.terms.agreed) ? '<span class="glyphicon glyphicon-ok"></span> ' + this.terms.date : '<span class="glyphicon glyphicon-remove"></span>'
+    };
   };
 
   Template.subscriber_details.ap_options = function () {
