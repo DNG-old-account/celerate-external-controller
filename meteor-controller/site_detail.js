@@ -1,6 +1,27 @@
 if (Meteor.isClient) {
   // site details functionality and events.
   Template.site_details.events({
+    'click .delete-picture': function (evt) {
+      evt.preventDefault();
+      var thisPic = this;
+      var thisSite = Template.parentData();
+      console.log(evt.target);
+      bootbox.confirm("Are you sure you want to delete this picture?", function(confirm) {
+        if (confirm) {
+          if (typeof thisSite.pictures === 'object' &&
+              typeof thisPic === 'object') {
+            var newPicturesArray = _.reject(thisSite.pictures, function(pic) {
+              return pic.key === thisPic.key;
+            });
+            var dbUpdate = {
+              pictures: newPicturesArray
+            };
+            Sites.update(thisSite._id, {$set: dbUpdate}); 
+          }
+        }
+      });
+    },
+
     'click #upload-picture': function (evt) {
       evt.preventDefault();
       var thisSite = this;
@@ -90,18 +111,16 @@ if (Meteor.isClient) {
 
       Sites.update(this._id, {$set: {"type" : new_types}});
     },
-    'click' : function(evt) {
-      if (evt.target.id == "delete_tag") {
-        // Handle deletion of a tag.
-        var tag_name = evt.target.parentNode.id;
-        console.log(tag_name);
-        console.log(this);
+    'click #delete_tag' : function(evt) {
+      // Handle deletion of a tag.
+      var tag_name = evt.target.parentNode.id;
+      console.log(tag_name);
+      console.log(this);
 
-        var new_types = this.type;
-        delete new_types[tag_name];
+      var new_types = this.type;
+      delete new_types[tag_name];
 
-        Sites.update(this._id, {$set: {"type" : new_types}});
-      }
+      Sites.update(this._id, {$set: {"type" : new_types}});
     },
     'change select': function (evt) {
       console.log(evt);

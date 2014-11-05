@@ -144,6 +144,10 @@ body {
   max-width: 100%;
 }
 
+.picture-container .delete-picture {
+  float: right;
+  cursor: pointer;
+}
 .subscriber-table-header {
   margin: 40px 0 0 10px;
 }

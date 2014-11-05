@@ -54,7 +54,8 @@ Meteor.methods({
     _.each(site.pictures, function(pictureObj) {
       results.push({
         url: Meteor.call('getS3Url', pictureObj.key),
-        label: pictureObj.label
+        label: pictureObj.label,
+        key: pictureObj.key
       });
     });
 
