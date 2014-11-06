@@ -56,22 +56,50 @@ if (Meteor.isClient) {
     return Session.get('paymentInfo');
   };
 
+  Template.required_payments.installationTotalPayment = function() {
+    var requiredPayments = Session.get('requiredPayments');
+    var installmentAmount = Session.get('instalmentAmount');
+
+    var installments = ($('#installment-choices').val() === 'installment' || 
+                        requiredPayments.installation.installments) ? 
+                        true : false;
+
+    if (installments) {
+      return installmentAmount;
+    } else {
+      return requiredPayments.installation.totalInstallationAmount;
+    }
+  };
+
+  Template.required_payments.installmentNum = function() {
+    return FRSettings.billing.installmentNum;
+  };
+
+  Template.required_payments.alreadyPaid = function() {
+    var requiredPayments = Session.get('requiredPayments');
+    return parseFloat(requiredPayments.installation.totalPaid).formatMoney(2, '.', ',');
+  };
+
   Template.required_payments.installmentAmount = function() {
-    return FRSettings.billing.installmentAmount;
+    var requiredPayments = Session.get('requiredPayments');
+    var installmentAmount = (requiredPayments.installation.totalInstallationAmount / FRSettings.billing.installmentNum).toFixed(2);
+    Session.set('installmentAmount', installmentAmount);
+    return installmentAmount;
   };
 
   var calcTotalPayment = function() {
     var requiredPayments = Session.get('requiredPayments');
     var total = 0;
+    var installmentAmount = Session.get('installmentAmount');
     if (requiredPayments.required) {
       if (!requiredPayments.installation.paid) {
         if ($('#installment-choices').val() === 'installment') {
-          total += FRSettings.billing.installmentAmount;
+          total += parseFloat(installmentAmount);
         } else {
           if (requiredPayments.installation.installments && !isNaN(parseFloat(requiredPayments.installation.remaining_amount))) {
             total += parseFloat(requiredPayments.installation.remaining_amount);
           } else {
-            total += parseFloat(requiredPayments.installation.standard_installation);
+            total += parseFloat(requiredPayments.installation.totalInstallationAmount);
           }
         }
       }
@@ -145,6 +173,7 @@ if (Meteor.isClient) {
           allowRememberMe: false,
           email: billingInfo.contact.email,
           description: '',
+          installmentAmount: Session.get('installmentAmount')
       }
       if (requiredPayments.dueToDate.required) {
         typesOfCharges.push('monthly');
@@ -159,17 +188,14 @@ if (Meteor.isClient) {
 
       } 
       if (!requiredPayments.installation.paid) { 
-        var installationAmount;
         stripeConfig.description += (stripeConfig.description.trim() === '') ? '' : '; ';
 
         if ($('#installment-choices').val() === 'installment') {
           typesOfCharges.push('installment');
-          installationAmount = parseFloat(FRSettings.billing.installmentAmount);
-          stripeConfig.description += 'Standard Installation Installment';
+          stripeConfig.description += 'Installation Installment Payment';
 
         } else {
           typesOfCharges.push('installation');
-          installationAmount = parseFloat(requiredPayments.installation.standard_installation);
           stripeConfig.description += 'Standard Installation';
         }
       }

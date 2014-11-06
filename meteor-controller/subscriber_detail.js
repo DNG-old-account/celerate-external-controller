@@ -79,6 +79,10 @@ if (Meteor.isClient) {
     'click .user_google_account_setup_button': function (evt) {
       window.open("https://admin.google.com/AdminHome?fral=1#UserList:org=45257bl2kp4lkp");
     },
+    'click #add-labor': function (evt) {
+      evt.preventDefault();
+      Session.set('showExtraLabor', true);
+    },
     'click #update_billing': function (evt) {
       // TODO: Doesn't have a handler for other equipment or labor
       evt.preventDefault();
@@ -90,8 +94,14 @@ if (Meteor.isClient) {
       paidInstallation = (paidInstallation === "true") ? true : false;
 
       Subscribers.update(thisSub._id, {$set: {'billing_info.installation.standard_installation': updatedVal }});
-      Subscribers.update(thisSub._id, {$set: {'billing_info.installation.paid': paidInstallation }});
 
+      var extraLaborCost = form.find('#billing_extra_labor').val().trim();
+      if (FRMethods.isNumber(extraLaborCost)) {
+        extraLaborCost = parseFloat(extraLaborCost);
+        Subscribers.update(thisSub._id, {$set: {'billing_info.installation.additional_labor': extraLaborCost }});
+      }
+
+      Subscribers.update(thisSub._id, {$set: {'billing_info.installation.paid': paidInstallation }});
     },
     'click .archive_subscriber_button': function (evt) {
       var id = this._id;
@@ -134,6 +144,14 @@ if (Meteor.isClient) {
         }
       }
     });
+  };
+
+  Template.subscriber_details.showExtraLabor = function () {
+    var thisSub = this;
+    if (FRMethods.isNumber(thisSub.billing_info.installation.additional_labor)) {
+      Session.set('showExtraLabor', true);
+    }
+    return (typeof Session.get('showExtraLabor') === 'boolean') ? Session.get('showExtraLabor') : false;
   };
 
   Template.subscriber_details.user_billing_link = function () {

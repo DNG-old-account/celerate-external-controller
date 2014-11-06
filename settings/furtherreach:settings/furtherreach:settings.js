@@ -5,7 +5,8 @@ FRSettings = {
     notificationEmails: 'support@furtherreach.net, max@denovogroup.org, barath@denovogroup.org'
   },
   billing: {
-    installmentAmount: 25,
+    installmentNum: 6,
+    additionalHourCost: 50,
     firstDayOfBilling: '2014-10-01',
     endOfBetaInstallation: '2014-09-15',
     discounts: {
@@ -172,6 +173,10 @@ FRMethods = {
     var account_id = hash.digest('hex').substr(0,10);
 
     return account_id;
+  },
+
+  isNumber: function (n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
   }
 };
 

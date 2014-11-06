@@ -73,7 +73,7 @@ Meteor.methods({
 
     console.log(result);
     var dollarAmount = stripeConfig.amount / 100;
-    var installmentAmount = FRSettings.billing.installmentAmount;
+    var installmentAmount = stripeConfig['installmentAmount'];
 
     if (!result.error && !result.result.err) {
       if (_.contains(typesOfCharges, 'installation')) {
@@ -268,12 +268,23 @@ Meteor.methods({
     result.dueToDate = dueToDate;
 
     result.installation = sub.billing_info.installation;
+    result.installation.standard_installation = parseFloat(result.installation.standard_installation).toFixed(2);
+
+    result.installation.totalInstallationAmount = parseFloat(result.installation.standard_installation);
+    result.installation.showAdditionalLabor = false;
+
+    if (FRMethods.isNumber(result.installation.additional_labor)) {
+      result.installation.showAdditionalLabor = true;
+      result.installation.additionalLaborCost =  (result.installation.additional_labor * FRSettings.billing.additionalHourCost).toFixed(2);
+      result.installation.totalInstallationAmount += FRSettings.billing.additionalHourCost * parseFloat(result.installation.additional_labor);
+      result.installation.additionalLaborHourCost = FRSettings.billing.additionalHourCost;
+    }
 
     if (result.installation.installments) {
-      var totalPaid = _.reduce(result.installation.installment_payments, function(sum, payment) {
+      result.installation.totalPaid = _.reduce(result.installation.installment_payments, function(sum, payment) {
         return sum + payment.amount;
       }, 0);
-      result.installation.remaining_amount = result.installation.standard_installation - totalPaid;
+      result.installation.remaining_amount = (result.installation.totalInstallationAmount - result.installation.totalPaid).toFixed(2);
     }
 
     if (!result.installation.paid) {

@@ -300,92 +300,162 @@
     <h2>Bill</h2>
   </div>
 
-  <div class="panel-body">
+  <div class="panel-body bill-container">
     <div class="col-xs-12">
       {{#if requiredPayments.dueToDate.required }}
-      <div class="row payment-row">
-        <div class="col-xs-4 payment-start-date">
-          {{#each requiredPayments.dueToDate.payments}}
-          <div class="row detail-row monthly-period-dates">
-            <div class="col-xs-12">
-              <span class="bolded-label">Period:</span> {{ formatDate this.startDate "MM/DD/YYYY" }} - {{ formatDate this.endDate "MM/DD/YYYY"}}
-            </div>
-          </div>
-          <div class="row detail-row monthly-period-plan">
-            <div class="col-xs-12">
-              <span class="bolded-label">Plan:</span> {{ this.plan.label }}
-            </div>
-          </div>
-          {{#if this.discount}}
-          <div class="row detail-row monthly-period-plan">
-            <div class="col-xs-12">
-              <span class="bolded-label">Discount:</span> {{ this.discount.label }}
-            </div>
-          </div>
-          <div class="row detail-row monthly-period-plan">
-            <div class="col-xs-12">
-              <span class="bolded-label">Original Amount:</span> ${{ this.discount.previousAmount }}
-            </div>
-          </div>
-          <div class="row detail-row monthly-period-plan">
-            <div class="col-xs-12">
-              <span class="bolded-label">Discount:</span> ${{ this.discount.amount }}
-            </div>
-          </div>
-          {{/if}}
-          {{/each}}
+      <div class="payment-header">
+        Monthly Charge
+      </div>
+      <div class="row headers-row">
+        <div class="col-xs-5">
+          Period
         </div>
-        <div class="col-xs-8">
-          <div class="row">
-            <div class="col-xs-12">
-              ${{ requiredPayments.dueToDate.amount }}
-            </div>
-          </div>
+        <div class="col-xs-5">
+          Plan
+        </div>
+        <div class="col-xs-2">
+          Amount
+        </div>
+      </div>
+      {{#each requiredPayments.dueToDate.payments}}
+      <div class="row monthly-row">
+        <div class="col-xs-5">
+          {{ formatDate this.startDate "MM/DD/YYYY" }} - {{ formatDate this.endDate "MM/DD/YYYY"}}
+        </div>
+        <div class="col-xs-5">
+          {{ this.plan.label }}
+        </div>
+        <div class="col-xs-2">
+          ${{ this.plan.monthly }}
+        </div>
+      </div>
+      {{#if this.discount}}
+      <div class="row headers-row discount-headers">
+        <div class="col-xs-5">
+          Discount
+        </div>
+        <div class="col-xs-5">
+          Original Amount
+        </div>
+        <div class="col-xs-2">
+          Discount Amount
+        </div>
+      </div>
+      <div class="row monthly-row">
+        <div class="col-xs-5">
+          {{ capitalize this.discount.label }}
+        </div>
+        <div class="col-xs-5">
+          ${{ this.discount.previousAmount }}
+        </div>
+        <div class="col-xs-2 negative-num-cell">
+          - ${{ this.discount.amount }}
+        </div>
+      </div>
+      {{/if}}
+      {{/each}}
+      <div class="row monthly-charges-total-row">
+        <div class="col-xs-4">
+          <span class="bolded-label">Monthly Total:</span>
+        </div>
+        <div class="col-xs-offset-6 col-xs-2">
+          ${{ requiredPayments.dueToDate.amount }}
         </div>
       </div>
       {{/if}}
       {{#if requiredPayments.installation.paid}}
       {{else}}
-      <div class="row payment-row">
-        <div class="col-xs-4 payment-start-date">
-          <div class="row">
-            <div class="col-xs-12">
-              Standard Installation
-            </div>
-          </div>
+      <div class="payment-header">
+        Installation
+      </div>
+      <div class="row headers-row">
+        <div class="col-xs-6">
+          Description
         </div>
-        <div class="col-xs-4">
-          <div class="row">
-            <div class="col-xs-12">
-              {{#if requiredPayments.installation.installments}}
-              Remaining installation amount: ${{requiredPayments.installation.remaining_amount}}
-              {{else}}
-              ${{ requiredPayments.installation.standard_installation }}
-              {{/if}}
-            </div>
+        <div class="col-xs-2">
+          Amount
+        </div>
+        <div class="col-xs-2">
+          Rate
+        </div>
+        <div class="col-xs-2">
+          Total
+        </div>
+      </div>
+      <div class="row payment-row">
+        <div class="col-xs-6">
+          Standard Installation (includes antenna, access point, Ethernet cable, 3 hour labor)
+        </div>
+        <div class="col-xs-2">
+          1
+        </div>
+        <div class="col-xs-2 col-xs-offset-2">
+          ${{ requiredPayments.installation.standard_installation }}
+        </div>
+      </div>
+      {{#if requiredPayments.installation.showAdditionalLabor}}
+      <div class="additional-labor-container">
+        
+        <div class="row payment-row">
+          <div class="col-xs-6">
+            Additional Labor (beyond 3 hours)
           </div>
-          <div class="row">
-            <div class="col-xs-12">
-              <select id="installment-choices" class="form-control">
-                <option value="full">
-                  Pay full installation 
-                  {{#if requiredPayments.installation.remaining_amount}} 
-                  - ${{requiredPayments.installation.remaining_amount}} 
-                  {{/if}}
-                </option>
-                <option value="installment">
-                  {{#if requiredPayments.installments}}
-                  Pay installment - ${{installmentAmount}}
-                  {{else}}
-                  Pay installment - (6 payments of ${{installmentAmount}} each)
-                  {{/if}}
-                </option>
-              </select>
-            </div>
+          <div class="col-xs-2">
+            {{requiredPayments.installation.additional_labor}} hours
+          </div>
+          <div class="col-xs-2">
+            ${{requiredPayments.installation.additionalLaborHourCost}}/hr
+          </div>
+          <div class="col-xs-2">
+            ${{requiredPayments.installation.additionalLaborCost}}
           </div>
         </div>
       </div>
-     {{/if}}
+      {{/if}}
+      {{#if requiredPayments.installation.installments}}
+      <div class="row installation-totals installation-item payment-row">
+        <div class="col-xs-2 col-xs-offset-8">
+          Already paid:
+        </div>
+        <div class="col-xs-2 negative-num-cell">
+          - ${{ alreadyPaid }}
+        </div>
+      </div>
+      {{/if}}
+      <div class="row installation-totals installation-item payment-row">
+        <div class="col-xs-6">
+          <span class="bolded-label">Installation Total:</span>
+        </div>
+        <div class="col-xs-offset-4 col-xs-2">
+          {{#if requiredPayments.installation.installments}}
+          ${{requiredPayments.installation.remaining_amount}} remaining
+          {{else}}
+          ${{ requiredPayments.installation.totalInstallationAmount }}
+          {{/if}}
+        </div>
+      </div>
+      <div class="row installation-item payment-row">
+        <div class="col-xs-4 col-xs-offset-8">
+          <select id="installment-choices" class="form-control">
+            <option value="full">
+              Pay full installation 
+              {{#if requiredPayments.installation.remaining_amount}} 
+              - ${{requiredPayments.installation.remaining_amount}} 
+              {{else}}
+              - ${{ installationTotalPayment }}
+              {{/if}}
+            </option>
+            <option value="installment">
+              {{#if requiredPayments.installments}}
+              Pay installment - ${{installmentAmount}}
+              {{else}}
+              Pay installment - ({{installmentNum}} payments of ${{installmentAmount}} each)
+              {{/if}}
+            </option>
+          </select>
+        </div>
+      </div>
+      {{/if}}
       <div class="row">
         <div class="col-xs-offset-6 col-xs-6 total-payment">
           <span class="bolded-label">Total:</span> ${{totalPayment}}
