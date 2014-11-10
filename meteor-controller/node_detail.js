@@ -158,6 +158,9 @@ if (Meteor.isClient) {
              { field: "site", label: "Site", value: this.site, options: true, options_custom_view: site_options },
              { field: "status", label: "Status", value: this.status, options: status_options },
              { field: "mac", label: "MAC", value: this.mac },
+             { field: "lat", label: "Lat", value:this.lat },
+             { field: "lng", label: "Lng", value:this.lng },
+             { field: "notes", label: "Notes", value:this.notes },
              { field: "ports", label: "Ports", value: this.ports, display_ports: true },
            ];
   };
