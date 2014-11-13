@@ -268,14 +268,42 @@ Meteor.methods({
     result.dueToDate = dueToDate;
 
     result.installation = sub.billing_info.installation;
-    result.installation.standard_installation = parseFloat(result.installation.standard_installation).toFixed(2);
+    result.installation.standard_installation = Math.round10(parseFloat(result.installation.standard_installation), -2);
 
     result.installation.totalInstallationAmount = parseFloat(result.installation.standard_installation);
     result.installation.showAdditionalLabor = false;
+    result.installation.showAdditionalEquipment = false;
+    result.installation.taxable = false;
 
-    if (FRMethods.isNumber(result.installation.additional_labor)) {
+    if (typeof result.installation.additional_equipment === 'object' &&
+        typeof result.installation.additional_equipment.length === 'number' &&
+        result.installation.additional_equipment.length > 0) {
+
+      result.installation.showAdditionalEquipment = true;
+      result.installation.taxable = true;
+      result.installation.taxableAmount = 0;
+      result.installation.totalTax = 0;
+
+      _.each(result.installation.additional_equipment, function(equipment) {
+        // If any piece of hardware has a different tax % than another piece of hardware, we should throw an error
+        if (FRMethods.isNumber(result.installation.taxPercent) && 
+            result.installation.taxPercent !== parseFloat(equipment.hardwareObj.tax)) {
+
+          throw "Hardware tax amounts aren't the same!";
+        }
+        result.installation.taxPercent = parseFloat(equipment.hardwareObj.tax);
+        equipment.hardwareObj.taxCost = Math.round10((parseFloat(equipment.hardwareObj.tax) / 100) * parseFloat(equipment.hardwareObj.price), -2);
+        result.installation.totalInstallationAmount += equipment.hardwareObj.taxCost + parseFloat(equipment.hardwareObj.price);
+        result.installation.taxableAmount += parseFloat(equipment.hardwareObj.price);
+        result.installation.totalTax += equipment.hardwareObj.taxCost;
+      });
+    }
+
+    if (FRMethods.isNumber(result.installation.additional_labor) && 
+        result.installation.additional_labor > 0) {
+
       result.installation.showAdditionalLabor = true;
-      result.installation.additionalLaborCost =  (result.installation.additional_labor * FRSettings.billing.additionalHourCost).toFixed(2);
+      result.installation.additionalLaborCost = Math.round10(result.installation.additional_labor * FRSettings.billing.additionalHourCost, -2);
       result.installation.totalInstallationAmount += FRSettings.billing.additionalHourCost * parseFloat(result.installation.additional_labor);
       result.installation.additionalLaborHourCost = FRSettings.billing.additionalHourCost;
     }
@@ -284,7 +312,7 @@ Meteor.methods({
       result.installation.totalPaid = _.reduce(result.installation.installment_payments, function(sum, payment) {
         return sum + payment.amount;
       }, 0);
-      result.installation.remaining_amount = (result.installation.totalInstallationAmount - result.installation.totalPaid).toFixed(2);
+      result.installation.remaining_amount = Math.round10(result.installation.totalInstallationAmount - result.installation.totalPaid, -2);
     }
 
     if (!result.installation.paid) {

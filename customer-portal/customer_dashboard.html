@@ -393,9 +393,9 @@
           ${{ requiredPayments.installation.standard_installation }}
         </div>
       </div>
+
       {{#if requiredPayments.installation.showAdditionalLabor}}
       <div class="additional-labor-container">
-        
         <div class="row payment-row">
           <div class="col-xs-6">
             Additional Labor (beyond 3 hours)
@@ -412,6 +412,61 @@
         </div>
       </div>
       {{/if}}
+
+      {{#if requiredPayments.installation.showAdditionalEquipment }}
+      <div class="row equipment-header">
+        <div class="col-xs-6">
+          Additional Equipment
+        </div>
+      </div>
+      {{#each requiredPayments.installation.additional_equipment }}
+      <div class="additional-equipment-container">
+        <div class="row payment-row">
+          <div class="col-xs-6">
+            {{this.hardwareObj.make}}
+            {{this.hardwareObj.model}}
+          </div>
+          <div class="col-xs-2">
+            1
+          </div>
+          <div class="col-xs-2">
+            ${{this.hardwareObj.price}}
+          </div>
+          <div class="col-xs-2">
+            ${{this.hardwareObj.price}}
+          </div>
+        </div>
+      </div>
+      {{/each}}
+      {{/if}}
+
+      {{#if requiredPayments.installation.taxable}}
+      <div class="row installation-item payment-row">
+        <div class="col-xs-2 col-xs-offset-8 taxable-border">
+          Taxable Amount:
+        </div>
+        <div class="col-xs-2 taxable-border">
+          ${{requiredPayments.installation.taxableAmount}}
+        </div>
+      </div>
+      <div class="row installation-item payment-row">
+        <div class="col-xs-2 col-xs-offset-8">
+          Tax:
+        </div>
+        <div class="col-xs-2">
+          {{requiredPayments.installation.taxPercent}}%
+        </div>
+      </div>
+      <div class="row installation-item payment-row">
+        <div class="col-xs-2 col-xs-offset-8">
+          Total Tax:
+        </div>
+        <div class="col-xs-2">
+          ${{requiredPayments.installation.totalTax}}
+        </div>
+      </div>
+      {{/if}}
+
       {{#if requiredPayments.installation.installments}}
       <div class="row installation-totals installation-item payment-row">
         <div class="col-xs-2 col-xs-offset-8">
@@ -456,6 +511,7 @@
         </div>
       </div>
       {{/if}}
+      
       <div class="row">
         <div class="col-xs-offset-6 col-xs-6 total-payment">
           <span class="bolded-label">Total:</span> ${{totalPayment}}

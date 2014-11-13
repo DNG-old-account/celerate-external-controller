@@ -256,11 +256,7 @@ if (Meteor.isClient) {
     var thisSub = this;
     Session.set('thisSub', thisSub);
 
-    if (typeof thisSub.billing_info.installation.additional_equipment === 'object' &&
-        typeof thisSub.billing_info.installation.additional_equipment.length !== 'undefined' &&
-        thisSub.billing_info.installation.additional_equipment.length > 0) {
-
-    }
+    var billedHardware = thisSub.billing_info.installation.additional_equipment;
     
     var nodes = [];
     // Now search through sites to see if any are associated with this subscriber
@@ -269,6 +265,17 @@ if (Meteor.isClient) {
       // Now search through nodes to see if any are associated with these sites
       _.each(thisSubsSites, function(site) {
         var thisSitesNodes = Nodes.find({'site': site._id._str}).fetch();
+
+        // Get rid of any that we've already added to billing
+        thisSitesNodes = _.reject(thisSitesNodes, function(node) {
+          var reject = false;
+          _.each(billedHardware, function(billed) {
+            if (node._id._str === billed._id._str) {
+              reject = true;
+            }
+          });
+          return reject;
+        });
 
         // Now add hardware details
         _.each(thisSitesNodes, function(node) {

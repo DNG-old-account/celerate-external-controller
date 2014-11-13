@@ -183,8 +183,12 @@ body {
   color: #1FA916;
 }
 
+.subscriber-details-container .billing-info-container .additional-equipment-list {
+  padding: 10px;
+}
+
 .subscriber-details-container .billing-info-container .additional-equipment-list:nth-child(even) {
-  background-color: #ccc;
+  background-color: #fefefe;
 }
 
 .subscriber-details-container .billing-info-container .additional-equipment-list:nth-child(odd) {
