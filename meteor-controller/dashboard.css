@@ -182,3 +182,12 @@ body {
 .subscriber-details-container .agreed-to-terms .glyphicon-ok {
   color: #1FA916;
 }
+
+.subscriber-details-container .billing-info-container .additional-equipment-list:nth-child(even) {
+  background-color: #ccc;
+}
+
+.subscriber-details-container .billing-info-container .additional-equipment-list:nth-child(odd) {
+  background-color: #ccc;
+}
+

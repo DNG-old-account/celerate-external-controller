@@ -52,52 +52,8 @@
 </div>
 
 <div class="tab-pane" id="billing_info">
-  <div class="container">
-    <div class="agreed-to-terms"><h4>Has agreed to terms: {{{terms_info.agreed_to_terms}}}</h4></div>
-    <form class="form-horizontal billing-form" role="form">
-      <div class="form-group">
-        <label for="billing_standard_installation" class="col-sm-2 control-label">Standard Installation:</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control billing-field" id="standard_installation" value="{{billing_info.installation.standard_installation}}">
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="paid_installation" class="col-sm-2 control-label">Paid for Installation:</label>
-        <div class="col-sm-10">
-          <select id="paid_installation" class="form-control">
-            {{#if billing_info.installation.paid}}
-            <option value=true selected>Yes</option>
-            <option value=false>No</option>
-            {{else}}
-            <option value=true>Yes</option>
-            <option value=false selected>No</option>
-            {{/if}}
-          </select>
-        </div>
-      </div>
-      <fieldset disabled>
-        <button class="btn btn-warning" id="add-equipment">Add Installation Equipment</button>
-      </fieldset>
-      <button class="btn btn-warning" id="add-labor">Add Labor Hours</button>
-      <div class="form-group">
-        <label for="billing_standard_installation" class="col-sm-2 control-label">Standard Installation:</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control billing-field" id="standard_installation" value="{{billing_info.installation.standard_installation}}">
-        </div>
-      </div>
-      {{#each billing_info.installation.additional_equipment}}
-      {{/each}}
-      {{#if showExtraLabor}}
-      <div class="form-group">
-        <label for="billing_extra_labor" class="col-sm-2 control-label">Extra Labor hours:</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control billing-field" id="billing_extra_labor" value="{{billing_info.installation.additional_labor}}">
-        </div>
-      </div>
-      {{/if}}
-      <button id="update_billing" class="btn btn-success">Save</button>
-    </form>
-  </div>
+  {{> subscriber_billing_info }}
+  
 </div>
 
 <div class="tab-pane" id="scheduling">
@@ -132,5 +88,104 @@
 
 </div>
 </form>
+</div>
+</template>
+
+<template name="subscriber_billing_info">
+<div class="container billing-info-container">
+  <div class="agreed-to-terms"><h4>Has agreed to terms: {{{terms_info.agreed_to_terms}}}</h4></div>
+  <form class="form-horizontal billing-form" role="form">
+    <div class="form-group">
+      <label for="billing-standard-installation" class="col-sm-2 control-label">Standard Installation:</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control billing-field" id="standard-installation" value="{{billing_info.installation.standard_installation}}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="paid-installation" class="col-sm-2 control-label">Paid for Installation:</label>
+      <div class="col-sm-10">
+        <select id="paid-installation" class="form-control">
+          {{#if billing_info.installation.paid}}
+          <option value=true selected>Yes</option>
+          <option value=false>No</option>
+          {{else}}
+          <option value=true>Yes</option>
+          <option value=false selected>No</option>
+          {{/if}}
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="billing-extra-labor" class="col-sm-2 control-label">Extra Labor hours:</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control billing-field" id="billing-extra-labor" value="{{billing_info.installation.additional_labor}}">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="form-group">
+          <label for="billing-extra-equipment" class="col-sm-4 control-label">Extra Equipment:</label>
+          <div class="col-sm-8">
+            <select class="form-control billing-field" id="billing-extra-equipment">
+              {{#each extraEquipment.installedNodes}}
+              <option value="{{this._id._str}}">{{this.name}}</option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <label class="col-sm-4 control-label">
+            Price: 
+          </label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control extra-equipment-price" value="{{selectedAdditionalEquipment.hardwareObj.price}}">
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <label class="col-sm-4 control-label">
+            Tax (%): 
+          </label>
+          <div class="col-sm-8">
+            <input type="text" id="extra-equipment-tax-percent" class="form-control" value="0">
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <button class="btn btn-warning" id="add-additional-hardware">Add Equipment</button>
+      </div>
+    </div>
+    {{#if billing_info.installation.additional_equipment}}
+    <h4 class="row additional-equipment-header">
+      Additional Equipment
+    </h4>
+    {{#each billing_info.installation.additional_equipment}}
+    <div class="row additional-equipment-list">
+      <div class="col-sm-3">
+        {{ this.name }}
+      </div>
+      <div class="col-sm-3">
+        {{ this.hardwareObj.make }}
+        {{ this.hardwareObj.model }}
+      </div>
+      <div class="col-sm-2">
+        ${{ this.hardwareObj.price }}
+      </div>
+      <div class="col-sm-2">
+        Tax {{ this.hardwareObj.tax }}%
+      </div>
+      <div class="col-sm-2">
+        {{#with this}}
+        <button class="btn btn-danger" id="remove-additional-hardware">Remove</button>
+        {{/with}}
+      </div>
+    </div>
+    {{/each}}
+    {{/if}}
+    <button id="update-billing" class="btn btn-success">Save</button>
+  </form>
 </div>
 </template>

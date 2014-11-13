@@ -59,6 +59,7 @@ if (Meteor.isClient) {
     return [ { field: "name", label: "Name", value: this.name },
              { field: "make", label: "Make", value: this.make },
              { field: "model", label: "Model", value: this.model },
+             { field: "price", label: "Base Price", value: this.price },
              { field: "voltage", label: "Voltage", value: this.voltage },
              { field: "ports", label: "Ports", value: this.ports, display_ports: true },
            ];

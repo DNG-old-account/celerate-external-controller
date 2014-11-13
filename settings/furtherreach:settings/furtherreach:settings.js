@@ -176,7 +176,7 @@ FRMethods = {
   },
 
   isNumber: function (n) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
+    return typeof n !== 'undefined' && !isNaN(parseFloat(n)) && isFinite(n);
   }
 };
 

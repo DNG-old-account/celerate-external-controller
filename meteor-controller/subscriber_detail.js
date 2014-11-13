@@ -79,30 +79,6 @@ if (Meteor.isClient) {
     'click .user_google_account_setup_button': function (evt) {
       window.open("https://admin.google.com/AdminHome?fral=1#UserList:org=45257bl2kp4lkp");
     },
-    'click #add-labor': function (evt) {
-      evt.preventDefault();
-      Session.set('showExtraLabor', true);
-    },
-    'click #update_billing': function (evt) {
-      // TODO: Doesn't have a handler for other equipment or labor
-      evt.preventDefault();
-      thisSub = this;
-
-      var form = $(evt.target).parents('form.billing-form');
-      var updatedVal = form.find('#standard_installation').val();
-      var paidInstallation = form.find('#paid_installation').val();
-      paidInstallation = (paidInstallation === "true") ? true : false;
-
-      Subscribers.update(thisSub._id, {$set: {'billing_info.installation.standard_installation': updatedVal }});
-
-      var extraLaborCost = form.find('#billing_extra_labor').val().trim();
-      if (FRMethods.isNumber(extraLaborCost)) {
-        extraLaborCost = parseFloat(extraLaborCost);
-        Subscribers.update(thisSub._id, {$set: {'billing_info.installation.additional_labor': extraLaborCost }});
-      }
-
-      Subscribers.update(thisSub._id, {$set: {'billing_info.installation.paid': paidInstallation }});
-    },
     'click .archive_subscriber_button': function (evt) {
       var id = this._id;
       bootbox.confirm("Are you sure you want to archive this subscriber?", function(result) {
@@ -146,31 +122,9 @@ if (Meteor.isClient) {
     });
   };
 
-  Template.subscriber_details.showExtraLabor = function () {
-    var thisSub = this;
-    if (FRMethods.isNumber(thisSub.billing_info.installation.additional_labor)) {
-      Session.set('showExtraLabor', true);
-    }
-    return (typeof Session.get('showExtraLabor') === 'boolean') ? Session.get('showExtraLabor') : false;
-  };
-
   Template.subscriber_details.user_billing_link = function () {
     console.log("re-getting user billing link: " + Session.get("user_billing_link"));
     return Session.get("user_billing_link");
-  };
-
-  Template.subscriber_details.cpe_options = function () {
-    return Nodes.find({ type: 'cpe' });
-  };
-
-  Template.subscriber_details.terms_info = function () {
-    return {
-      agreed_to_terms: (typeof this.terms === "object" && this.terms.agreed) ? '<span class="glyphicon glyphicon-ok"></span> ' + this.terms.date : '<span class="glyphicon glyphicon-remove"></span>'
-    };
-  };
-
-  Template.subscriber_details.ap_options = function () {
-    return Nodes.find({ type: 'ap' });
   };
 
   Template.subscriber_details.basic_info_fields = function () {
@@ -210,29 +164,6 @@ if (Meteor.isClient) {
            ];
   };
 
-  Template.subscriber_details.billing_info = function () {
-    // If a subscriber doesn't have billing info yet, we can just create it here
-    if (typeof this.billing_info !== 'object') {
-      // Create default billing info
-      var billing = {
-        installation: {
-          standard_installation: '150',
-          additional_equipment: [],
-          additional_labor: [],
-          paid: false
-        },
-        charges: [],
-        monthly_payments: []
-      };
-      db_update = {};
-      db_update['billing_info'] = billing;
-      Subscribers.update(this._id, {$set: db_update}); 
-    }
-
-  
-    return this.billing_info; 
-
-  };
 
   Template.subscriber_details.is_archived = function () {
     return this.archived == "true";
@@ -253,4 +184,122 @@ if (Meteor.isClient) {
            ];
   };
 
+  Template.subscriber_billing_info.events({
+    'click #add-additional-hardware': function (evt) {
+      evt.preventDefault();
+      var selectedHardware = Session.get('selectedAdditionalEquipmentNode');
+      var tax = parseFloat($('#extra-equipment-tax-percent').val());
+      selectedHardware.hardwareObj.tax = tax;
+      var thisSub = this;
+      Subscribers.update(thisSub._id, {$push: {'billing_info.installation.additional_equipment': selectedHardware }});
+    },
+    'click #remove-additional-hardware': function (evt) {
+      evt.preventDefault();
+      var thisSub = Session.get('thisSub');
+      var removeHardware = this;
+      Subscribers.update(thisSub._id, {$pull: {'billing_info.installation.additional_equipment': {'_id': removeHardware._id} }});
+    },
+    'click #update-billing': function (evt) {
+      // TODO: Doesn't have a handler for other equipment or labor
+      evt.preventDefault();
+      var thisSub = this;
+
+      var form = $(evt.target).parents('form.billing-form');
+      var updatedVal = form.find('#standard-installation').val();
+      var paidInstallation = form.find('#paid-installation').val();
+      paidInstallation = (paidInstallation === "true") ? true : false;
+
+      Subscribers.update(thisSub._id, {$set: {'billing_info.installation.standard_installation': updatedVal }});
+
+      var extraLaborCost = form.find('#billing-extra-labor').val().trim();
+      if (FRMethods.isNumber(extraLaborCost)) {
+        extraLaborCost = parseFloat(extraLaborCost);
+        Subscribers.update(thisSub._id, {$set: {'billing_info.installation.additional_labor': extraLaborCost }});
+      }
+
+      Subscribers.update(thisSub._id, {$set: {'billing_info.installation.paid': paidInstallation }});
+    },
+    'change select#billing-extra-equipment': function (evt) {
+      var newSelectedId = $(evt.target).val();
+      var nodes = Session.get('additionalEquipmentNodes');
+
+      var newSelectedNode = _.find(nodes, function(node) {
+        return node._id._str === newSelectedId;
+      });
+      Session.set('selectedAdditionalEquipmentNode', newSelectedNode);
+
+    }
+  });
+
+  Template.subscriber_billing_info.billing_info = function () {
+    // If a subscriber doesn't have billing info yet, we can just create it here
+    if (typeof this.billing_info !== 'object') {
+      // Create default billing info
+      var billing = {
+        installation: {
+          standard_installation: '150',
+          additional_equipment: [],
+          additional_labor: [],
+          paid: false
+        },
+        charges: [],
+        monthly_payments: []
+      };
+      db_update = {};
+      db_update['billing_info'] = billing;
+      Subscribers.update(this._id, {$set: db_update}); 
+    }
+    return this.billing_info; 
+  };
+
+  Template.subscriber_billing_info.extraEquipment = function () {
+    var thisSub = this;
+    Session.set('thisSub', thisSub);
+
+    if (typeof thisSub.billing_info.installation.additional_equipment === 'object' &&
+        typeof thisSub.billing_info.installation.additional_equipment.length !== 'undefined' &&
+        thisSub.billing_info.installation.additional_equipment.length > 0) {
+
+    }
+    
+    var nodes = [];
+    // Now search through sites to see if any are associated with this subscriber
+    var thisSubsSites = Sites.find({'type.subscriber': thisSub._id}).fetch();
+    if (thisSubsSites.length > 0) {
+      // Now search through nodes to see if any are associated with these sites
+      _.each(thisSubsSites, function(site) {
+        var thisSitesNodes = Nodes.find({'site': site._id._str}).fetch();
+
+        // Now add hardware details
+        _.each(thisSitesNodes, function(node) {
+          var thisHardware = Hardware.findOne({'name': node.hardware});
+          node.hardwareObj = thisHardware;
+        });
+
+        nodes = nodes.concat(thisSitesNodes);
+      });
+      Session.set('selectedAdditionalEquipmentNode', _.first(nodes));
+      Session.set('additionalEquipmentNodes', nodes);
+    }
+
+    return {
+      installedNodes: nodes,
+    };
+  };
+   
+  Template.subscriber_billing_info.selectedAdditionalEquipment = function () {
+    return Session.get('selectedAdditionalEquipmentNode');
+  };
+
+  Template.subscriber_billing_info.terms_info = function () {
+    return {
+      agreed_to_terms: (typeof this.terms === "object" && this.terms.agreed) ? '<span class="glyphicon glyphicon-ok"></span> ' + this.terms.date : '<span class="glyphicon glyphicon-remove"></span>'
+    };
+  };
+
+  Template.subscriber_billing_info.ap_options = function () {
+    return Nodes.find({ type: 'ap' });
+  };
+
 }
+
