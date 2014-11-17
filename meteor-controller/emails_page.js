@@ -50,10 +50,9 @@ if (Meteor.isClient) {
       query = {$and: subquery};
     }
 
-    var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'activation_date': 1, 'billing_info': 1};
+    // var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'activation_date': 1, 'billing_info': 1};
 
-    var result = Subscribers.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")}).fetch();
-    Session.set("subscriber_count", result.length);
+    var result = Subscribers.find(query, {sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")}).fetch();
 
     _.each(result, function(sub) {
       var payments = FRMethods.calculatePayments(sub);
@@ -69,6 +68,7 @@ if (Meteor.isClient) {
         return sub.billing_info.needsPayment;
       });
     }
+    Session.set("subscriber_count", result.length);
     Session.set('subscribersList', result);
     return result;
   };
