@@ -281,4 +281,18 @@ if (Meteor.isClient) {
     }
   });
 
+  
+  Template.manage_autopay.autoPayOn = function() {
+    return Session.get('autoPayOn');
+  };
+
+  Template.manage_autopay.events({ 
+    'click .autopay-button.toggle-on': function(evt) {
+      Session.set('autoPayOn', true);
+    },
+    'click .autopay-button.toggle-off': function(evt) {
+      Session.set('autoPayOn', false);
+    }
+  });
+
 }

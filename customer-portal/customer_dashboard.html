@@ -292,6 +292,29 @@
 {{/if}}
 </template>
 
+<template name="manage_autopay">
+<div class="autopay-container">
+  <h3 class="sub-header">Manage Autopay</h3>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="btn-group" role="group" aria-label="Autopay is">
+        {{#if autoPayOn}}
+        <button type="button" class="btn btn-default autopay-button toggle-off">Off</button>
+        <button type="button" class="btn btn-success autopay-button toggle-on">On</button>
+        {{else}}
+        <button type="button" class="btn btn-success autopay-button toggle-off">Off</button>
+        <button type="button" class="btn btn-default autopay-button toggle-on">On</button>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+  {{#if autoPayOn}}
+  <div class="row autopay-details">
+
+  </div>
+  {{/if}}
+</div>
+</template>
 
 <template name="required_payments">
 {{#if requiredPayments.required }}
@@ -459,7 +482,7 @@
       </div>
       <div class="row installation-item payment-row">
         <div class="col-xs-2 col-xs-offset-8">
-          Total Tax:
+          Total Tax:payment-row 
         </div>
         <div class="col-xs-2">
           ${{requiredPayments.installation.totalTax}}
@@ -549,6 +572,7 @@
           {{ planInfo.details }}
         </div>
       </div>
+      {{> manage_autopay}}
     </div>
   </div>
 </div>
