@@ -3,7 +3,6 @@ if (Meteor.isClient) {
   var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "city_sort": "city", "mapped_sort": "lat"};
 
   Meteor.startup(function() {
-    console.log('on startup?');
     Session.set("primary_sort_field_subscribers", "status_sort");
     Session.set("status_sort", -1);
     Session.set("name_sort", 1);
@@ -17,7 +16,11 @@ if (Meteor.isClient) {
 
   Template.subscribers_emails_list.searchable_fields = function () {
     console.log('searchable fields');
-    return [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "prior_email", "archived", "current_provider", "bts_to_use" ];
+    return [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "prior_email", "archived", "current_provider", "bts_to_use"];
+  };
+
+  Template.subscribers_emails_list.seeNeedsPayment = function() {
+    return Session.get('seeNeedsPayment');
   };
 
   Template.subscribers_emails_list.current_search_fields = function () {
@@ -40,17 +43,33 @@ if (Meteor.isClient) {
         field_query[s] = { '$regex': current_search_fields[s], '$options': 'i' };
         subquery.push(field_query);
       }
+
     }
     query = {};
     if (subquery.length > 0) {
       query = {$and: subquery};
     }
 
-    var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'billing_info': 1};
+    // var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'activation_date': 1, 'billing_info': 1};
 
-    var result = Subscribers.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")});
-    Session.set("subscriber_count", result.count());
+    var result = Subscribers.find(query, {sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")}).fetch();
 
+    _.each(result, function(sub) {
+      var payments = FRMethods.calculatePayments(sub);
+
+      sub.billing_info.needsPayment = false;
+      if (payments.dueToDate.required && payments.dueToDate.amount > 0) {
+        sub.billing_info.needsPayment = true;
+      }
+    });
+
+    if (Session.get('seeNeedsPayment')) {
+      result = _.filter(result, function(sub) {
+        return sub.billing_info.needsPayment;
+      });
+    }
+    Session.set("subscriber_count", result.length);
+    Session.set('subscribersList', result);
     return result;
   };
 
@@ -80,6 +99,13 @@ if (Meteor.isClient) {
           $(elem).attr('checked', true);
         }
       });
+    },
+    'change #see-needs-payment': function (evt) {
+      if ($(evt.target).prop('checked')) {
+        Session.set('seeNeedsPayment', true);
+      } else {
+        Session.set('seeNeedsPayment', false);
+      }
     },
     'click #add_search_field': function (evt) {
       var search_value = $("#subscriber_search_input").val().trim();
@@ -112,10 +138,29 @@ if (Meteor.isClient) {
     return FREmails;
   };
 
+  Template.subscribers_emails_list.emailContents = function() {
+    return Session.get('emailContents') || '';
+  };
+
+  var setEmailContents = function() {
+    var sub = Session.get('subscribersList')[0];
+    var emailKey = $('#email-choice').val();
+    var accountId = '0000000';
+    var userLink = 'https://customerportal.furtherreach.net';
+    var emailObj = FREmails[emailKey];
+    var body = emailObj.body(sub, userLink, accountId); 
+    var subject = emailObj.subject(sub);
+    Session.set('emailContents', {subject: subject, body: body});
+    $('#subscriber_email').modal('show');
+  };
+
   Template.subscribers_emails_list.events({
     'click #open_send_email': function() {
-      $('#subscriber_email').modal('show');
-
+      setEmailContents();
+     },
+    'change #email-choice': function(evt) {
+      var emailKey = $('#email-choice').val();
+      setEmailContents();
     },
     'click #send_emails': function() {
       var emailKey = $('#email-choice').val();

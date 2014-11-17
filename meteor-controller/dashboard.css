@@ -167,6 +167,15 @@ body {
   cursor: pointer;
 }
 
+#subscriber_email .modal-dialog {
+  width: 90%;
+}
+
+.email-contents {
+  width: 90%;
+  height: 500px;
+}
+
 /* 
  * Subscriber Details
  */
