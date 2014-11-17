@@ -38,6 +38,30 @@ Meteor.methods({
     });
   },
 
+  setupAutoPay: function (token, turnOn, configObj) {
+    var subId = new Meteor.Collection.ObjectID(authenticate(token));
+    var sub = Subscribers.findOne(subId); // TODO: Add selector for not certain fields
+
+    if (!turnOn) {
+      // If we've already setup the billing_info.autopay object
+      if (typeof sub.billing_info.autopay === 'object') {
+        Subscribers.update(sub._id, {$set: {'billing_info.autopay.on': false }});
+      } else {
+        Subscribers.update(sub._id, {$set: {'billing_info.autopay': {on: false} }});
+      }
+    } else {
+
+    }
+    return sub.billing_info.autopay;
+  },
+
+  autoPayConfig: function (token) {
+    var subId = new Meteor.Collection.ObjectID(authenticate(token));
+    var sub = Subscribers.findOne(subId); // TODO: Add selector for not certain fields
+
+    return sub.billing_info.autopay;
+  },
+
   getSubscriber: function (token) {
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
     var sub = Subscribers.findOne(subId); // TODO: Add selector for not certain fields

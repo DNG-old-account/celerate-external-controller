@@ -282,8 +282,39 @@ if (Meteor.isClient) {
   });
 
   
+  Template.manage_autopay.autoPayConfig = function() {
+    var authToken = Session.get('authToken');
+    Meteor.call('autoPayConfig', authToken, function(err, result) {
+      if (!err && typeof result === 'object') {
+        Session.set('autoPayConfig', result);
+      } else {
+        Router.go('/error/' + authToken);
+      }
+    });
+    return Session.get('autoPayConfig');
+  };
+  
+  Template.manage_autopay.autoPaySetup = function() {
+    return Session.get('autoPaySetup');
+  };
+
   Template.manage_autopay.autoPayOn = function() {
-    return Session.get('autoPayOn');
+    var autoPayOn = Session.get('autoPayOn');
+    if (autoPayOn) {
+      $('#credit-card-cvc').payment('formatCardCVC');
+      $('#credit-card-exp-date').payment('formatCardExpiry');
+      $('#credit-card-number').payment('formatCardNumber');
+    }
+
+    return autoPayOn;
+  };
+
+  Template.manage_autopay.creditCardHidden = function() {
+    return Session.get('autoPayOn') ? '' : 'hidden';
+  };
+
+  Template.manage_autopay.rendered = function() {
+    var creditNum = $('#credit-card-number');
   };
 
   Template.manage_autopay.events({ 
@@ -291,8 +322,32 @@ if (Meteor.isClient) {
       Session.set('autoPayOn', true);
     },
     'click .autopay-button.toggle-off': function(evt) {
-      Session.set('autoPayOn', false);
-    }
+      bootbox.confirm("Are you sure you want to turn off autopay?", function(result) {
+        var authToken = Session.get('authToken');
+        if (result) {
+          Meteor.call('setupAutoPay', authToken, false, undefined, function(err, result) {
+            if (!err && typeof result === 'object') {
+              Session.set('autoPayConfig', result);
+              Session.set('autoPayOn', false);
+            } else {
+              Router.go('/error/' + authToken);
+            }
+          });
+        }
+      });
+    },
+    'click .autopay-button.save-config': function(evt) {
+      var creditNum = $('#credit-card-number');
+      var cvc = $('#credit-card-cvc');
+      Meteor.call('setupAutoPay', authToken, false, undefined, function(err, result) {
+        if (!err && typeof result === 'object') {
+          Session.set('autoPayConfig', result);
+          Session.set('autoPayOn', false);
+        } else {
+          Router.go('/error/' + authToken);
+        }
+      });
+    },
   });
 
 }
