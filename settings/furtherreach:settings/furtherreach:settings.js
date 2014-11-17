@@ -382,6 +382,14 @@ FREmails = {
   }
 };
 
+// Adds formatMoney to Number prototypes
+// Usage:
+// (123456789.12345).formatMoney(2, '.', ',');
+// returns:
+// 123,456,789.12
+// c: number of decimals
+// d: decimal separator
+// t: thousands separator
 Number.prototype.formatMoney = function(c, d, t){
   var n = this, 
       c = isNaN(c = Math.abs(c)) ? 2 : c, 
