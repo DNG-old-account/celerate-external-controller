@@ -24,6 +24,17 @@
     </div>
 
     <div class="row">
+      <div class="col-sm-12">
+        <label for="see-needs-payment">See who needs payment</label>
+        {{#if seeNeedsPayment}}
+        <input id="see-needs-payment" selected type="checkbox"/>
+        {{else}}
+        <input id="see-needs-payment" type="checkbox"/>
+        {{/if}}
+      </div>
+    </div>
+
+    <div class="row">
       <div class="col-md-3">
         <select class="form-control" id="search_tag">
           {{#each searchable_fields}}
@@ -58,6 +69,8 @@
           <th class="city_header" style="cursor:pointer;">City</th>
           <th>Plan</th>
           <th>Email</th>
+          <th>Install Paid</th>
+          <th>Needs Payment</th>
           <th id="select-all-emails">Send Email?</th>
         </tr>
       </thead>
@@ -81,6 +94,10 @@
             <option value="{{key}}">{{value.label}}</option>
             {{/each}}
           </select>
+          <h3>Subject: {{emailContents.subject}}</h3>
+          <textarea disabled class="email-contents">
+            {{emailContents.body}}
+          </textarea>
         </div>
         <div class="modal-footer">
           <button class="btn" data-dismiss="modal" id='send_emails'>OK</button>
@@ -98,6 +115,8 @@
   <td>{{city}}</td>
   <td>{{plan}}</td>
   <td>{{prior_email}}</td>
+  <td>{{#if billing_info.installation.paid}}Yes{{else}}No{{/if}}</td>
+  <td>{{#if billing_info.needsPayment}}Yes{{else}}No{{/if}}</td>
   <td>
     <input data-subscriber="{{_id._str}}" class="form-control email-sub" type="checkbox"/>
   </td>

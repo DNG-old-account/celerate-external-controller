@@ -172,6 +172,161 @@ FRMethods = {
     var account_id = hash.digest('hex').substr(0,10);
 
     return account_id;
+  },
+
+  calculatePayments: function(sub) {
+    var result = {};
+
+    // If a subscriber doesn't have billing info yet, we can just create it here
+    if (typeof sub.billing_info !== 'object') {
+      // Create default billing info
+      var billing = {
+        installation: {
+          standard_installation: '150',
+          additional_equipment: [],
+          additional_labor: [],
+          paid: false,
+          installments: false
+        },
+        charges: [],
+        monthly_payments: []
+      };
+      dbUpdate = {};
+      dbUpdate['billing_info'] = billing;
+      Subscribers.update(sub._id, {$set: dbUpdate}); 
+    }
+
+    result.monthlyPayments = [];
+    result.required = false;
+
+    // Will show users the billing info one day before the 1st of the month
+    var startOfThisMonth = moment().tz('America/Los_Angeles').add(1, 'days').startOf('month'); 
+    var activationDate;
+
+    if (sub.status === 'connected' && 
+        moment(sub.activation_date).isValid()) {
+
+      // Want to mark any user connected before the beta period end as paid
+      var endOfBetaInstallation = moment.tz(FRSettings.billing.endOfBetaInstallation, 'America/Los_Angeles');
+      activationDate = moment.tz(sub.activation_date, 'America/Los_Angeles');
+      if (activationDate.isBefore(endOfBetaInstallation) || activationDate.isSame(endOfBetaInstallation, 'day')) {
+        Subscribers.update(sub._id, {$set: {'billing_info.installation.paid': true}});
+      }
+
+      // Calculate monthly payments
+      if (typeof sub.plan === 'string') {
+
+        var dateCursor = moment(startOfThisMonth);
+        var firstDayOfBilling = moment.tz(FRSettings.billing.firstDayOfBilling, 'America/Los_Angeles');
+
+        if (activationDate.isAfter(firstDayOfBilling) || 
+            activationDate.isSame(firstDayOfBilling, 'day')) {
+          var firstMonthEver = moment(activationDate).startOf('month');
+        } else {
+          var firstMonthEver = moment(firstDayOfBilling);
+        }
+
+        while (dateCursor.isAfter(firstMonthEver) && !dateCursor.isSame(firstMonthEver, 'day')) {
+
+          var monthlyPayment = {};
+          monthlyPayment.required = true;
+          monthlyPayment.startDate = moment(dateCursor).subtract(1, 'months');
+          monthlyPayment.endDate = moment(dateCursor).subtract(1, 'days');
+          if (monthlyPayment.startDate.isBefore(activationDate)) {
+            monthlyPayment.startDate = moment(activationDate);
+          }
+
+          if (typeof sub.billing_info.monthly_payments === 'object') {
+            _.each(sub.billing_info.monthly_payments, function(payment) {
+              if (moment(payment.startDate).isValid() && 
+                  monthlyPayment.startDate.isSame(moment(payment.start_date), 'day')) {
+                monthlyPayment.required = false;
+                monthlyPayment.startDate = moment(payment.start_date).tz('America/Los_Angeles');
+                monthlyPayment.endDate = moment(payment.end_date).tz('America/Los_Angeles');
+              }
+            });
+          }
+
+          if (monthlyPayment.required && typeof FRSettings.billing.plans[sub.plan] !== 'undefined') {
+
+            var monthlyPaymentAmount = FRSettings.billing.plans[sub.plan].monthly;
+            var monthlyPaymentPlan = FRSettings.billing.plans[sub.plan];
+            monthlyPayment.plan = FRSettings.billing.plans[sub.plan];
+
+            if (monthlyPayment.startDate.isBefore(activationDate) || monthlyPayment.startDate.isSame(activationDate, 'day')) {
+              var startOfMonth = moment(activationDate).startOf('month');
+              var diff = Math.abs(startOfMonth.diff(activationDate, 'days'));
+              var daysInMonth = startOfMonth.daysInMonth();
+              monthlyPayment.amount = (monthlyPaymentAmount * ((daysInMonth - diff) / daysInMonth)).formatMoney();
+              monthlyPayment.startDate = moment(activationDate);
+            } else {
+              monthlyPayment.amount = monthlyPaymentAmount;
+            }
+            // Check for and apply discount
+            if (typeof sub.discount === 'string' && 
+                typeof FRSettings.billing.discounts[sub.discount] === 'function') {
+              var newAmount = FRSettings.billing.discounts[sub.discount](monthlyPayment.amount);
+              monthlyPayment.discount = {
+                label: sub.discount,
+                previousAmount: monthlyPayment.amount,
+                amount: monthlyPayment.amount - newAmount
+              };
+              monthlyPayment.amount = newAmount;
+            }
+          }
+          // We have to translate back into Date obj for Meteor client <--> server
+          monthlyPayment.startDate = monthlyPayment.startDate.toISOString();
+          monthlyPayment.endDate = monthlyPayment.endDate.toISOString();
+          result.monthlyPayments.push(monthlyPayment);
+          dateCursor.subtract(1, 'months');
+        }
+      }
+    }
+
+    _.each(result.monthlyPayments, function(payment) {
+      if (payment.required) {
+        result.required = true;
+      }
+    });
+
+    var dueToDate = {
+      startDate: moment().add(10, 'years'),
+      endDate: moment().subtract(10, 'years'),
+      amount: 0,
+      payments: [],
+      required: false,
+    };
+
+    _.each(result.monthlyPayments, function(payment) {
+      if (payment.required) {
+        dueToDate.required = true;
+        dueToDate.amount += parseFloat(payment.amount);
+        dueToDate.payments.push(payment);
+        if (moment(dueToDate.startDate).isAfter(moment(payment.startDate))) {
+          dueToDate.startDate = moment(payment.startDate).toISOString();
+        }
+        if (moment(dueToDate.endDate).isBefore(moment(payment.endDate))) {
+          dueToDate.endDate = moment(payment.endDate).toISOString();
+        }
+      }
+    });
+
+    result.dueToDate = dueToDate;
+
+    result.installation = sub.billing_info.installation;
+
+    if (result.installation.installments) {
+      var totalPaid = _.reduce(result.installation.installment_payments, function(sum, payment) {
+        return sum + payment.amount;
+      }, 0);
+      result.installation.remaining_amount = result.installation.standard_installation - totalPaid;
+    }
+
+    if (!result.installation.paid) {
+      result.required = true;
+    }
+
+    return result;
   }
 };
 
@@ -201,5 +356,39 @@ FREmails = {
              '\n\n\nThank you for choosing FurtherReach!' + 
              '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
     }
+  },
+  billingReminder: {
+    slug: 'billing-reminder',
+    label: 'Billing Reminder',
+    from: 'Further Reach Billing <billing@furtherreach.net>',
+    subject: function(context) {
+      return 'A Reminder from Further Reach about your Monthly Bill';
+    },
+    body: function(context, userLink, accountNum) {
+      context.first_name = (typeof context.first_name === 'string') ? context.first_name : '';
+      context.last_name = (typeof context.last_name === 'string') ? context.last_name : '';
+      context.prior_email = (typeof context.prior_email === 'string') ? context.prior_email : '';
+      context.plan = (typeof context.plan === 'string') ? context.plan : '';
+      return 'Dear ' + context.first_name + ' ' + context.last_name + 
+             '\n\nA bill for your further reach account was sent out at the beginning of this month. The link to make a payment is here:\n' + 
+             userLink + 
+             '\n\nPlan: ' + (context.plan.slice(0, 1).toUpperCase() + context.plan.slice(1)) + '\n' + // TODO: This is just capitalizing the first letter - we should move this to helpers
+             'Account Number: ' + accountNum + '\n' + 
+             'User ID: ' + context.prior_email + '\n' + 
+             'Due Date: ' + context.billingDate + '\n' + 
+             '\n\n\nThank you for choosing FurtherReach!' + 
+             '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
+    }
   }
+};
+
+Number.prototype.formatMoney = function(c, d, t){
+  var n = this, 
+      c = isNaN(c = Math.abs(c)) ? 2 : c, 
+      d = d == undefined ? "." : d, 
+      t = t == undefined ? "," : t, 
+      s = n < 0 ? "-" : "", 
+      i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "", 
+      j = (j = i.length) > 3 ? j % 3 : 0;
+  return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
 };
