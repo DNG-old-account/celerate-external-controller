@@ -362,7 +362,7 @@ FREmails = {
     label: 'Billing Reminder',
     from: 'Further Reach Billing <billing@furtherreach.net>',
     subject: function(context) {
-      return 'A Reminder from Further Reach about your Monthly Bill';
+      return 'Your Further Reach bill is past due!';
     },
     body: function(context, userLink, accountNum) {
       context.first_name = (typeof context.first_name === 'string') ? context.first_name : '';
@@ -370,13 +370,15 @@ FREmails = {
       context.prior_email = (typeof context.prior_email === 'string') ? context.prior_email : '';
       context.plan = (typeof context.plan === 'string') ? context.plan : '';
       return 'Dear ' + context.first_name + ' ' + context.last_name + 
-             '\n\nA bill for your further reach account was sent out at the beginning of this month. The link to make a payment is here:\n' + 
+             '\n\nYour bill for your Further Reach account is past due! Please go to the customer portal link and make a payment as soon as possible:\n' + 
              userLink + 
+             '\n\nOn the portal you can also view your contact details, bill details, payment history and more.' + 
+             '\n\nNote, if this is your first time accessing the customer portal please take the time to review and sign the Terms and Conditions, and verify your contact information.' + 
              '\n\nPlan: ' + (context.plan.slice(0, 1).toUpperCase() + context.plan.slice(1)) + '\n' + // TODO: This is just capitalizing the first letter - we should move this to helpers
              'Account Number: ' + accountNum + '\n' + 
              'User ID: ' + context.prior_email + '\n' + 
              'Due Date: ' + context.billingDate + '\n' + 
-             '\n\n\nThank you for choosing FurtherReach!' + 
+             '\n\nThank you for choosing FurtherReach!' + 
              '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
     }
   }
