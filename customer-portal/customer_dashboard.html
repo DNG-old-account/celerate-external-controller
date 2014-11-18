@@ -315,6 +315,8 @@
       {{/if}}
       <form role="form" class="{{creditCardHidden}}">
         <h2>Credit Card Information</h2>
+        <span class="payment-errors">
+        </span>
         <div class="form-group">
           <label for="credit-card-number">Number</label>
           <input type="text" class="form-control" id="credit-card-number">
@@ -327,7 +329,7 @@
           <label for="credit-card-cvc">CVC</label>
           <input type="text" class="form-control" id="credit-card-cvc">
         </div>
-        <button type="submit" class="btn btn-success">Submit</button>
+        <button type="submit" id="submit-autopay-config" class="btn btn-success">Submit</button>
       </form>
     </div>
   </div>

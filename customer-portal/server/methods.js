@@ -41,6 +41,7 @@ Meteor.methods({
   setupAutoPay: function (token, turnOn, configObj) {
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
     var sub = Subscribers.findOne(subId); // TODO: Add selector for not certain fields
+    var stripe = Meteor.npmRequire('stripe')(Meteor.settings.stripe.privateKey);
 
     if (!turnOn) {
       // If we've already setup the billing_info.autopay object
@@ -50,6 +51,20 @@ Meteor.methods({
         Subscribers.update(sub._id, {$set: {'billing_info.autopay': {on: false} }});
       }
     } else {
+
+      // Make our call to stripe syncronous
+      var result = Async.runSync(function(done) {
+        stripe.customer.create({
+          card: configObj.token,
+          email: configObj.email,
+          description: 'Further Reach Autopay for ' + sub.first_name + ' ' + sub.last_name,
+          email: sub.prior_email,
+        }, function(err, charge) {
+          done(err, charge);
+        });
+      });
+
+      console.log(result);
 
     }
     return sub.billing_info.autopay;

@@ -150,7 +150,9 @@ if (Meteor.isClient) {
       }
     });
     $.getScript('https://checkout.stripe.com/checkout.js', function() {
-
+    });
+    $.getScript('https://js.stripe.com/v2/', function() {
+      Stripe.setPublishableKey(Meteor.settings.public.stripe.publicKey);
     });
   };
 
@@ -336,17 +338,59 @@ if (Meteor.isClient) {
         }
       });
     },
-    'click .autopay-button.save-config': function(evt) {
+    'click #submit-autopay-config': function(evt) {
+      evt.preventDefault();
+      $('.autopay-details .has-error').removeClass('has-error');
       var creditNum = $('#credit-card-number');
       var cvc = $('#credit-card-cvc');
-      Meteor.call('setupAutoPay', authToken, false, undefined, function(err, result) {
-        if (!err && typeof result === 'object') {
-          Session.set('autoPayConfig', result);
-          Session.set('autoPayOn', false);
-        } else {
-          Router.go('/error/' + authToken);
+      var expDate = $('#credit-card-exp-date');
+      var expDateObj = $.payment.cardExpiryVal(expDate.val());
+      var valid = true;
+      if (!$.payment.validateCardNumber(creditNum.val())) {
+        creditNum.parent().addClass('has-error');
+        valid = false;
+      }
+      if (!$.payment.validateCardExpiry(expDateObj.month, expDateObj.year)) {
+        expDate.parent().addClass('has-error');
+        valid = false;
+      }
+      if (!$.payment.validateCardCVC(cvc.val())) {
+        cvc.parent().addClass('has-error');
+        valid = false;
+      }
+
+      if (valid) {
+        var billingObj = {
+          cardNum: creditNum.val(),
+          expDate: expDateObj,
+          cvc: cvc.val()
         }
-      });
+
+        $('#submit-autopay-config').prop('disabled', true);
+
+        Stripe.card.createToken({
+          number: billingObj.cardNum,
+          cvc: billingObj.cvc,
+          exp_month: billingObj.expDate.month,
+          exp_year: billingObj.expDate.year,
+        }, function(status, response) {
+          if (response.error) {
+            // Show the errors on the form
+            $('.autopay-details .payment-errors').text(response.error.message);
+          } else {
+            billingObj.token = response.id;
+            delete billingObj.number;
+            Meteor.call('setupAutoPay', authToken, true, billingObj, function(err, result) {
+              if (!err && typeof result === 'object') {
+                Session.set('autoPayConfig', result);
+                Session.set('autoPayOn', false);
+              } else {
+                Router.go('/error/' + authToken);
+              }
+            });
+          }
+        });
+      }
     },
   });
 
