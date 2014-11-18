@@ -16,6 +16,8 @@ if (Meteor.isClient) {
     Session.set("subscriber_search_input", "");
     Session.set("subscriber_search_fields", {});
     Session.set("search_tag_selection", "last_name");
+
+    Session.set("recenter_map", true);
   });
 
   Template.subscriber_overview.searchable_fields = function () {
@@ -128,6 +130,10 @@ if (Meteor.isClient) {
       } else {
         $("#subscriber_map").slideUp();
       }
+    },
+    'click .recenter_map': function (evt) {
+      console.log(evt);
+      Session.set("recenter_map", evt.target.checked);
     }
   });
 

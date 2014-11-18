@@ -78,7 +78,9 @@ if (Meteor.isClient) {
       } catch (e) { console.log("failed to map subscriber " + JSON.stringify(subscriber)); console.log(e); }
       });
 
-      map.fitBounds(bounds);
+      if (Session.get("recenter_map")) {
+        map.fitBounds(bounds);
+      }
     });
   };
 
