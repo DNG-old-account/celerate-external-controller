@@ -283,36 +283,41 @@ if (Meteor.isClient) {
     }
   });
 
-  
   Template.manage_autopay.autoPayConfig = function() {
+        return Session.get('autoPayConfig');
+  };
+  
+  Template.manage_autopay.autoPaySetup = function() {
     var authToken = Session.get('authToken');
     Meteor.call('autoPayConfig', authToken, function(err, result) {
       if (!err && typeof result === 'object') {
+        console.log(result);
+        if (result.on) {
+          Session.set('autoPayOn', true);
+          Session.set('autoPaySetup', true);
+        }
         Session.set('autoPayConfig', result);
       } else {
         Router.go('/error/' + authToken);
       }
     });
-    return Session.get('autoPayConfig');
-  };
-  
-  Template.manage_autopay.autoPaySetup = function() {
+
     return Session.get('autoPaySetup');
   };
 
   Template.manage_autopay.autoPayOn = function() {
+    var autoPayOn = Session.get('autoPayOn');
+    return autoPayOn;
+  };
+
+  Template.manage_autopay.creditCardHidden = function() {
     var autoPayOn = Session.get('autoPayOn');
     if (autoPayOn) {
       $('#credit-card-cvc').payment('formatCardCVC');
       $('#credit-card-exp-date').payment('formatCardExpiry');
       $('#credit-card-number').payment('formatCardNumber');
     }
-
-    return autoPayOn;
-  };
-
-  Template.manage_autopay.creditCardHidden = function() {
-    return Session.get('autoPayOn') ? '' : 'hidden';
+    return autoPayOn ? '' : 'hidden';
   };
 
   Template.manage_autopay.rendered = function() {
@@ -341,6 +346,21 @@ if (Meteor.isClient) {
     'click #submit-autopay-config': function(evt) {
       evt.preventDefault();
       $('.autopay-details .has-error').removeClass('has-error');
+
+      // We can't set up autopay unless the subscriber is up to date in payments
+      var requiredPayments = Session.get('requiredPayments');
+      var totalUnpaid = 0;
+      _.each(requiredPayments.monthlyPayments, function(payment) {
+        if (payment.required) {
+          totalUnpaid++;
+        }
+      });
+
+      if (totalUnpaid > 1) {
+        bootbox.alert('You must be up to date in payments to set up autopayment.');
+        return false;
+      }
+
       var creditNum = $('#credit-card-number');
       var cvc = $('#credit-card-cvc');
       var expDate = $('#credit-card-exp-date');
@@ -379,11 +399,17 @@ if (Meteor.isClient) {
             $('.autopay-details .payment-errors').text(response.error.message);
           } else {
             billingObj.token = response.id;
+
+            // Don't send the actual card number to our servers
             delete billingObj.number;
+
+            var authToken = Session.get('authToken');
+
             Meteor.call('setupAutoPay', authToken, true, billingObj, function(err, result) {
               if (!err && typeof result === 'object') {
                 Session.set('autoPayConfig', result);
-                Session.set('autoPayOn', false);
+                Session.set('autoPayOn', true);
+                Session.set('autoPaySetup', true);
               } else {
                 Router.go('/error/' + authToken);
               }

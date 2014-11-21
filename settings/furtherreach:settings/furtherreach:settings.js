@@ -254,31 +254,29 @@ FRMethods = {
             });
           }
 
-          if (monthlyPayment.required) {
-            var monthlyPaymentAmount = FRSettings.billing.plans[sub.plan].monthly;
-            var monthlyPaymentPlan = FRSettings.billing.plans[sub.plan];
-            monthlyPayment.plan = FRSettings.billing.plans[sub.plan];
+          var monthlyPaymentAmount = Math.round10(parseFloat(FRSettings.billing.plans[sub.plan].monthly, 2));
+          var monthlyPaymentPlan = FRSettings.billing.plans[sub.plan];
+          monthlyPayment.plan = FRSettings.billing.plans[sub.plan];
 
-            if (monthlyPayment.startDate.isBefore(activationDate) || monthlyPayment.startDate.isSame(activationDate, 'day')) {
-              var startOfMonth = moment(activationDate).startOf('month');
-              var diff = Math.abs(startOfMonth.diff(activationDate, 'days'));
-              var daysInMonth = startOfMonth.daysInMonth();
-              monthlyPayment.amount = (monthlyPaymentAmount * ((daysInMonth - diff) / daysInMonth)).formatMoney();
-              monthlyPayment.startDate = moment(activationDate);
-            } else {
-              monthlyPayment.amount = monthlyPaymentAmount;
-            }
-            // Check for and apply discount
-            if (typeof sub.discount === 'string' && 
-                typeof FRSettings.billing.discounts[sub.discount] === 'function') {
-              var newAmount = FRSettings.billing.discounts[sub.discount](monthlyPayment.amount);
-              monthlyPayment.discount = {
-                label: sub.discount,
-                previousAmount: monthlyPayment.amount,
-                amount: monthlyPayment.amount - newAmount
-              };
-              monthlyPayment.amount = newAmount;
-            }
+          if (monthlyPayment.startDate.isBefore(activationDate) || monthlyPayment.startDate.isSame(activationDate, 'day')) {
+            var startOfMonth = moment(activationDate).startOf('month');
+            var diff = Math.abs(startOfMonth.diff(activationDate, 'days'));
+            var daysInMonth = startOfMonth.daysInMonth();
+            monthlyPayment.amount = Math.round10(monthlyPaymentAmount * ((daysInMonth - diff) / daysInMonth), 2);
+            monthlyPayment.startDate = moment(activationDate);
+          } else {
+            monthlyPayment.amount = monthlyPaymentAmount;
+          }
+          // Check for and apply discount
+          if (typeof sub.discount === 'string' && 
+              typeof FRSettings.billing.discounts[sub.discount] === 'function') {
+            var newAmount = FRSettings.billing.discounts[sub.discount](monthlyPayment.amount);
+            monthlyPayment.discount = {
+              label: sub.discount,
+              previousAmount: monthlyPayment.amount,
+              amount: monthlyPayment.amount - newAmount
+            };
+            monthlyPayment.amount = Math.round10(newAmount);
           }
           // We have to translate back into Date obj for Meteor client <--> server
           monthlyPayment.startDate = monthlyPayment.startDate.toISOString();

@@ -40,46 +40,166 @@ Meteor.methods({
 
   setupAutoPay: function (token, turnOn, configObj) {
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
-    var sub = Subscribers.findOne(subId); // TODO: Add selector for not certain fields
+    var sub = Subscribers.findOne(subId); 
     var stripe = Meteor.npmRequire('stripe')(Meteor.settings.stripe.privateKey);
 
+    var paymentsObj = FRMethods.calculatePayments(sub);
+
     if (!turnOn) {
-      // If we've already setup the billing_info.autopay object
-      if (typeof sub.billing_info.autopay === 'object') {
-        Subscribers.update(sub._id, {$set: {'billing_info.autopay.on': false }});
-      } else {
-        Subscribers.update(sub._id, {$set: {'billing_info.autopay': {on: false} }});
+      if (typeof sub.billing_info.autopay !== 'object') {
+        Subscribers.update(sub._id, {$set: {'billing_info.autopay': {} }});
+      } 
+
+      sub = Subscribers.findOne(sub._id);
+      if (typeof sub.billing_info.autopay.customer === 'object' && 
+          typeof sub.billing_info.autopay.subscription === 'object') {
+ 
+        // Cancel subscription
+        var stripeResp = Async.runSync(function(done) {
+          stripe.customers.cancelSubscription(
+            sub.billing_info.autopay.customer.id,
+            sub.billing_info.autopay.subscription.id, 
+            function(err, result) {
+              done(err, result);
+            }
+          );
+        });
+
+        console.log(stripeResp);
+        if (stripeResp.err || !stripeResp.result) {
+          console.log(stripeResp);
+          throw new Meteor.Error("Couldn't cancel the Stripe Subscription.", stripeResp);
+        }
+
+        var thisCancellation = stripeResp.result;
+        Subscribers.update(sub._id, {$set: {'billing_info.autopay.cancellation': thisCancellation }});
+        sub = Subscribers.findOne(sub._id);
       }
+
+      Subscribers.update(sub._id, {$set: {'billing_info.autopay.on': false }});
+      sub = Subscribers.findOne(sub._id);
+
     } else {
 
-      // Make our call to stripe syncronous
-      var result = Async.runSync(function(done) {
-        stripe.customer.create({
+      var stripeResp;
+
+      // First check for outstanding payments and pay those
+      //
+      // TODO:
+
+      // Create a customer
+      stripeResp = Async.runSync(function(done) {
+        stripe.customers.create({
           card: configObj.token,
           email: configObj.email,
           description: 'Further Reach Autopay for ' + sub.first_name + ' ' + sub.last_name,
           email: sub.prior_email,
-        }, function(err, charge) {
-          done(err, charge);
+        }, function(err, result) {
+          done(err, result);
         });
       });
 
-      console.log(result);
+      if (stripeResp.err || !stripeResp.result) {
+        console.log(stripeResp);
+        throw new Meteor.Error("Couldn't create new Stripe customer", stripeResp);
+      }
 
+      var thisCustomer = stripeResp.result;
+      var hasMore = true;
+      var plans = [];
+
+      // Check to see if a plan already exists with the proper name and amount
+      while (hasMore) {
+        stripeResp = Async.runSync(function(done) {
+          stripe.plans.list(function(err, result) {
+            done(err, result);
+          });
+        });
+
+        if (stripeResp.err || !stripeResp.result) {
+          console.log(stripeResp);
+          throw new Meteor.Error("Stripe couldn't list plans", stripeResp);
+        }
+        plans = plans.concat(stripeResp.result.data);
+        hasMore = plans.has_more;
+      }
+
+      console.log(paymentsObj);
+      console.log(plans);
+      var monthlyPayment = _.last(paymentsObj.monthlyPayments);
+      console.log(monthlyPayment);
+      var planName = sub.plan + '-' + (monthlyPayment.amount * 100);
+      var myPlan = _.find(plans, function(plan) {
+        return planName === plan.id && plan.amount === monthlyPayment.amount * 100;
+      });
+
+      // If there isn't already a plan for this sub we gotta create one!
+      if (typeof myPlan !== 'object') {
+        stripeResp = Async.runSync(function(done) {
+          stripe.plans.create({
+            id: planName,
+            amount: monthlyPayment.amount * 100,
+            currency: 'usd',
+            interval: 'month',
+            name: FRSettings.billing.plans[sub.plan].label,
+            statement_description: 'FR Monthly',
+          }, function(err, result) {
+            done(err, result);
+          });
+        });
+        console.log(stripeResp);
+        if (stripeResp.err || !stripeResp.result) {
+          console.log(stripeResp);
+          throw new Meteor.Error("Stripe couldn't create plan", stripeResp);
+        }
+        myPlan = stripeResp.result;
+      }
+
+      var startOfNextMonth = moment().tz('America/Los_Angeles').endOf('month').add(1, 'days');
+
+      // Now create subscription for customer to plan
+      stripeResp = Async.runSync(function(done) {
+        stripe.customers.createSubscription(thisCustomer.id, {
+          plan: myPlan.id,
+          trial_end: startOfNextMonth.unix(), // This will start autopay at the beginning of next month
+        }, function(err, result) {
+          done(err, result);
+        });
+      });
+      
+      console.log(stripeResp);
+      if (stripeResp.err || !stripeResp.result) {
+        console.log(stripeResp);
+        throw new Meteor.Error("Stripe couldn't create new subscription for customer", stripeResp);
+      }
+      var thisSubscription = stripeResp.result;
+
+      // Now we've ostensibly setup autopay for the customer - let's update the collection
+      if (typeof sub.billing_info.autopay !== 'object') {
+        Subscribers.update(sub._id, {$set: {'billing_info.autopay': {on: true} }});
+      }
+      Subscribers.update(sub._id, {$set: {'billing_info.autopay.on': true }});
+      Subscribers.update(sub._id, {$set: {'billing_info.autopay.plan': myPlan }});
+      Subscribers.update(sub._id, {$set: {'billing_info.autopay.customer': thisCustomer }});
+      Subscribers.update(sub._id, {$set: {'billing_info.autopay.subscription': thisSubscription }});
     }
+
+    sub = Subscribers.findOne(sub._id);
     return sub.billing_info.autopay;
   },
 
   autoPayConfig: function (token) {
+    // TODO: Fill this out!
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
-    var sub = Subscribers.findOne(subId); // TODO: Add selector for not certain fields
+    var sub = Subscribers.findOne(subId); 
 
-    return sub.billing_info.autopay;
+    // TODO: Fill this out!
+    return sub.billing_info.autopay || sub.billing_info || sub;
   },
 
   getSubscriber: function (token) {
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
-    var sub = Subscribers.findOne(subId); // TODO: Add selector for not certain fields
+    var sub = Subscribers.findOne(subId);
     sub.contactInfo = [];
     if (typeof sub.contacts === 'object') {
       _.each(sub.contacts, function(c) {
@@ -141,6 +261,7 @@ Meteor.methods({
           amount: dollarAmount,
           start_date: stripeConfig.billingPeriodStartDate,
           end_date: stripeConfig.billingPeriodEndDate,
+          charge: result.result
         };
         Subscribers.update(thisSub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
       }

@@ -7,7 +7,6 @@ standard-app-packages
 insecure
 less
 mizzao:bootstrap-3
-iron:router
 accounts-google
 rajit:accounts-ui-bootstrap-3
 mizzao:user-status
@@ -20,3 +19,5 @@ npm-container
 furtherreach:settings
 mrt:moment
 mrt:moment-timezone
+iron:router@1.0.1
+
