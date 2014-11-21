@@ -36,11 +36,10 @@ Router.map(function() {
     }
   });
 
-  console.log(this);
-  this.route('/webhooks/stripe', { where: 'server' })
+  this.route('/stripe/webhooks', { where: 'server' })
     .post(function () {
       var request = this.request;
-      var eventJson = JSON.parse(request.body);
+      var eventJson = request.body;
 
       var eventId = eventJson.id;
 
@@ -55,6 +54,7 @@ Router.map(function() {
       });
 
       console.log(stripeResp);
+
       if (stripeResp.err || !stripeResp.result) {
         console.log(stripeResp);
         throw new Meteor.Error("Couldn't retrieve the stripe event.", stripeResp);
