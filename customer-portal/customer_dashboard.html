@@ -295,43 +295,84 @@
 <template name="manage_autopay">
 <div class="autopay-container">
   <h3 class="sub-header">Manage Autopay</h3>
-  <div class="row">
-    <div class="col-xs-12">
-      <div class="btn-group" role="group" aria-label="Autopay is">
-        {{#if autoPayOn}}
-        <button type="button" class="btn btn-default autopay-button toggle-off">Off</button>
-        <button type="button" class="btn btn-success autopay-button toggle-on">On</button>
-        {{else}}
-        <button type="button" class="btn btn-success autopay-button toggle-off">Off</button>
-        <button type="button" class="btn btn-default autopay-button toggle-on">On</button>
-        {{/if}}
+  <div class="throbber-container {{autoPayThrobberClass}}">
+    <div id="floatingCirclesG">
+      <div class="f_circleG" id="frotateG_01">
+      </div>
+      <div class="f_circleG" id="frotateG_02">
+      </div>
+      <div class="f_circleG" id="frotateG_03">
+      </div>
+      <div class="f_circleG" id="frotateG_04">
+      </div>
+      <div class="f_circleG" id="frotateG_05">
+      </div>
+      <div class="f_circleG" id="frotateG_06">
+      </div>
+      <div class="f_circleG" id="frotateG_07">
+      </div>
+      <div class="f_circleG" id="frotateG_08">
+      </div>
+    </div> 
+  </div>
+  <div class="autopay-subcontainer {{autoPayContainerClass}}">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="btn-group" role="group" aria-label="Autopay is">
+          {{#if autoPayOn}}
+          <button type="button" class="btn btn-default autopay-button toggle-off">Off</button>
+          <button type="button" class="btn btn-success autopay-button toggle-on">On</button>
+          {{else}}
+          <button type="button" class="btn btn-success autopay-button toggle-off">Off</button>
+          <button type="button" class="btn btn-default autopay-button toggle-on">On</button>
+          {{/if}}
+        </div>
       </div>
     </div>
-  </div>
-  <div class="row autopay-details">
-    <div class="col-xs-12">
-      {{#if autoPaySetup}}
-      Autopay setup
-      {{else}}
-      <form role="form" class="{{creditCardHidden}}">
-        <h2>Credit Card Information</h2>
-        <span class="payment-errors">
-        </span>
-        <div class="form-group">
-          <label for="credit-card-number">Number</label>
-          <input type="text" class="form-control" id="credit-card-number">
+    <div class="row autopay-details">
+      <div class="col-xs-12">
+        {{#if autoPaySetup}}
+        <div class="row">
+          <div class="col-xs-12">
+            <h4>
+              Autopay Info
+            </h4>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="credit-card-exp-date">Expiration Date</label>
-          <input type="text" class="form-control" id="credit-card-exp-date">
+        <div class="row">
+          <div class="col-xs-12">
+            <span class="bolded-label">Email:</span> {{autoPayConfig.customer.email}}
+          </div>
         </div>
-        <div class="form-group">
-          <label for="credit-card-cvc">CVC</label>
-          <input type="text" class="form-control" id="credit-card-cvc">
+        <div class="row">
+          <div class="col-xs-12">
+            <span class="bolded-label">Card:</span> {{autoPayConfig.defaultCard.brand}} ending in {{autoPayConfig.defaultCard.last4}}
+          </div>
         </div>
-        <button type="submit" id="submit-autopay-config" class="btn btn-success">Submit</button>
-      </form>
-      {{/if}}
+        <pre class="json-dump">
+        {{{json autoPayConfig}}}
+        </pre>
+        {{else}}
+        <form role="form" class="{{creditCardHidden}}">
+          <h2>Credit Card Information</h2>
+          <span class="payment-errors">
+          </span>
+          <div class="form-group">
+            <label for="credit-card-number">Number</label>
+            <input type="text" class="form-control" id="credit-card-number">
+          </div>
+          <div class="form-group">
+            <label for="credit-card-exp-date">Expiration Date</label>
+            <input type="text" class="form-control" id="credit-card-exp-date">
+          </div>
+          <div class="form-group">
+            <label for="credit-card-cvc">CVC</label>
+            <input type="text" class="form-control" id="credit-card-cvc">
+          </div>
+          <button type="submit" id="submit-autopay-config" class="btn btn-success">Submit</button>
+        </form>
+        {{/if}}
+      </div>
     </div>
   </div>
 </div>

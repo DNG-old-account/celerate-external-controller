@@ -98,6 +98,11 @@ Router.map(function() {
       }
 
       var response = this.response;
-      response.send(200);
+      console.log("\n\n\nRESPONSE\n\n");
+      console.log(response);
+      console.log(response.write);
+      console.log(response.end);
+      response.write('200');
+      response.end();
     })
 });

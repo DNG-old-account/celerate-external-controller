@@ -254,7 +254,8 @@ FRMethods = {
             });
           }
 
-          var monthlyPaymentAmount = Math.round10(parseFloat(FRSettings.billing.plans[sub.plan].monthly, 2));
+          var monthlyPaymentAmount = Math.round10(parseFloat(FRSettings.billing.plans[sub.plan].monthly), 2);
+          
           var monthlyPaymentPlan = FRSettings.billing.plans[sub.plan];
           monthlyPayment.plan = FRSettings.billing.plans[sub.plan];
 
@@ -262,7 +263,8 @@ FRMethods = {
             var startOfMonth = moment(activationDate).startOf('month');
             var diff = Math.abs(startOfMonth.diff(activationDate, 'days'));
             var daysInMonth = startOfMonth.daysInMonth();
-            monthlyPayment.amount = Math.round10(monthlyPaymentAmount * ((daysInMonth - diff) / daysInMonth), 2);
+            monthlyPayment.amount = monthlyPaymentAmount * ((daysInMonth - diff) / daysInMonth);
+            monthlyPayment.amount = Math.round10(monthlyPayment.amount, 2);
             monthlyPayment.startDate = moment(activationDate);
           } else {
             monthlyPayment.amount = monthlyPaymentAmount;
@@ -427,51 +429,14 @@ FREmails = {
 
 (function(){
 
-  /**
-   * Decimal adjustment of a number.
-   *
-   * @param {String}  type  The type of adjustment.
-   * @param {Number}  value The number.
-   * @param {Integer} exp   The exponent (the 10 logarithm of the adjustment base).
-   * @returns {Number}      The adjusted value.
-   */
-  function decimalAdjust(type, value, exp) {
-    // If the exp is undefined or zero...
-    if (typeof exp === 'undefined' || +exp === 0) {
-      return Math[type](value);
-    }
-    value = +value;
-    exp = +exp;
-    // If the value is not a number or the exp is not an integer...
-    if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
-      return NaN;
-    }
-    // Shift
-    value = value.toString().split('e');
-    value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
-    // Shift back
-    value = value.toString().split('e');
-    return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
-  }
-
   // Decimal round
   if (!Math.round10) {
     Math.round10 = function(value, exp) {
-      return decimalAdjust('round', value, exp);
+      var exp10 = Math.pow(10, exp);
+      return Math.round(value * exp10) / exp10
     };
   }
-  // Decimal floor
-  if (!Math.floor10) {
-    Math.floor10 = function(value, exp) {
-      return decimalAdjust('floor', value, exp);
-    };
-  }
-  // Decimal ceil
-  if (!Math.ceil10) {
-    Math.ceil10 = function(value, exp) {
-      return decimalAdjust('ceil', value, exp);
-    };
-  }
+  
   // Adds formatMoney to Number prototypes
   // Usage:
   // (123456789.12345).formatMoney(2, '.', ',');

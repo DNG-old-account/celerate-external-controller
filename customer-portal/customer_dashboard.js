@@ -283,8 +283,22 @@ if (Meteor.isClient) {
     }
   });
 
+  Template.manage_autopay.autoPayContainerClass = function() {
+    return Session.get('autoPayLoading') ? 'hidden' : '';
+  };
+
+  Template.manage_autopay.autoPayThrobberClass = function() {
+    return Session.get('autoPayLoading') ? '' : 'hidden';
+  };
+
   Template.manage_autopay.autoPayConfig = function() {
-        return Session.get('autoPayConfig');
+    var autoPayConfig = Session.get('autoPayConfig');
+    var cardId = autoPayConfig.customer.default_card;
+    var cardObj = _.find(autoPayConfig.customer.cards.data, function(card) {
+      return card.id === cardId;
+    });
+    autoPayConfig.defaultCard = cardObj;
+    return autoPayConfig;
   };
   
   Template.manage_autopay.autoPaySetup = function() {
@@ -332,9 +346,11 @@ if (Meteor.isClient) {
       bootbox.confirm("Are you sure you want to turn off autopay?", function(result) {
         var authToken = Session.get('authToken');
         if (result) {
+          Session.set('autoPayLoading', true);
           Meteor.call('setupAutoPay', authToken, false, undefined, function(err, result) {
             if (!err && typeof result === 'object') {
               Session.set('autoPayConfig', result);
+              Session.set('autoPayLoading', false);
               Session.set('autoPayOn', false);
             } else {
               Router.go('/error/' + authToken);
@@ -387,6 +403,7 @@ if (Meteor.isClient) {
         }
 
         $('#submit-autopay-config').prop('disabled', true);
+        Session.set('autoPayLoading', true);
 
         Stripe.card.createToken({
           number: billingObj.cardNum,
@@ -396,6 +413,7 @@ if (Meteor.isClient) {
         }, function(status, response) {
           if (response.error) {
             // Show the errors on the form
+            Session.set('autoPayLoading', false);
             $('.autopay-details .payment-errors').text(response.error.message);
           } else {
             billingObj.token = response.id;
@@ -407,9 +425,11 @@ if (Meteor.isClient) {
 
             Meteor.call('setupAutoPay', authToken, true, billingObj, function(err, result) {
               if (!err && typeof result === 'object') {
+                
                 Session.set('autoPayConfig', result);
                 Session.set('autoPayOn', true);
                 Session.set('autoPaySetup', true);
+                Session.set('autoPayLoading', false);
               } else {
                 Router.go('/error/' + authToken);
               }
