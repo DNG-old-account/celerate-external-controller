@@ -165,31 +165,41 @@ if (Meteor.isClient) {
     var plan_options = ["limited", "essential", "performance", "ultra", "silver", "gold"];
     var discount_options = ["nonprofit", "relay", "core-site", "landuse"];
 
-    return [ { field: "first_name", label: "First Name", value: this.first_name },
-             { field: "last_name", label: "Last Name", value: this.last_name },
-             { field: "subscriber_type", label: "Subscriber Type", value: this.subscriber_type, options: subscriber_type_options },
-             { field: "community", label: "Community", value: this.community },
-             { field: "street_address", label: "Street Address", value: this.street_address },
-             { field: "city", label: "City", value: this.city },
-             { field: "state", label: "State", value: this.state },
-             { field: "zip_code", label: "Zip Code", value: this.zip_code },
-             { field: "lat", label: "Location Lat", value: this.lat },
-             { field: "lng", label: "Location Lng", value: this.lng },
-             { field: "mobile", label: "Mobile", value: this.mobile },
-             { field: "landline", label: "Landline", value: this.landline },
-             { field: "prior_email", label: "Prior Email", value: this.prior_email },
-             { field: "status", label: "Status", value: this.status, options: status_options },
-             { field: "plan", label: "Plan", value: this.plan, options: plan_options },
-             { field: "discount", label: "Discount", value: this.discount, options: discount_options },
-             { field: "discount_start_date", label: "Discount Start Date", value: this.discount_start_date },
-             { field: "discount_end_date", label: "Discount End Date", value: this.discount_end_date },
-             { field: "username", label: "Username", value: this.username },
-             { field: "max_speed", label: "Max Speed", value: this.max_speed },
-             { field: "activation_date", label: "Activation Date", value: this.activation_date },
-             { field: "signup_date", label: "Signup Date", value: this.signup_date },
-             { field: "end_date", label: "End Date", value: this.end_date },
-             { field: "hold_date", label: "Hold Date", value: this.hold_date }
-           ];
+    // Assemble the fields to display.
+    var fields;
+    fields = [ { field: "first_name", label: "First Name", value: this.first_name },
+               { field: "last_name", label: "Last Name", value: this.last_name } ];
+
+    // For non-residential subscribers, show a business name field.
+    // TODO(barath): Eventually only show a business name field for such subscribers.
+    if (this.subscriber_type !== 'residential') {
+      fields.push({ field: "business_name", label: "Business Name", value: this.business_name });
+    }
+
+    fields.push({ field: "subscriber_type", label: "Subscriber Type", value: this.subscriber_type, options: subscriber_type_options },
+                { field: "community", label: "Community", value: this.community },
+                { field: "street_address", label: "Street Address", value: this.street_address },
+                { field: "city", label: "City", value: this.city },
+                { field: "state", label: "State", value: this.state },
+                { field: "zip_code", label: "Zip Code", value: this.zip_code },
+                { field: "lat", label: "Location Lat", value: this.lat },
+                { field: "lng", label: "Location Lng", value: this.lng },
+                { field: "mobile", label: "Mobile", value: this.mobile },
+                { field: "landline", label: "Landline", value: this.landline },
+                { field: "prior_email", label: "Prior Email", value: this.prior_email },
+                { field: "status", label: "Status", value: this.status, options: status_options },
+                { field: "plan", label: "Plan", value: this.plan, options: plan_options },
+                { field: "discount", label: "Discount", value: this.discount, options: discount_options },
+                { field: "discount_start_date", label: "Discount Start Date", value: this.discount_start_date },
+                { field: "discount_end_date", label: "Discount End Date", value: this.discount_end_date },
+                { field: "username", label: "Username", value: this.username },
+                { field: "max_speed", label: "Max Speed", value: this.max_speed },
+                { field: "activation_date", label: "Activation Date", value: this.activation_date },
+                { field: "signup_date", label: "Signup Date", value: this.signup_date },
+                { field: "end_date", label: "End Date", value: this.end_date },
+                { field: "hold_date", label: "Hold Date", value: this.hold_date });
+
+    return fields;
   };
 
   Template.subscriber_details.billing_info = function () {
