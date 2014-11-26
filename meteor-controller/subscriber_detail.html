@@ -12,6 +12,9 @@
 {{#with ..}}
 <button type="button" class="delete_subscriber_button btn btn-danger">Delete Subscriber</button>
 {{/with}}
+{{#if site_link}}
+<a href="/site_details/{{site_link._id._str}}" role="button" class="btn btn-success" target="_blank">Associated Site</a>
+{{/if}}
 <hr>
 
 <form class="form-horizontal" role="form">

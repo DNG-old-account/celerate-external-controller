@@ -141,6 +141,10 @@ if (Meteor.isClient) {
     return Session.get("user_billing_link");
   };
 
+  Template.subscriber_details.site_link = function () {
+    return Sites.findOne({'type.subscriber': this._id});
+  };
+
   Template.subscriber_details.cpe_options = function () {
     return Nodes.find({ type: 'cpe' });
   };
