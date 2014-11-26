@@ -121,11 +121,4 @@ if (Meteor.isClient) {
   close_site_modal = function() {
     $('#site_details_modal').modal('hide');
   };
-
-
-  // Sidebar stuff.
-  Template.celerate_sidebar.activeSidebar = function () {
-    return '';
-    //return Session.equals("currentPage", this.id) ? 'class="active"' : '';
-  };
 }

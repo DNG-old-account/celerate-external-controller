@@ -181,10 +181,4 @@ if (Meteor.isClient) {
   close_subscriber_modal = function() {
     $('#subscriber_details_modal').modal('hide');
   };
-
-  // Sidebar stuff.
-  Template.celerate_sidebar.activeSidebar = function () {
-    return '';
-    //return Session.equals("currentPage", this.id) ? 'class="active"' : '';
-  };
 }
