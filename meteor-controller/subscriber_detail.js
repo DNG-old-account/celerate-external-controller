@@ -101,6 +101,14 @@ if (Meteor.isClient) {
         }
       }); 
     },
+    'click .unarchive_subscriber_button': function (evt) {
+      var id = this._id;
+      bootbox.confirm("Are you sure you want to UN-archive this subscriber?", function(result) {
+        if (result) {
+          Subscribers.update(id, {$set: {archived: "false"}});
+        }
+      }); 
+    },
     'click .delete_subscriber_button': function (evt) {
       var id = this._id;
       bootbox.confirm("Are you sure you want to delete this subscriber?", function(first_result) {
