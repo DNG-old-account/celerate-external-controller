@@ -352,6 +352,7 @@ if (Meteor.isClient) {
               Session.set('autoPayConfig', result);
               Session.set('autoPayLoading', false);
               Session.set('autoPayOn', false);
+              Session.set('autoPaySetup', false);
             } else {
               Router.go('/error/' + authToken);
             }
