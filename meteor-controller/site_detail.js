@@ -177,15 +177,12 @@ if (Meteor.isClient) {
   Template.site_details.picturesList = function() {
     var thisSite = this;
     Meteor.call('getPictures', thisSite, function(err, result) {
-
       if (!err && typeof result === 'object') {
         Session.set('pictureList', result);
       }
-
     });
 
     return Session.get('pictureList');
-
   };
 
   Handlebars.registerHelper('site_type_deletable', function (key) {
