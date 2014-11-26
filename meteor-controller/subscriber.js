@@ -16,7 +16,7 @@ if (Meteor.isClient) {
     Session.set("selected_subscriber", null);
     Session.set("subscriber_search_input", "");
     Session.set("subscriber_search_fields", {});
-    Session.set("search_tag_selection", "last_name");
+    Session.set("search_tag_selection", "global");
 
     Session.set("recenter_map", true);
   });
@@ -40,9 +40,24 @@ if (Meteor.isClient) {
       }
 
       for (s in current_search_fields) {
-        var field_query = {};
-        field_query[s] = { '$regex': current_search_fields[s], '$options': 'i' };
-        subquery.push(field_query);
+        var query_input = current_search_fields[s];
+        if (s === 'global') {
+          var global_query = [];
+          var searchable_fields = Template.subscriber_overview.searchable_fields();
+
+          for (f in searchable_fields) {
+            var field = searchable_fields[f];
+            var field_query = {};
+            field_query[field] = { '$regex': query_input, '$options': 'i' };
+            global_query.push(field_query);
+          }
+
+          subquery.push({$or: global_query});
+        } else {
+          var field_query = {};
+          field_query[s] = { '$regex': query_input, '$options': 'i' };
+          subquery.push(field_query);
+        }
       }
     }
     query = {};
@@ -91,6 +106,7 @@ if (Meteor.isClient) {
     'click #add_search_field': function (evt) {
       var search_value = $("#subscriber_search_input").val().trim();
       console.log("search_value: " + search_value);
+ 
       var search_field = Session.get("search_tag_selection");
       console.log("search_field: " + search_field);
 
