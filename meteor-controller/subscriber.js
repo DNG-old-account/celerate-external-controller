@@ -87,18 +87,18 @@ if (Meteor.isClient) {
     });
   };
 
-  var subscriber_search_input_timeout = false;
-  var subscriber_search_input_lag_ms = 1000;
+  var subscriber_search_input_lag_ms = 500;
   Template.subscriber_overview.events({
     'keyup .subscriber_search_input': function (evt) {
-      if (Session.get("subscriber_search_input_timeout") != true) {
-        subscriber_search_input_timeout = true;
-
-        setTimeout(function() {
-          Session.set("subscriber_search_input", $("#subscriber_search_input").val().trim());
-          subscriber_search_input_timeout = false;
-        }, subscriber_search_input_lag_ms);
+      var timeout = Session.get("subscriber_search_input_timeout");
+      if (timeout) {
+        clearTimeout(timeout);
       }
+
+      Session.set("subscriber_search_input_timeout", setTimeout(function() {
+        Session.set("subscriber_search_input", $("#subscriber_search_input").val().trim());
+        Session.set("subscriber_search_input_timeout", null);
+      }, subscriber_search_input_lag_ms));
     },
     'change #search_tag': function (evt) {
       Session.set("search_tag_selection", $("#search_tag").val().trim());
