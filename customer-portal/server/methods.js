@@ -217,6 +217,24 @@ Meteor.methods({
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
     var thisSub = Subscribers.findOne(subId);
 
+    // Check to make sure that our totals are accurate
+    var installmentAmount;
+    if (_.contains(typesOfCharges, 'installment') && FRMethods.isNumber(stripeConfig.installmentAmount)) {
+      installmentAmount = parseFloat(stripeConfig.installmentAmount);
+    }
+    var requiredPayments = FRMethods.calculatePayments(thisSub);
+    var totalPayment = FRMethods.calcTotalPayment(thisSub, installmentAmount);
+
+    console.log('stripeConfig = ');
+    console.log(stripeConfig);
+    if (totalPayment * 100 !== stripeConfig.amount) {
+      throw { 
+        name:        "Stripe Charge Error", 
+        message:     "Stripe Charge is going to not equal our calculated total payment.", 
+        toString:    function(){return this.name + ": " + this.message;} 
+      }; 
+    }
+
     // Make our call to stripe syncronous
     var result = Async.runSync(function(done) {
       stripe.charges.create({
@@ -232,7 +250,6 @@ Meteor.methods({
 
     console.log(result);
     var dollarAmount = stripeConfig.amount / 100;
-    var installmentAmount = stripeConfig['installmentAmount'];
 
     if (!result.error && !result.result.err) {
       if (_.contains(typesOfCharges, 'installation')) {
@@ -265,6 +282,33 @@ Meteor.methods({
         };
         Subscribers.update(thisSub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
       }
+      
+      console.log(requiredPayments);
+      if (typeof requiredPayments.discounts === 'object') {
+        console.log(requiredPayments.discounts);
+        _.each(requiredPayments.discounts, function(discount) {
+          if (discount.toBeUsed) {
+            // If there is leftover amount on this discount, create a copy of this one with 
+            // the remaining amount and a note
+            if (discount.leftover !== 0) {
+              var newDiscount = _.extend({}, discount);
+              newDiscount.amount = discount.leftover;
+              delete newDiscount.lefover;
+              delete newDiscount.toBeUsed;
+              newDiscount.notes = 'Leftover from ' + new Date() + '. ' + newDiscount.notes;
+
+              Subscribers.update(thisSub._id, {$push: {'billing_info.discounts': newDiscount }});
+            } 
+
+            discount.used = true;
+            discount.dateUsed = new Date();
+
+            Subscribers.update(thisSub._id, {$pull: {'billing_info.discounts': {'dateCreated': discount.dateCreated}}});
+            Subscribers.update(thisSub._id, {$push: {'billing_info.discounts': discount }});
+          }
+        });
+      }
+
       Subscribers.update(thisSub._id, {$push: {'billing_info.charges': result.result}});
     }
     return result;

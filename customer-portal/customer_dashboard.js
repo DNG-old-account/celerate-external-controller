@@ -88,38 +88,23 @@ if (Meteor.isClient) {
   };
 
   var calcTotalPayment = function() {
-    var requiredPayments = Session.get('requiredPayments');
-    var total = 0;
-    var installmentAmount = Session.get('installmentAmount');
-    if (requiredPayments.required) {
-      if (!requiredPayments.installation.paid) {
-        if ($('#installment-choices').val() === 'installment') {
-          total += parseFloat(installmentAmount);
-        } else {
-          if (requiredPayments.installation.installments && !isNaN(parseFloat(requiredPayments.installation.remaining_amount))) {
-            total += parseFloat(requiredPayments.installation.remaining_amount);
-          } else {
-            total += parseFloat(requiredPayments.installation.totalInstallationAmount);
-          }
-        }
-      }
-      if (requiredPayments.dueToDate.required && !isNaN(parseFloat(requiredPayments.dueToDate.amount))) {
-        total += parseFloat(requiredPayments.dueToDate.amount);
-      }
-    } 
-    total = total.formatMoney(2, '.', '');
-    Session.set('totalPayment', total);
-  };
+    var thisSub = Session.get('subscriber');
+    if (typeof thisSub === 'object') {
+      var installmentAmount = $('#installment-choices').val() === 'installment' ? Session.get('installmentAmount') : undefined;
+      var total = FRMethods.calcTotalPayment(thisSub, installmentAmount);
+      Session.set('totalPayment', total);
+    }
+  }
 
   Template.required_payments.totalPayment = function() {
     calcTotalPayment();
-    var totalPayment = Session.get('totalPayment');
-    return totalPayment;
-  }
+    return Session.get('totalPayment');
+  };
+
 
   Template.required_payments.paymentNeeded = function() {
     return Session.get('totalPayment') > 0;
-  }
+  };
 
   Template.required_payments.requiredPayments = function() {
     var authToken = Session.get('authToken');
@@ -175,6 +160,7 @@ if (Meteor.isClient) {
           allowRememberMe: false,
           email: billingInfo.contact.email,
           description: '',
+          requiredPayments: requiredPayments,
           installmentAmount: Session.get('installmentAmount')
       }
       if (requiredPayments.dueToDate.required) {

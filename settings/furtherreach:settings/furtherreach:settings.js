@@ -196,7 +196,8 @@ FRMethods = {
           installments: false
         },
         charges: [],
-        monthly_payments: []
+        monthly_payments: [],
+        discounts: [],
       };
       dbUpdate = {};
       dbUpdate['billing_info'] = billing;
@@ -269,7 +270,7 @@ FRMethods = {
           } else {
             monthlyPayment.amount = monthlyPaymentAmount;
           }
-          // Check for and apply discount
+          // Check for and apply monthly discount
           if (typeof sub.discount === 'string' && 
               typeof FRSettings.billing.discounts[sub.discount] === 'function') {
             var newAmount = FRSettings.billing.discounts[sub.discount](monthlyPayment.amount);
@@ -278,7 +279,7 @@ FRMethods = {
               previousAmount: monthlyPayment.amount,
               amount: monthlyPayment.amount - newAmount
             };
-            monthlyPayment.amount = Math.round10(newAmount);
+            monthlyPayment.amount = Math.round10(newAmount, 2);
           }
           // We have to translate back into Date obj for Meteor client <--> server
           monthlyPayment.startDate = monthlyPayment.startDate.toISOString();
@@ -320,7 +321,7 @@ FRMethods = {
     result.dueToDate = dueToDate;
 
     result.installation = sub.billing_info.installation;
-    result.installation.standard_installation = Math.round10(parseFloat(result.installation.standard_installation), -2);
+    result.installation.standard_installation = Math.round10(parseFloat(result.installation.standard_installation), 2);
 
     result.installation.totalInstallationAmount = parseFloat(result.installation.standard_installation);
     result.installation.showAdditionalLabor = false;
@@ -344,7 +345,7 @@ FRMethods = {
           throw "Hardware tax amounts aren't the same!";
         }
         result.installation.taxPercent = parseFloat(equipment.hardwareObj.tax);
-        equipment.hardwareObj.taxCost = Math.round10((parseFloat(equipment.hardwareObj.tax) / 100) * parseFloat(equipment.hardwareObj.price), -2);
+        equipment.hardwareObj.taxCost = Math.round10((parseFloat(equipment.hardwareObj.tax) / 100) * parseFloat(equipment.hardwareObj.price), 2);
         result.installation.totalInstallationAmount += equipment.hardwareObj.taxCost + parseFloat(equipment.hardwareObj.price);
         result.installation.taxableAmount += parseFloat(equipment.hardwareObj.price);
         result.installation.totalTax += equipment.hardwareObj.taxCost;
@@ -355,7 +356,7 @@ FRMethods = {
         result.installation.additional_labor > 0) {
 
       result.installation.showAdditionalLabor = true;
-      result.installation.additionalLaborCost = Math.round10(result.installation.additional_labor * FRSettings.billing.additionalHourCost, -2);
+      result.installation.additionalLaborCost = Math.round10(result.installation.additional_labor * FRSettings.billing.additionalHourCost, 2);
       result.installation.totalInstallationAmount += FRSettings.billing.additionalHourCost * parseFloat(result.installation.additional_labor);
       result.installation.additionalLaborHourCost = FRSettings.billing.additionalHourCost;
     }
@@ -364,15 +365,66 @@ FRMethods = {
       result.installation.totalPaid = _.reduce(result.installation.installment_payments, function(sum, payment) {
         return sum + payment.amount;
       }, 0);
-      result.installation.remaining_amount = Math.round10(result.installation.totalInstallationAmount - result.installation.totalPaid, -2);
+      result.installation.remaining_amount = Math.round10(result.installation.totalInstallationAmount - result.installation.totalPaid, 2);
     }
 
     if (!result.installation.paid) {
       result.required = true;
     }
 
+    // Check for any overall discounts and apply them
+    if (typeof sub.billing_info.discounts === 'object') {
+      result.discounts = [];
+      _.each(sub.billing_info.discounts, function(discount) {
+        if (!discount.used) {
+          result.discounts.push(discount);
+        }
+      });
+    }
     return result;
+  },
+
+  calcTotalPayment: function(sub, installmentAmount) {
+    var requiredPayments = FRMethods.calculatePayments(sub);
+    var total = 0;
+    if (requiredPayments.required) {
+      if (!requiredPayments.installation.paid) {
+        if (FRMethods.isNumber(installmentAmount)) {
+          total += parseFloat(installmentAmount);
+        } else {
+          if (requiredPayments.installation.installments && !isNaN(parseFloat(requiredPayments.installation.remaining_amount))) {
+            total += parseFloat(requiredPayments.installation.remaining_amount);
+          } else {
+            total += parseFloat(requiredPayments.installation.totalInstallationAmount);
+          }
+        }
+      }
+      if (requiredPayments.dueToDate.required && !isNaN(parseFloat(requiredPayments.dueToDate.amount))) {
+        total += parseFloat(requiredPayments.dueToDate.amount);
+      }
+    } 
+
+    if (typeof requiredPayments.discounts === 'object') {
+      _.each(requiredPayments.discounts, function(discount) {
+        var newTotal;
+        if (!discount.used) {
+          newTotal = total - discount.amount;
+          if (newTotal > 0) {
+            discount.leftover = 0;
+            total = newTotal;
+          } else {
+            discount.leftover = Math.abs(newTotal);
+            total = 0;
+          }
+          discount.toBeUsed = true;
+        }
+      });
+    }
+
+    total = total.formatMoney(2, '.', '');
+    return total;
   }
+
 };
 
 FREmails = {
@@ -433,7 +485,7 @@ FREmails = {
   if (!Math.round10) {
     Math.round10 = function(value, exp) {
       var exp10 = Math.pow(10, exp);
-      return Math.round(value * exp10) / exp10
+      return Math.round(value * exp10) / exp10;
     };
   }
   

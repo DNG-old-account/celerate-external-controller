@@ -381,6 +381,9 @@
   <div class="panel-heading">
     <h2>Bill</h2>
   </div>
+  <!-- <pre class="json-dump"> -->
+  <!-- {{{json requiredPayments}}} -->
+  <!-- </pre> -->
 
   <div class="panel-body bill-container">
     <div class="col-xs-12">
@@ -541,7 +544,7 @@
       </div>
       <div class="row installation-item payment-row">
         <div class="col-xs-2 col-xs-offset-8">
-          Total Tax:payment-row 
+          Total Tax: 
         </div>
         <div class="col-xs-2">
           ${{requiredPayments.installation.totalTax}}
@@ -593,7 +596,30 @@
         </div>
       </div>
       {{/if}}
-      
+      {{#if requiredPayments.discounts}}
+      <div class="row">
+        <div class="col-xs-offset-6">
+          <div class="row headers-row discount-headers">
+            <div class="col-xs-8">
+              Discount
+            </div>
+            <div class="col-xs-4">
+              Discount Amount
+            </div>
+          </div>
+          {{#each requiredPayments.discounts}}
+          <div class="row monthly-row">
+            <div class="col-xs-8">
+              {{ capitalize this.label }}
+            </div>
+            <div class="col-xs-4 negative-num-cell">
+              - ${{ this.amount }}
+            </div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}} 
       <div class="row">
         <div class="col-xs-offset-6 col-xs-6 total-payment">
           <span class="bolded-label">Total:</span> ${{totalPayment}}

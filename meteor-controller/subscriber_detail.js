@@ -185,6 +185,28 @@ if (Meteor.isClient) {
   };
 
   Template.subscriber_billing_info.events({
+    'click #add-discount': function (evt) {
+      evt.preventDefault();
+      var thisSub = Session.get('thisSub');
+      var amount = Math.round10(parseFloat($('#discount-amount').val()), 2);
+      var notes = $('#discount-notes').val();
+      var label = $('#discount-label').val();
+      var discount = {
+        amount: amount,
+        dateCreated: new Date(),
+        used: false,
+        notes: notes,
+        label: label
+      };
+      Subscribers.update(thisSub._id, {$push: {'billing_info.discounts': discount }});
+    },
+
+    'click .delete-discount': function (evt) {
+      evt.preventDefault();
+      var thisSub = Session.get('thisSub');
+      Subscribers.update(thisSub._id, {$pull: {'billing_info.discounts': {'dateCreated': this.dateCreated}}});
+
+    },
     'click #add-additional-hardware': function (evt) {
       evt.preventDefault();
       var selectedHardware = Session.get('selectedAdditionalEquipmentNode');

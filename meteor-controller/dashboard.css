@@ -204,3 +204,6 @@ body {
   background-color: #ccc;
 }
 
+.subscriber-details-container .billing-info-container #update-billing {
+  margin-top: 20px;
+}

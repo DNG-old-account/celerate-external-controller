@@ -158,6 +158,32 @@
         <button class="btn btn-warning" id="add-additional-hardware">Add Equipment</button>
       </div>
     </div>
+    <div class="row">
+      <label for="discount-amount" class="col-sm-1 control-label">
+        Discount Amount: 
+      </label>
+      <div class="col-sm-1">
+        <input type="text" id="discount-amount" class="form-control discount-amount" placeholder="0">
+      </div>
+      <label for="discount-label" class="col-sm-1 control-label">
+        Discount Label: 
+      </label>
+      <div class="col-sm-3">
+        <input type="text" id="discount-label" class="form-control discount-label" placeholder="Further Reach Holiday Appreciation">
+      </div>
+      <label for="discount-notes" class="col-sm-1 control-label">
+        Discount Notes: 
+      </label>
+      <div class="col-sm-3">
+        <input type="text" id="discount-notes" class="form-control discount-notes" placeholder="Installation confusion, they're a super nice person, etc.">
+      </div>
+      <div class="col-sm-1">
+        <button class="btn btn-warning" id="add-discount">Add Discount</button>
+      </div>
+    </div>
+    <div class="row">
+      <span class="help-block">The Discount Label will show up on user's bill. Notes are internal documents.</span>
+    </div>
     {{#if billing_info.installation.additional_equipment}}
     <h4 class="row additional-equipment-header">
       Additional Equipment
@@ -181,6 +207,43 @@
         {{#with this}}
         <button class="btn btn-danger" id="remove-additional-hardware">Remove</button>
         {{/with}}
+      </div>
+    </div>
+    {{/each}}
+    {{/if}}
+    {{#if billing_info.discounts}}
+    <h4 class="row discounts-header">
+      Discounts
+    </h4>
+    {{#each billing_info.discounts}}
+    <div class="row">
+      <div class="col-sm-1">
+        Amount:
+        {{ this.amount }}
+      </div>
+      <div class="col-sm-2">
+        Date Created:
+        {{ this.dateCreated }}
+      </div>
+      <div class="col-sm-2">
+        Used:
+        {{#if this.used}}YES{{else}}
+        NO{{/if}}
+      </div>
+      <div class="col-sm-2">
+        Date Used:
+        {{ this.dateUsed }}
+      </div>
+      <div class="col-sm-2">
+        Notes:
+        {{ this.notes }}
+      </div>
+      <div class="col-sm-2">
+        Label:
+        {{ this.label }}
+      </div>
+      <div class="col-sm-1">
+        <button class="btn btn-danger delete-discount" data-discountDate="{{this.dateCreated}}">Delete</button>
       </div>
     </div>
     {{/each}}
