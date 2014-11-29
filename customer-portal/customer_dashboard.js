@@ -43,7 +43,8 @@ if (Meteor.isClient) {
         var billingInfo = result.billing_info;
         if (typeof billingInfo.charges === 'object') {
           _.each(billingInfo.charges, function(charge) {
-            var dateString = moment(billingInfo.created).format('M/D/YYYY');
+            // Stripe hands us date created in ms and moment wants seconds
+            var dateString = moment(charge.created * 1000).format('M/D/YYYY');
             charge.dateCreatedString = dateString;
             charge.dollarAmount = (charge.amount / 100).formatMoney(2, '.', ',');
           });
