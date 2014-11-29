@@ -80,13 +80,8 @@ Meteor.methods({
       sub = Subscribers.findOne(sub._id);
 
     } else {
-
       var stripeResp;
-
-      // First check for outstanding payments and pay those
-      //
-      // TODO:
-
+      // TODO: only create a customer if doesn't already exist!
       // Create a customer
       stripeResp = Async.runSync(function(done) {
         stripe.customers.create({
@@ -107,6 +102,38 @@ Meteor.methods({
       var thisCustomer = stripeResp.result;
       var hasMore = true;
       var plans = [];
+
+      // First check for outstanding monthly payments and pay those
+      var requiredPayments = FRMethods.calculatePayments(sub);
+
+      if (requiredPayments.dueToDate.required) {
+
+        var stripeConfig = {
+            name: 'Further Reach',
+            allowRememberMe: false,
+            email: sub.prior_email,
+            description: '',
+            requiredPayments: requiredPayments,
+            installmentAmount: 0
+        }
+        var billingPeriodEndDate = requiredPayments.dueToDate.endDate;
+        var billingPeriodStartDate = requiredPayments.dueToDate.startDate;
+
+        stripeConfig.description += 'Monthly payment for period of ' + 
+                        moment(billingPeriodStartDate).format('MM/DD/YYYY') + ' to ' + 
+                        moment(billingPeriodEndDate).format('MM/DD/YYYY') + '';
+        stripeConfig.billingPeriodStartDate = billingPeriodStartDate;
+        stripeConfig.billingPeriodEndDate = billingPeriodEndDate;
+ 
+        var stripeAmount = Math.round(requiredPayments.dueToDate.amount * 100); // Stripe does it by cents
+        stripeConfig.amount = parseInt(stripeAmount, 10); 
+
+        var stripeTokenObj = {
+          id: thisCustomer.id
+        };
+
+        Meteor.call('chargeCard', token, stripeTokenObj, stripeConfig, ["monthly"]);
+      }
 
       // Check to see if a plan already exists with the proper name and amount
       while (hasMore) {
@@ -219,20 +246,14 @@ Meteor.methods({
 
     // Check to make sure that our totals are accurate
     var installmentAmount;
-    if (_.contains(typesOfCharges, 'installment') && FRMethods.isNumber(stripeConfig.installmentAmount)) {
+    if (FRMethods.isNumber(stripeConfig.installmentAmount)) {
       installmentAmount = parseFloat(stripeConfig.installmentAmount);
     }
     var requiredPayments = FRMethods.calculatePayments(thisSub);
     var totalPayment = FRMethods.calcTotalPayment(thisSub, installmentAmount);
 
-    console.log('stripeConfig = ');
-    console.log(stripeConfig);
     if (totalPayment * 100 !== stripeConfig.amount) {
-      throw { 
-        name:        "Stripe Charge Error", 
-        message:     "Stripe Charge is going to not equal our calculated total payment.", 
-        toString:    function(){return this.name + ": " + this.message;} 
-      }; 
+      throw new Meteor.Error("Stripe Charge Error", "Stripe Charge is going to not equal our calculated total payment.");
     }
 
     // Make our call to stripe syncronous
@@ -257,7 +278,7 @@ Meteor.methods({
       }
       if (_.contains(typesOfCharges, 'installment')) {
         var installmentPayment = {
-          amount: installmentAmount,
+          amount: parseFloat(installmentAmount),
           charge_date: moment().tz('America/Los_Angeles').toISOString()
         }
         Subscribers.update(thisSub._id, {$set: {'billing_info.installation.installments': true }});
@@ -275,7 +296,7 @@ Meteor.methods({
       } 
       if (_.contains(typesOfCharges, 'monthly')) {
         var monthlyPayment = {
-          amount: dollarAmount,
+          amount: parseFloat(dollarAmount),
           start_date: stripeConfig.billingPeriodStartDate,
           end_date: stripeConfig.billingPeriodEndDate,
           charge: result.result
@@ -283,9 +304,7 @@ Meteor.methods({
         Subscribers.update(thisSub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
       }
       
-      console.log(requiredPayments);
       if (typeof requiredPayments.discounts === 'object') {
-        console.log(requiredPayments.discounts);
         _.each(requiredPayments.discounts, function(discount) {
           if (discount.toBeUsed) {
             // If there is leftover amount on this discount, create a copy of this one with 

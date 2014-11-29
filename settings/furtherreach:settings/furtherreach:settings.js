@@ -363,7 +363,7 @@ FRMethods = {
 
     if (result.installation.installments) {
       result.installation.totalPaid = _.reduce(result.installation.installment_payments, function(sum, payment) {
-        return sum + payment.amount;
+        return sum + parseFloat(payment.amount);
       }, 0);
       result.installation.remaining_amount = Math.round10(result.installation.totalInstallationAmount - result.installation.totalPaid, 2);
     }

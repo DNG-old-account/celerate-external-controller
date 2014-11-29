@@ -83,7 +83,7 @@ if (Meteor.isClient) {
 
   Template.required_payments.installmentAmount = function() {
     var requiredPayments = Session.get('requiredPayments');
-    var installmentAmount = (requiredPayments.installation.totalInstallationAmount / FRSettings.billing.installmentNum).toFixed(2);
+    var installmentAmount = Math.round10((requiredPayments.installation.totalInstallationAmount / FRSettings.billing.installmentNum), 2);
     Session.set('installmentAmount', installmentAmount);
     return installmentAmount;
   };
@@ -189,7 +189,7 @@ if (Meteor.isClient) {
         }
       }
       
-      var stripeAmount = (amount * 100).toFixed(2); // Stripe does it by cents
+      var stripeAmount = Math.round(amount * 100); // Stripe does it by cents
       stripeConfig.amount = parseInt(stripeAmount, 10); 
 
       var handler = StripeCheckout.configure({
