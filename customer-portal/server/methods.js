@@ -42,8 +42,9 @@ Meteor.methods({
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
     var sub = Subscribers.findOne(subId); 
     var stripe = Meteor.npmRequire('stripe')(Meteor.settings.stripe.privateKey);
+    var hasMore;
 
-    var paymentsObj = FRMethods.calculatePayments(sub);
+    var requiredPayments = FRMethods.calculatePayments(sub);
 
     if (!turnOn) {
       if (typeof sub.billing_info.autopay !== 'object') {
@@ -65,7 +66,6 @@ Meteor.methods({
           );
         });
 
-        console.log(stripeResp);
         if (stripeResp.err || !stripeResp.result) {
           console.log(stripeResp);
           throw new Meteor.Error("Couldn't cancel the Stripe Subscription.", stripeResp);
@@ -82,30 +82,57 @@ Meteor.methods({
     } else {
       var stripeResp;
       // TODO: only create a customer if doesn't already exist!
-      // Create a customer
-      stripeResp = Async.runSync(function(done) {
-        stripe.customers.create({
-          card: configObj.token,
-          email: configObj.email,
-          description: 'Further Reach Autopay for ' + sub.first_name + ' ' + sub.last_name,
-          email: sub.prior_email,
-        }, function(err, result) {
-          done(err, result);
-        });
-      });
+      
+      hasMore = true;
+      var customers = [];
+      var lastCustomer = undefined;
+      var stripeRestConfig = {limit: 100};
+      // Check to see if a plan already exists with the proper name and amount
+      while (hasMore) {
+        if (typeof lastCustomer === 'string') {
+          stripeRestConfig.starting_after = lastCustomer;
+        } 
 
-      if (stripeResp.err || !stripeResp.result) {
-        console.log(stripeResp);
-        throw new Meteor.Error("Couldn't create new Stripe customer", stripeResp);
+        stripeResp = Async.runSync(function(done) {
+          stripe.customers.list(stripeRestConfig, function(err, result) {
+            done(err, result);
+          });
+        });
+
+        if (stripeResp.err || !stripeResp.result) {
+          console.log(stripeResp);
+          throw new Meteor.Error("Stripe couldn't list customers", stripeResp);
+        }
+        lastCustomer = _.last(stripeResp.result.data).id;
+        customers = customers.concat(stripeResp.result.data);
+        hasMore = stripeResp.result.has_more;
       }
 
-      var thisCustomer = stripeResp.result;
-      var hasMore = true;
-      var plans = [];
+      var thisCustomer = _.find(customers, function(customer) {
+        return customer.email === sub.prior_email;
+      });
+
+      if (typeof thisCustomer !== 'object') {
+        // Create a customer
+        stripeResp = Async.runSync(function(done) {
+          stripe.customers.create({
+            card: configObj.token,
+            description: 'Further Reach Autopay for ' + sub.first_name + ' ' + sub.last_name,
+            email: sub.prior_email,
+          }, function(err, result) {
+            done(err, result);
+          });
+        });
+
+        if (stripeResp.err || !stripeResp.result) {
+          console.log(stripeResp);
+          throw new Meteor.Error("Couldn't create new Stripe customer", stripeResp);
+        }
+
+        thisCustomer = stripeResp.result;
+      }
 
       // First check for outstanding monthly payments and pay those
-      var requiredPayments = FRMethods.calculatePayments(sub);
-
       if (requiredPayments.dueToDate.required) {
 
         var stripeConfig = {
@@ -135,10 +162,17 @@ Meteor.methods({
         Meteor.call('chargeCard', token, stripeTokenObj, stripeConfig, ["monthly"]);
       }
 
+      hasMore = true;
+      var plans = [];
+      var lastPlan = undefined;
+      stripeRestConfig = {limit: 100};
       // Check to see if a plan already exists with the proper name and amount
       while (hasMore) {
+        if (typeof lastPlan === 'string') {
+          stripeRestConfig.starting_after = lastPlan;
+        }
         stripeResp = Async.runSync(function(done) {
-          stripe.plans.list(function(err, result) {
+          stripe.plans.list(stripeRestConfig, function(err, result) {
             done(err, result);
           });
         });
@@ -147,13 +181,12 @@ Meteor.methods({
           console.log(stripeResp);
           throw new Meteor.Error("Stripe couldn't list plans", stripeResp);
         }
+        lastPlan = _.last(stripeResp.result.data).id;
         plans = plans.concat(stripeResp.result.data);
         hasMore = plans.has_more;
       }
 
-      console.log(paymentsObj);
-      console.log(plans);
-      var monthlyPayment = _.last(paymentsObj.monthlyPayments);
+      var monthlyPayment = _.last(requiredPayments.monthlyPayments);
       console.log(monthlyPayment);
       var planName = sub.plan + '-' + (monthlyPayment.amount * 100);
       var myPlan = _.find(plans, function(plan) {
