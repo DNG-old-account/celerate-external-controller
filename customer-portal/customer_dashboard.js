@@ -404,6 +404,7 @@ if (Meteor.isClient) {
                 Session.set('autoPayOn', true);
                 Session.set('autoPaySetup', true);
                 Session.set('autoPayLoading', false);
+                window.location.reload();
               } else {
                 Router.go('/error/' + authToken);
               }

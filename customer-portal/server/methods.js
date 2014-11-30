@@ -112,6 +112,8 @@ Meteor.methods({
         return customer.email === sub.prior_email;
       });
 
+      // TODO: Add a new card? if customer already exists?
+
       if (typeof thisCustomer !== 'object') {
         // Create a customer
         stripeResp = Async.runSync(function(done) {
@@ -156,6 +158,7 @@ Meteor.methods({
         stripeConfig.amount = parseInt(stripeAmount, 10); 
 
         var stripeTokenObj = {
+          type: 'customer',
           id: thisCustomer.id
         };
 
@@ -289,15 +292,31 @@ Meteor.methods({
       throw new Meteor.Error("Stripe Charge Error", "Stripe Charge is going to not equal our calculated total payment.");
     }
 
+    var chargeObj = {
+      amount: stripeConfig.amount,
+      currency: "usd",
+      description: stripeConfig.description,
+      receipt_email: stripeConfig.email,
+    };
+
+    if (typeof stripeToken === 'object' &&
+        typeof stripeToken.type === 'string' &&
+        stripeToken.type === 'customer') {
+
+      _.extend(chargeObj, {
+        customer: stripeToken.id
+      });
+    } else {
+      _.extend(chargeObj, {
+        card: stripeToken.id,
+      });
+    }
+
+      
+
     // Make our call to stripe syncronous
     var result = Async.runSync(function(done) {
-      stripe.charges.create({
-        amount: stripeConfig.amount,
-        currency: "usd",
-        card: stripeToken.id,
-        description: stripeConfig.description,
-        receipt_email: stripeConfig.email,
-      }, function(err, charge) {
+      stripe.charges.create(chargeObj, function(err, charge) {
         done(err, charge);
       });
     });

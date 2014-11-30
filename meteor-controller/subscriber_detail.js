@@ -60,6 +60,9 @@ if (Meteor.isClient) {
               }
               Subscribers.update(this._id, {$push: {'billing_info.plan_activity': planChange}}); 
               // TODO: we need to check to see if subscriber is autopay and then change their plans and do all that fancy magic
+              if (typeof this.billing_info.autopay === 'object' && this.billing_info.autopay.on) {
+
+              }
             }
           }
           db_update = {};
