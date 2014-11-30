@@ -1,6 +1,6 @@
 if (Meteor.isClient) {
-  var sort_fields = ["status_sort", "name_sort", "city_sort", "mapped_sort"];
-  var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "city_sort": "city", "mapped_sort": "lat"};
+  var sort_fields = ["status_sort", "name_sort", "city_sort", "mapped_sort", "plan_sort"];
+  var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "city_sort": "city", "mapped_sort": "lat", "plan_sort": "plan"};
 
   var archived_subscribers_dep = new Tracker.Dependency;
   var non_archived_subscribers_dep = new Tracker.Dependency;
@@ -11,11 +11,14 @@ if (Meteor.isClient) {
     Session.set("name_sort", 1);
     Session.set("city_sort", 1);
     Session.set("mapped_sort", 1);
+    Session.set("plan_sort", 1);
 
     Session.set("selected_subscriber", null);
     Session.set("subscriber_search_input", "");
     Session.set("subscriber_search_fields", {});
-    Session.set("search_tag_selection", "last_name");
+    Session.set("search_tag_selection", "global");
+
+    Session.set("recenter_map", true);
   });
 
   Template.subscriber_overview.searchable_fields = function () {
@@ -37,9 +40,24 @@ if (Meteor.isClient) {
       }
 
       for (s in current_search_fields) {
-        var field_query = {};
-        field_query[s] = { '$regex': current_search_fields[s], '$options': 'i' };
-        subquery.push(field_query);
+        var query_input = current_search_fields[s];
+        if (s === 'global') {
+          var global_query = [];
+          var searchable_fields = Template.subscriber_overview.searchable_fields();
+
+          for (f in searchable_fields) {
+            var field = searchable_fields[f];
+            var field_query = {};
+            field_query[field] = { '$regex': query_input, '$options': 'i' };
+            global_query.push(field_query);
+          }
+
+          subquery.push({$or: global_query});
+        } else {
+          var field_query = {};
+          field_query[s] = { '$regex': query_input, '$options': 'i' };
+          subquery.push(field_query);
+        }
       }
     }
     query = {};
@@ -69,18 +87,18 @@ if (Meteor.isClient) {
     });
   };
 
-  var subscriber_search_input_timeout = false;
-  var subscriber_search_input_lag_ms = 1000;
+  var subscriber_search_input_lag_ms = 500;
   Template.subscriber_overview.events({
     'keyup .subscriber_search_input': function (evt) {
-      if (Session.get("subscriber_search_input_timeout") != true) {
-        subscriber_search_input_timeout = true;
-
-        setTimeout(function() {
-          Session.set("subscriber_search_input", $("#subscriber_search_input").val().trim());
-          subscriber_search_input_timeout = false;
-        }, subscriber_search_input_lag_ms);
+      var timeout = Session.get("subscriber_search_input_timeout");
+      if (timeout) {
+        clearTimeout(timeout);
       }
+
+      Session.set("subscriber_search_input_timeout", setTimeout(function() {
+        Session.set("subscriber_search_input", $("#subscriber_search_input").val().trim());
+        Session.set("subscriber_search_input_timeout", null);
+      }, subscriber_search_input_lag_ms));
     },
     'change #search_tag': function (evt) {
       Session.set("search_tag_selection", $("#search_tag").val().trim());
@@ -88,6 +106,7 @@ if (Meteor.isClient) {
     'click #add_search_field': function (evt) {
       var search_value = $("#subscriber_search_input").val().trim();
       console.log("search_value: " + search_value);
+ 
       var search_field = Session.get("search_tag_selection");
       console.log("search_field: " + search_field);
 
@@ -128,6 +147,10 @@ if (Meteor.isClient) {
       } else {
         $("#subscriber_map").slideUp();
       }
+    },
+    'click .recenter_map': function (evt) {
+      console.log(evt);
+      Session.set("recenter_map", evt.target.checked);
     }
   });
 
@@ -151,6 +174,10 @@ if (Meteor.isClient) {
     'click .mapped_header': function () {
       Session.set("mapped_sort", -1 * Session.get("mapped_sort"));
       Session.set("primary_sort_field_subscribers", "mapped_sort");
+    },
+    'click .plan_header': function () {
+      Session.set("plan_sort", -1 * Session.get("plan_sort"));
+      Session.set("primary_sort_field_subscribers", "plan_sort");
     }
   });
 
@@ -169,11 +196,5 @@ if (Meteor.isClient) {
 
   close_subscriber_modal = function() {
     $('#subscriber_details_modal').modal('hide');
-  };
-
-  // Sidebar stuff.
-  Template.celerate_sidebar.activeSidebar = function () {
-    return '';
-    //return Session.equals("currentPage", this.id) ? 'class="active"' : '';
   };
 }

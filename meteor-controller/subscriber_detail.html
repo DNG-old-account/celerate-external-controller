@@ -6,12 +6,16 @@
 
 <a href="{{user_billing_link}}" role="button" class="btn btn-success" target="_blank">User Billing Setup</a>
 {{#if is_archived}}
+<button type="button" class="unarchive_subscriber_button btn btn-warning">Unarchive Subscriber</button>
 {{else}}
 <button type="button" class="archive_subscriber_button btn btn-warning">Archive Subscriber</button>
 {{/if}}
 {{#with ..}}
 <button type="button" class="delete_subscriber_button btn btn-danger">Delete Subscriber</button>
 {{/with}}
+{{#if site_link}}
+<a href="/site_details/{{site_link._id._str}}" role="button" class="btn btn-success" target="_blank">Associated Site</a>
+{{/if}}
 <hr>
 
 <form class="form-horizontal" role="form">

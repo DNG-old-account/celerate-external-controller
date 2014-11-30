@@ -7,9 +7,7 @@
   {{> celerate_navbar}}
   <div class="container-fluid">
     <div class="row">
-      {{> celerate_sidebar}}
-
-      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+      <div class="main">
         {{> subscriber_overview}}
       </div>
     </div>
@@ -52,6 +50,7 @@
     <div class="row">
       <div class="col-md-3">
         <select class="form-control" id="search_tag">
+          <option value="global">global</option>
           {{#each searchable_fields}}
           <option value="{{this}}">{{this}}</option>
           {{/each}}
@@ -69,6 +68,7 @@
       </div>
       <div class="col-md-2">
         <div class="show_map checkbox"><label><input type="checkbox" id="show_map" checked>Show Map</label></div>
+        <div class="recenter_map checkbox"><label><input type="checkbox" id="recenter_map" checked>Recenter Map</label></div>
       </div>
       <div class="col-md-2">
         <button type="button" class="new_user_button btn btn-warning" id="new_user_button">Add New User</button>
@@ -80,7 +80,7 @@
   {{/if}}
   <div class="table_responsive">
     <table class="table table-striped">
-      <thead><tr><th class="edit_column"></th><th class="mobile_column"></th><th class="landline_column"></th><th class="name_header" style="cursor:pointer;">Full Name</th><th class="status_header" style="cursor:pointer;">Status</th><th class="address_header">Street Address</th><th class="city_header" style="cursor:pointer;">City</th><th>Plan</th><th>Install Paid</th><th>Email</th><th class="mapped_header"></th></tr></thead>
+      <thead><tr><th class="edit_column"></th><th class="mobile_column"></th><th class="landline_column"></th><th class="name_header" style="cursor:pointer;">Full Name</th><th class="status_header" style="cursor:pointer;">Status</th><th class="address_header">Street Address</th><th class="city_header" style="cursor:pointer;">City</th><th class="plan_header" style="cursor:pointer;">Plan</th><th>Install Paid</th><th>Email</th><th class="mapped_header" style="cursor:pointer;"><span class="glyphicon-globe glyphicon" style="padding: 10px 0px 0px 0px; font-size: 18px;" title="Mapped?"></span></th></tr></thead>
       <tbody>
         {{#each subscribers}}
         {{> subscriber}}

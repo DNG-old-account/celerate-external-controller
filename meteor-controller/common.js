@@ -53,9 +53,16 @@ Handlebars.registerHelper('selected_if_empty', function(val) {
   return "";
 });
 
+Handlebars.registerHelper('activeIfTemplateIs', function (template) {
+  var currentRoute = Router.current();
+  console.log(currentRoute);
+  return currentRoute && template === currentRoute.path ? 'active' : '';
+});
+
 if (Meteor.isClient) {
   Template.registerHelper('isIterable', function(collection) {
     return typeof collection === "object";
   });
+
 }
 

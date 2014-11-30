@@ -1,12 +1,13 @@
 if (Meteor.isClient) {
   var search_fields = ["type", "name"];
-  var sort_fields = ["type_sort", "name_sort"];
-  var sort_fields_to_label = {"type_sort": "type", "name_sort": "name"};
+  var sort_fields = ["type_sort", "name_sort", "pictures_sort"];
+  var sort_fields_to_label = {"type_sort": "type", "name_sort": "name", "pictures_sort": "pictures"};
 
   Meteor.startup(function() {
     Session.set("primary_sort_field_sites", "name_sort");
     Session.set("type_sort", 1);
     Session.set("name_sort", 1);
+    Session.set("pictures_sort", 1);
 
     Session.set("selected_site", null);
     Session.set("site_search_input", "");
@@ -26,7 +27,7 @@ if (Meteor.isClient) {
     }
     console.log("query: " + JSON.stringify(query));
 
-    var include_fields = {'type': 1, 'name': 1};
+    var include_fields = {'type': 1, 'name': 1, 'type': 1, 'pictures': 1};
 
     var result = Sites.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_sites")});
     Session.set("site_count", result.count());
@@ -69,6 +70,10 @@ if (Meteor.isClient) {
     'click .name_header': function () {
       Session.set("type_sort", -1 * Session.get("type_sort"));
       Session.set("primary_sort_field_sites", "type_sort");
+    },
+    'click .pictures_header': function () {
+      Session.set("pictures_sort", -1 * Session.get("pictures_sort"));
+      Session.set("primary_sort_field_sites", "pictures_sort");
     }
   });
 
@@ -115,12 +120,5 @@ if (Meteor.isClient) {
 
   close_site_modal = function() {
     $('#site_details_modal').modal('hide');
-  };
-
-
-  // Sidebar stuff.
-  Template.celerate_sidebar.activeSidebar = function () {
-    return '';
-    //return Session.equals("currentPage", this.id) ? 'class="active"' : '';
   };
 }

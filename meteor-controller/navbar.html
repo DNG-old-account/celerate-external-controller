@@ -11,11 +11,14 @@
       <a class="navbar-brand" href="#">Celerate</a>
     </div>
     <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav navbar-left">
+        <li class="{{activeIfTemplateIs '/subscriber'}}" id="subscriber"> <a href="/subscriber">Subscribers</a></li>
+        <li class="{{activeIfTemplateIs '/node'}}" id="node"> <a href="/node">Nodes</a></li>
+        <li class="{{activeIfTemplateIs '/hardware'}}" id="hardware"> <a href="/hardware">Hardware</a></li>
+        <li class="{{activeIfTemplateIs '/site'}}" id="site"> <a href="/site">Sites</a></li>
+      </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="#">Dashboard</a></li>
-        <li><a href="/emails_page">Emails Admin</a></li>
-        <li><a href="#">Profile</a></li>
-        <li><a href="#">Help</a></li>
+        <li class="{{activeIfTemplateIs '/emails_page'}}" ><a href="/emails_page">Emails Admin</a></li>
       </ul>
     </div>
   </div>
