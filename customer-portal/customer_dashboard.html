@@ -275,7 +275,7 @@
           {{/if}} 
         </div>
         <div class="col-xs-2">
-          <span class="bolded-label">Amount:</span> ${{ this.dollarAmount }}
+          <span class="bolded-label">Amount:</span> ${{formatMoney this.dollarAmount}}
         </div>
         <div class="col-xs-4">
           <span class="bolded-label">Description:</span> {{ this.description }}
@@ -411,7 +411,7 @@
           {{ this.plan.label }}
         </div>
         <div class="col-xs-2">
-          ${{ this.plan.monthly }}
+          ${{ formatMoney this.amount }}
         </div>
       </div>
       {{#if this.discount}}
@@ -431,10 +431,10 @@
           {{ capitalize this.discount.label }}
         </div>
         <div class="col-xs-5">
-          ${{ this.discount.previousAmount }}
+          ${{ formatMoney this.discount.previousAmount }}
         </div>
         <div class="col-xs-2 negative-num-cell">
-          - ${{ this.discount.amount }}
+          - ${{ formatMoney this.discount.amount }}
         </div>
       </div>
       {{/if}}
@@ -444,7 +444,7 @@
           <span class="bolded-label">Monthly Total:</span>
         </div>
         <div class="col-xs-offset-6 col-xs-2">
-          ${{ requiredPayments.dueToDate.amount }}
+          ${{ formatMoney requiredPayments.dueToDate.amount }}
         </div>
       </div>
       {{/if}}
@@ -531,7 +531,7 @@
           Taxable Amount:
         </div>
         <div class="col-xs-2 taxable-border">
-          ${{requiredPayments.installation.taxableAmount}}
+          ${{formatMoney requiredPayments.installation.taxableAmount}}
         </div>
       </div>
       <div class="row installation-item payment-row">
@@ -568,9 +568,9 @@
         </div>
         <div class="col-xs-offset-4 col-xs-2">
           {{#if requiredPayments.installation.installments}}
-          ${{requiredPayments.installation.remaining_amount}} remaining
+          ${{formatMoney requiredPayments.installation.remaining_amount}} remaining
           {{else}}
-          ${{ requiredPayments.installation.totalInstallationAmount }}
+          ${{formatMoney requiredPayments.installation.totalInstallationAmount}}
           {{/if}}
         </div>
       </div>
@@ -587,9 +587,9 @@
             </option>
             <option value="installment">
               {{#if requiredPayments.installments}}
-              Pay installment - ${{installmentAmount}}
+              Pay installment - ${{formatMoney installmentAmount}}
               {{else}}
-              Pay installment - ({{installmentNum}} payments of ${{installmentAmount}} each)
+              Pay installment - ({{installmentNum}} payments of ${{formatMoney installmentAmount}} each)
               {{/if}}
             </option>
           </select>
@@ -613,7 +613,7 @@
               {{ capitalize this.label }}
             </div>
             <div class="col-xs-4 negative-num-cell">
-              - ${{ this.amount }}
+              - ${{formatMoney this.amount}}
             </div>
           </div>
           {{/each}}

@@ -40,21 +40,37 @@ if (Meteor.isClient) {
                 window.alert("Adding site for newly connected subscriber.");
               }
 
-              // Toggle the icon visual state.
-              evt.target.classList.add("text-gray");
-              evt.target.previousElementSibling.classList.remove("text-gray");
             }
           });
         } else {
+          if (formelement.id === 'plan') {
+            // Check if has current plan
+            if (typeof this.plan === 'string' && this.plan.trim() !== '') {
+              if (this.billing_info !== 'object') {
+                FRMethods.createBillingProperties(this);
+              }
+
+              if (typeof this.billing_info.plan_activity !== 'object') {
+                Subscribers.update(this._id, {$set: {'billing_info.plan_activity': []}}); 
+              }
+              var planChange = {
+                previousPlan: this.plan,
+                newPlan: formelement.value,
+                date: new Date()
+              }
+              Subscribers.update(this._id, {$push: {'billing_info.plan_activity': planChange}}); 
+              // TODO: we need to check to see if subscriber is autopay and then change their plans and do all that fancy magic
+            }
+          }
           db_update = {};
           db_update[formelement.id] = formelement.value;
           Subscribers.update(this._id, {$set: db_update}); 
           formelement.disabled = true;
-
-          // Toggle the icon visual state.
-          evt.target.classList.add("text-gray");
-          evt.target.previousElementSibling.classList.remove("text-gray");
         }
+
+        // Toggle the icon visual state.
+        evt.target.classList.add("text-gray");
+        evt.target.previousElementSibling.classList.remove("text-gray");
       }
     },
     'click .get_location_button': function (evt) {
@@ -254,22 +270,8 @@ if (Meteor.isClient) {
   });
 
   Template.subscriber_billing_info.billing_info = function () {
-    // If a subscriber doesn't have billing info yet, we can just create it here
     if (typeof this.billing_info !== 'object') {
-      // Create default billing info
-      var billing = {
-        installation: {
-          standard_installation: '150',
-          additional_equipment: [],
-          additional_labor: [],
-          paid: false
-        },
-        charges: [],
-        monthly_payments: []
-      };
-      db_update = {};
-      db_update['billing_info'] = billing;
-      Subscribers.update(this._id, {$set: db_update}); 
+      FRMethods.createBillingProperties(this);
     }
     return this.billing_info; 
   };

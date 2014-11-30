@@ -179,12 +179,7 @@ FRMethods = {
     return typeof n !== 'undefined' && !isNaN(parseFloat(n)) && isFinite(n);
   },
 
-  calculatePayments: function(sub) {
-    var result = {};
-    // If a subscriber doesn't have billing info yet, we can just create it here
-    // TODO: this should really be code that's shared with controller - we don't want
-    // to have to change this in both places!!
-    // We can use a package for this!
+  createBillingProperties: function(sub) {
     if (typeof sub.billing_info !== 'object') {
       // Create default billing info
       var billing = {
@@ -196,13 +191,22 @@ FRMethods = {
           installments: false
         },
         charges: [],
-        monthly_payments: [],
         discounts: [],
+        monthly_payments: []
       };
       dbUpdate = {};
       dbUpdate['billing_info'] = billing;
       Subscribers.update(sub._id, {$set: dbUpdate}); 
+
+      sub = Subscribers.findOne(sub._id);
     }
+    return sub;
+  },
+
+  calculatePayments: function(sub) {
+    var result = {};
+    // If a subscriber doesn't have billing info yet, we can just create it here
+    sub = FRMethods.createBillingProperties(sub);
 
     result.monthlyPayments = [];
     result.required = false;
@@ -224,30 +228,68 @@ FRMethods = {
       // Calculate monthly payments
       if (typeof sub.plan === 'string' && sub.plan.trim() !== '') {
 
-        var dateCursor = moment(startOfThisMonth);
-        var firstDayOfBilling = moment.tz(FRSettings.billing.firstDayOfBilling, 'America/Los_Angeles');
+        var iterateDates = function(first, last, plan) {
+          var hasChange = false;
 
-        if (activationDate.isAfter(firstDayOfBilling) || 
-            activationDate.isSame(firstDayOfBilling, 'day')) {
-          var firstMonthEver = moment(activationDate).startOf('month');
-        } else {
-          var firstMonthEver = moment(firstDayOfBilling);
+          if (first.isBefore(activationDate) || first.isSame(activationDate, 'day')) {
+            first = moment(activationDate);
+          }         
+
+          if (typeof sub.billing_info.plan_activity === 'object' && _.size(sub.billing_info.plan_activity) > 0) {
+            _.each(sub.billing_info.plan_activity, function(change) {
+              var changeDate = moment(change.date).tz('America/Los_Angeles');
+              if (changeDate.isAfter(first) && !changeDate.isSame(first, 'day') && 
+                  changeDate.isBefore(last) && !changeDate.isSame(last, 'day')) {
+                hasChange = true;
+                iterateDates(first, changeDate, change.previousPlan);
+                iterateDates(changeDate, last, change.newPlan);
+              }
+            });
+          } 
+          if(!hasChange) {
+            var numDiffDays = 999999; // Essentially max days
+            if (typeof plan !== 'string') {
+              // Find the nearest plan activity and then find out if before or after
+              // then use previousPlan or nextPlan 
+              if (typeof sub.billing_info.plan_activity === 'object' && _.size(sub.billing_info.plan_activity) > 0) {
+                _.each(sub.billing_info.plan_activity, function(change) {
+                  var diff;
+                  var changeDate = moment(change.date).tz('America/Los_Angeles');
+                  if (changeDate.isAfter(last)) {
+                    diff = Math.abs(change.date.diff(last));
+                    if (diff < numDiffDays) {
+                      plan = change.previousPlan;
+                    }
+                  } else {
+                    diff = Math.abs(change.date.diff(first));
+                    if (diff < numDiffDays) {
+                      plan = change.nextPlan;
+                    }
+                  }
+
+                });
+              } else {
+                plan = sub.plan;
+              }
+            }
+            calcAmount(first, last, plan);
+          }
         }
 
-        while (dateCursor.isAfter(firstMonthEver) && !dateCursor.isSame(firstMonthEver, 'day')) {
-
+        var calcAmount = function(first, last, plan) {
           var monthlyPayment = {};
           monthlyPayment.required = true;
-          monthlyPayment.startDate = moment(dateCursor).subtract(1, 'months');
-          monthlyPayment.endDate = moment(dateCursor).subtract(1, 'days');
-          if (monthlyPayment.startDate.isBefore(activationDate)) {
-            monthlyPayment.startDate = moment(activationDate);
-          }
+          monthlyPayment.startDate = moment(first);
+          monthlyPayment.endDate = moment(last);
+ 
+          monthlyPayment.plan = FRSettings.billing.plans[plan];
 
           if (typeof sub.billing_info.monthly_payments === 'object') {
             _.each(sub.billing_info.monthly_payments, function(payment) {
               if (moment(payment.startDate).isValid() && 
-                  monthlyPayment.startDate.isSame(moment(payment.start_date), 'day')) {
+                  monthlyPayment.startDate.isSame(moment(payment.start_date), 'day') &&
+                  moment(payment.endDate).isValid() && 
+                  monthlyPayment.endDate.isSame(moment(payment.end_date), 'day')) {
                 monthlyPayment.required = false;
                 monthlyPayment.startDate = moment(payment.start_date).tz('America/Los_Angeles');
                 monthlyPayment.endDate = moment(payment.end_date).tz('America/Los_Angeles');
@@ -255,22 +297,17 @@ FRMethods = {
             });
           }
 
-          var monthlyPaymentAmount = Math.round10(parseFloat(FRSettings.billing.plans[sub.plan].monthly), 2);
+          var monthlyPaymentAmount = Math.round10(parseFloat(monthlyPayment.plan.monthly), 2);
           
-          var monthlyPaymentPlan = FRSettings.billing.plans[sub.plan];
-          monthlyPayment.plan = FRSettings.billing.plans[sub.plan];
+          var startOfBilling = moment(monthlyPayment.startDate).startOf('month');
+          var numberOfBillingDays = Math.abs(monthlyPayment.startDate.diff(monthlyPayment.endDate, 'days')) + 1;
+          var daysInMonth = startOfBilling.daysInMonth();
+          monthlyPayment.amount = monthlyPaymentAmount * (numberOfBillingDays / daysInMonth);
+          monthlyPayment.amount = Math.round10(monthlyPayment.amount, 2);
 
-          if (monthlyPayment.startDate.isBefore(activationDate) || monthlyPayment.startDate.isSame(activationDate, 'day')) {
-            var startOfMonth = moment(activationDate).startOf('month');
-            var diff = Math.abs(startOfMonth.diff(activationDate, 'days'));
-            var daysInMonth = startOfMonth.daysInMonth();
-            monthlyPayment.amount = monthlyPaymentAmount * ((daysInMonth - diff) / daysInMonth);
-            monthlyPayment.amount = Math.round10(monthlyPayment.amount, 2);
-            monthlyPayment.startDate = moment(activationDate);
-          } else {
-            monthlyPayment.amount = monthlyPaymentAmount;
-          }
           // Check for and apply monthly discount
+          // TODO: probably want to do discounts by month and not sub-month period
+          // ie. if subs plan is $70 and the discount is $30, we don't want to apply that $30 discount twice
           if (typeof sub.discount === 'string' && 
               typeof FRSettings.billing.discounts[sub.discount] === 'function') {
             var newAmount = FRSettings.billing.discounts[sub.discount](monthlyPayment.amount);
@@ -281,10 +318,31 @@ FRMethods = {
             };
             monthlyPayment.amount = Math.round10(newAmount, 2);
           }
-          // We have to translate back into Date obj for Meteor client <--> server
+
           monthlyPayment.startDate = monthlyPayment.startDate.toISOString();
           monthlyPayment.endDate = monthlyPayment.endDate.toISOString();
           result.monthlyPayments.push(monthlyPayment);
+        }
+
+        var dateCursor = moment(startOfThisMonth);
+        var firstDayOfBilling = moment.tz(FRSettings.billing.firstDayOfBilling, 'America/Los_Angeles');
+
+        if (activationDate.isAfter(firstDayOfBilling) || 
+            activationDate.isSame(firstDayOfBilling, 'day')) {
+          var firstMonthEver = moment(activationDate).startOf('month');
+        } else {
+          var firstMonthEver = moment(firstDayOfBilling);
+        }
+
+        var startDate;
+        var endDate;
+        while (dateCursor.isAfter(firstMonthEver) && !dateCursor.isSame(firstMonthEver, 'day')) {
+          
+          startDate = moment(dateCursor).subtract(1, 'months');
+          endDate = moment(dateCursor).subtract(1, 'days');
+
+          iterateDates(startDate, endDate)
+          // We have to translate back into Date obj for Meteor client <--> server
           dateCursor.subtract(1, 'months');
         }
       }
@@ -317,7 +375,7 @@ FRMethods = {
         }
       }
     });
-
+    dueToDate.amount = Math.round10(dueToDate.amount, 2);
     result.dueToDate = dueToDate;
 
     result.installation = sub.billing_info.installation;
