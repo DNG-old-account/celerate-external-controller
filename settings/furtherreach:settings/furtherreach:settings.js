@@ -26,21 +26,15 @@ FRSettings = {
     },
 
     plans: {
-      "beta-free": {
-        "label": "Beta Free",
-        "monthly": 0,
+      "hold": {
+        "label": "On Hold",
+        "monthly": 20,
+        "details": "Subscription on hold"
       },
-      "nonprofit-free": {
-        "label": "Non-profit Free",
+      "disconnected": {
+        "label": "Disconnected",
         "monthly": 0,
-      },
-      "relay-free": {
-        "label": "Relay Free",
-        "monthly": 0,
-      },
-      "landuse-free": {
-        "label": "Landuse Free",
-        "monthly": 0,
+        "details": "Sorry to see you go"
       },
       "limited": {
         "label": "Limited",
@@ -215,7 +209,7 @@ FRMethods = {
     var startOfThisMonth = moment().tz('America/Los_Angeles').add(1, 'days').startOf('month'); 
     var activationDate;
 
-    if (sub.status === 'connected' && 
+    if ((sub.status === 'connected' || sub.status === 'disconnected') && 
         moment(sub.activation_date).isValid()) {
 
       // Want to mark any user connected before the beta period end as paid
@@ -250,20 +244,20 @@ FRMethods = {
             var numDiffDays = 999999; // Essentially max days
             if (typeof plan !== 'string') {
               // Find the nearest plan activity and then find out if before or after
-              // then use previousPlan or nextPlan 
+              // then use previousPlan or newPlan 
               if (typeof sub.billing_info.plan_activity === 'object' && _.size(sub.billing_info.plan_activity) > 0) {
                 _.each(sub.billing_info.plan_activity, function(change) {
                   var diff;
                   var changeDate = moment(change.date).tz('America/Los_Angeles');
                   if (changeDate.isAfter(last)) {
-                    diff = Math.abs(change.date.diff(last));
+                    diff = Math.abs(changeDate.diff(last, 'days'));
                     if (diff < numDiffDays) {
                       plan = change.previousPlan;
                     }
                   } else {
-                    diff = Math.abs(change.date.diff(first));
+                    diff = Math.abs(changeDate.diff(first, 'days'));
                     if (diff < numDiffDays) {
-                      plan = change.nextPlan;
+                      plan = change.newPlan;
                     }
                   }
 
@@ -352,6 +346,11 @@ FRMethods = {
       if (payment.required) {
         result.required = true;
       }
+    });
+
+    // Lets sort monthlyPayments by date
+    result.monthlyPayments = _.sortBy(result.monthlyPayments, function(payment) {
+      return moment(payment.endDate).unix();
     });
 
     var dueToDate = {

@@ -181,9 +181,9 @@ if (Meteor.isClient) {
     getUserBillingLink(this._id._str);
 
     var subscriber_type_options = ["residential", "business", "non profit organization"];
-    var status_options = ["connected", "new lead", "no coverage", "deferred", "not interested"];
+    var status_options = ["connected", "new lead", "no coverage", "deferred", "not interested", "disconnected"];
     var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
-    var plan_options = ["limited", "essential", "performance", "ultra", "silver", "gold"];
+    var plan_options = _.keys(FRSettings.billing.plans);
     var discount_options = ["nonprofit", "relay", "core-site", "landuse"];
 
     // Assemble the fields to display.
