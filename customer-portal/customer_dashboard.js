@@ -351,20 +351,6 @@ if (Meteor.isClient) {
       evt.preventDefault();
       $('.autopay-details .has-error').removeClass('has-error');
 
-      // We can't set up autopay unless the subscriber is up to date in payments
-      var requiredPayments = Session.get('requiredPayments');
-      var totalUnpaid = 0;
-      _.each(requiredPayments.monthlyPayments, function(payment) {
-        if (payment.required) {
-          totalUnpaid++;
-        }
-      });
-
-      if (totalUnpaid > 1) {
-        bootbox.alert('You must be up to date in payments to set up autopayment.');
-        return false;
-      }
-
       var creditNum = $('#credit-card-number');
       var cvc = $('#credit-card-cvc');
       var expDate = $('#credit-card-exp-date');
