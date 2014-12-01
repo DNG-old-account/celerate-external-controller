@@ -81,7 +81,6 @@ Meteor.methods({
 
     } else {
       var stripeResp;
-      // TODO: only create a customer if doesn't already exist!
       
       hasMore = true;
       var customers = [];
@@ -112,8 +111,6 @@ Meteor.methods({
         return customer.email === sub.prior_email;
       });
 
-      // TODO: Add a new card? if customer already exists?
-
       if (typeof thisCustomer !== 'object') {
         // Create a customer
         stripeResp = Async.runSync(function(done) {
@@ -132,6 +129,21 @@ Meteor.methods({
         }
 
         thisCustomer = stripeResp.result;
+      } else {
+        stripeResp = Async.runSync(function(done) {
+          stripe.customers.update(thisCustomer.id, {
+            card: configObj.token,
+          }, function(err, result) {
+            done(err, result);
+          });
+        });
+
+        if (stripeResp.err || !stripeResp.result) {
+          console.log(stripeResp);
+          throw new Meteor.Error("Couldn't update Stripe customer", stripeResp);
+        }
+
+        thisCustomer = stripeResp.result;
       }
 
       // First check for outstanding monthly payments and pay those
@@ -143,7 +155,8 @@ Meteor.methods({
             email: sub.prior_email,
             description: '',
             requiredPayments: requiredPayments,
-            installmentAmount: 0
+            installmentAmount: 0,
+            monthlyCharges: requiredPayments.dueToDate.payments
         }
         var billingPeriodEndDate = requiredPayments.dueToDate.endDate;
         var billingPeriodStartDate = requiredPayments.dueToDate.startDate;
@@ -288,7 +301,7 @@ Meteor.methods({
     var requiredPayments = FRMethods.calculatePayments(thisSub);
     var totalPayment = FRMethods.calcTotalPayment(thisSub, installmentAmount);
 
-    if (totalPayment * 100 !== stripeConfig.amount) {
+    if (Math.round(totalPayment * 100) !== stripeConfig.amount) {
       throw new Meteor.Error("Stripe Charge Error", "Stripe Charge is going to not equal our calculated total payment.");
     }
 
@@ -311,8 +324,6 @@ Meteor.methods({
         card: stripeToken.id,
       });
     }
-
-      
 
     // Make our call to stripe syncronous
     var result = Async.runSync(function(done) {
@@ -346,14 +357,18 @@ Meteor.methods({
           Subscribers.update(thisSub._id, {$set: {'billing_info.installation.paid': true }});
         }
       } 
-      if (_.contains(typesOfCharges, 'monthly')) {
-        var monthlyPayment = {
-          amount: parseFloat(dollarAmount),
-          start_date: stripeConfig.billingPeriodStartDate,
-          end_date: stripeConfig.billingPeriodEndDate,
-          charge: result.result
-        };
-        Subscribers.update(thisSub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
+      if (_.contains(typesOfCharges, 'monthly') && 
+          typeof stripeConfig.monthlyCharges === 'object') {
+
+        _.each(stripeConfig.monthlyCharges, function(charge) {
+          var monthlyPayment = {
+            amount: parseFloat(charge.amount),
+            start_date: charge.startDate,
+            end_date: charge.endDate,
+            charge: result.result
+          };
+          Subscribers.update(thisSub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
+        });
       }
       
       if (typeof requiredPayments.discounts === 'object') {

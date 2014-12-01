@@ -257,6 +257,7 @@ if (Meteor.isClient) {
         notes: notes,
         label: label
       };
+      // TODO: (max) - need to figure out if autopay is on, and then apply a discount to their subscription
       Subscribers.update(thisSub._id, {$push: {'billing_info.discounts': discount }});
     },
 
@@ -281,7 +282,6 @@ if (Meteor.isClient) {
       Subscribers.update(thisSub._id, {$pull: {'billing_info.installation.additional_equipment': {'_id': removeHardware._id} }});
     },
     'click #update-billing': function (evt) {
-      // TODO: Doesn't have a handler for other equipment or labor
       evt.preventDefault();
       var thisSub = this;
 

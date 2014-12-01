@@ -174,7 +174,7 @@ if (Meteor.isClient) {
                         moment(billingPeriodEndDate).format('MM/DD/YYYY') + '';
         stripeConfig.billingPeriodStartDate = billingPeriodStartDate;
         stripeConfig.billingPeriodEndDate = billingPeriodEndDate;
-
+        stripeConfig.monthlyCharges = requiredPayments.dueToDate.payments;
       } 
       if (!requiredPayments.installation.paid) { 
         stripeConfig.description += (stripeConfig.description.trim() === '') ? '' : '; ';
@@ -375,7 +375,6 @@ if (Meteor.isClient) {
           cvc: cvc.val()
         }
 
-        $('#submit-autopay-config').prop('disabled', true);
         Session.set('autoPayLoading', true);
 
         Stripe.card.createToken({
