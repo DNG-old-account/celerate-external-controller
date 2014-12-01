@@ -10,8 +10,7 @@
         </div>
       </div>
     </div>
-    {{#if loading}}
-    <div class="throbber-container">
+    <div class="throbber-container {{showThrobber}}">
       <div id="floatingCirclesG">
         <div class="f_circleG" id="frotateG_01">
         </div>
@@ -31,69 +30,69 @@
         </div>
       </div> 
     </div>
-    {{else}}
-    {{#if connected}}
-    {{else}}
-    <div class="row">
-      <div class="col-xs-12">
-        <div class="not-connected-warning-container">
-          {{> not_connected_warning }}
+    <div class="{{hideDashboardContainer}}">
+      {{#if connected}}
+      {{else}}
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="not-connected-warning-container">
+            {{> not_connected_warning }}
+          </div>
         </div>
       </div>
+      {{/if}}
+      {{#if subscriberInfo.plan}}
+      {{else}}
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="no-plan-warning-container">
+            {{> plan_warning }}
+          </div>
+        </div>
+      </div>
+      {{/if}}
+      <div class="row">
+        <div class="col-xs-12">
+          {{#if subscriberInfo.agreedToTerms}}
+          {{else}}
+          <div class="agreement-info-container">
+            {{> agreement_info }}
+          </div>
+          {{/if}}
+        </div>
+      </div>
+      {{#if subscriberInfo.plan}}
+      {{#if subscriberInfo.activation_date}}
+      <div class="row">
+        <div class="col-xs-6">
+          <div class="plan-info-container">
+            {{> plan_info }}
+          </div>
+        </div>
+        <div class="col-xs-6">
+          <div class="subscriber-info-container">
+            {{> subscriber_info }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="payments-info-container">
+            {{> required_payments }}
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="payments-info-container">
+            {{> payment_history }}
+          </div>
+        </div>
+      </div>
+      {{/if}}
+      {{/if}}
     </div>
-    {{/if}}
-    {{#if subscriberInfo.plan}}
-    {{else}}
-    <div class="row">
-      <div class="col-xs-12">
-        <div class="no-plan-warning-container">
-          {{> plan_warning }}
-        </div>
-      </div>
-    </div>
-    {{/if}}
-    <div class="row">
-      <div class="col-xs-12">
-        {{#if subscriberInfo.agreedToTerms}}
-        {{else}}
-        <div class="agreement-info-container">
-          {{> agreement_info }}
-        </div>
-        {{/if}}
-      </div>
-    </div>
-    {{#if subscriberInfo.plan}}
-    {{#if subscriberInfo.activation_date}}
-    <div class="row">
-      <div class="col-xs-6">
-        <div class="plan-info-container">
-          {{> plan_info }}
-        </div>
-      </div>
-      <div class="col-xs-6">
-        <div class="subscriber-info-container">
-          {{> subscriber_info }}
-        </div>
-      </div>
-    </div>
-    
-    <div class="row">
-      <div class="col-xs-12">
-        <div class="payments-info-container">
-          {{> required_payments }}
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-12">
-        <div class="payments-info-container">
-          {{> payment_history }}
-        </div>
-      </div>
-    </div>
-    {{/if}}
-    {{/if}}
-    {{/if}}
   </div>
   <!-- <div class="json-dump"> -->
   <!--   <pre> -->

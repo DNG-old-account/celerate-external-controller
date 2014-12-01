@@ -3,8 +3,14 @@ if (Meteor.isServer) {
 }
 if (Meteor.isClient) {
 
-  Template.customer_dashboard.loading = function() {
-    return Session.get('loading');
+  Template.customer_dashboard.hideDashboardContainer = function() {
+    var sub = Session.get('subscriber');
+    return (Session.get('loading') || typeof sub === 'undefined') ? 'hidden' : '';
+  };
+
+  Template.customer_dashboard.showThrobber = function() {
+    var sub = Session.get('subscriber');
+    return (Session.get('loading') || typeof sub === 'undefined') ? '' : 'hidden';
   };
 
   Template.subscriber_info.connected = Template.customer_dashboard.connected = function() {
