@@ -10,7 +10,7 @@ var authenticate = function(short_token) {
     throw new Meteor.Error("invalid-auth-token", p.err);
   }
 
-  console.log("Got subscriber_id: " + p.subscriber_id);
+  // console.log("Got subscriber_id: " + p.subscriber_id);
   return p.subscriber_id;
 }
 
@@ -287,8 +287,10 @@ Meteor.methods({
     if (FRMethods.isNumber(stripeConfig.installmentAmount)) {
       installmentAmount = parseFloat(stripeConfig.installmentAmount);
     }
-    var requiredPayments = FRMethods.calculatePayments(thisSub);
-    var totalPayment = FRMethods.calcTotalPayment(thisSub, installmentAmount);
+
+    var calcTotalPaymentObj = FRMethods.calcTotalPayment(thisSub, installmentAmount, true);
+    var totalPayment = calcTotalPaymentObj.total;
+    var requiredPayments = calcTotalPaymentObj.requiredPayments;
 
     if (Math.round(totalPayment * 100) !== stripeConfig.amount) {
       throw new Meteor.Error("Stripe Charge Error", "Stripe Charge is going to not equal our calculated total payment.");
@@ -358,27 +360,19 @@ Meteor.methods({
           Subscribers.update(thisSub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
         });
       }
-      
+
       if (typeof requiredPayments.discounts === 'object') {
         _.each(requiredPayments.discounts, function(discount) {
           if (discount.toBeUsed) {
-            // If there is leftover amount on this discount, create a copy of this one with 
-            // the remaining amount and a note
-            if (discount.leftover !== 0) {
-              var newDiscount = _.extend({}, discount);
-              newDiscount.amount = discount.leftover;
-              delete newDiscount.lefover;
-              delete newDiscount.toBeUsed;
-              newDiscount.notes = 'Leftover from ' + new Date() + '. ' + newDiscount.notes;
+            var updatedDiscount = _.extend({}, discount);
+            delete updatedDiscount.leftover;
+            delete updatedDiscount.toBeUsed;
 
-              Subscribers.update(thisSub._id, {$push: {'billing_info.discounts': newDiscount }});
-            } 
+            updatedDiscount.used = true;
+            updatedDiscount.dateUsed = new Date();
 
-            discount.used = true;
-            discount.dateUsed = new Date();
-
-            Subscribers.update(thisSub._id, {$pull: {'billing_info.discounts': {'dateCreated': discount.dateCreated}}});
-            Subscribers.update(thisSub._id, {$push: {'billing_info.discounts': discount }});
+            Subscribers.update(thisSub._id, {$pull: {'billing_info.discounts': {'dateCreated': discount._id}}});
+            Subscribers.update(thisSub._id, {$push: {'billing_info.discounts': updatedDiscount }});
           }
         });
       }

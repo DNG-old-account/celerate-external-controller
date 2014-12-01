@@ -210,6 +210,7 @@ if (Meteor.isClient) {
           Session.set('loading', true);
           Meteor.call('chargeCard', authToken, stripeToken, stripeConfig, typesOfCharges, function(err, result) {
             Session.set('loading', false);
+            Template.required_payments.requiredPayments();
             if (err || result.error) {
               bootbox.alert('There seems to have been an error processing your card. If this persists, please contact support@furtherreach.net');
               $('.btn').on('click', function(evt) {

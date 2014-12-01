@@ -41,6 +41,17 @@ if (Meteor.isClient) {
         console.log(formelement);
         console.log(this);
 
+        if (formelement.id === 'email') {
+          if (typeof formelement.value !== 'string' || 
+              formelement.value.trim() === '' ||
+              !FRMethods.isValidEmail(formelement.value)) {
+
+            bootbox.alert('"' + formelement.value + '" is not a valid email address');
+            return;
+          }
+        }
+
+
         db_update = {};
         db_update[formelement.id] = formelement.value;
         Contacts.update(this._id, {$set: db_update}); 

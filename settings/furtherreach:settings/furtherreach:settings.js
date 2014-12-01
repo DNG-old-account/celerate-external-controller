@@ -143,7 +143,7 @@ FRMethods = {
       return { 'err': 'Token/tag invalid', 'subscriber_id': '' };
     }
 
-    console.log("Long token: " + JSON.stringify(long_token));
+    // console.log("Long token: " + JSON.stringify(long_token));
 
     var iv = long_token.iv;
     var token = long_token.token;
@@ -167,7 +167,7 @@ FRMethods = {
 
     var plaintext = decipher.update(token, input_encoding='hex', output_encoding='ascii');
     plaintext += decipher.final(output_encoding='ascii');
-    console.log("got plaintext [" + plaintext + "]");
+    // console.log("got plaintext [" + plaintext + "]");
 
     var m = JSON.parse(plaintext);
     if (!m || !m['subscriber_id'] || !m['expiryday']) {
@@ -382,16 +382,59 @@ FRMethods = {
     _.each(result.monthlyPayments, function(payment) {
       if (payment.required) {
         // If any bill is older than 1 month and is $0, mark it as "paid"
-        if (moment(payment.endDate).isBefore(moment(startOfThisMonth).add(-1, 'months')) && parseFloat(payment.amount) === 0) {
-          payment.required = false;
-          var monthlyPayment = {
-            amount: 0,
-            start_date: payment.startDate,
-            end_date: payment.endDate,
-          };
-          Subscribers.update(sub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
-        } else { 
-          result.required = true;
+        if (moment(payment.endDate).isBefore(moment(startOfThisMonth).add(-1, 'months'))) {
+          var total = parseFloat(payment.amount);
+          // Are there any outstanding discounts?
+          _.each(sub.billing_info.discounts, function(discount) {
+            var newTotal;
+            if (!discount.used) {
+              newTotal = total - discount.amount;
+              if (newTotal > 0) {
+                discount.leftover = 0;
+                total = newTotal;
+              } else {
+                discount.leftover = Math.abs(newTotal);
+                total = 0;
+              }
+              discount.toBeUsed = true;
+            }
+          });
+          if (total === 0) {
+            _.each(sub.billing_info.discounts, function(discount) {
+              if (discount.toBeUsed) {
+                // If there is leftover amount on this discount, create a copy of this one with 
+                // the remaining amount and a note
+                if (discount.leftover !== 0) {
+                  var newDiscount = _.extend({}, discount);
+                  newDiscount._id = new Meteor.Collection.ObjectID();
+                  newDiscount.amount = discount.leftover;
+                  delete newDiscount.lefover;
+                  delete newDiscount.toBeUsed;
+                  newDiscount.notes = 'Leftover from ' + new Date() + '. ' + newDiscount.notes;
+
+                  Subscribers.update(sub._id, {$push: {'billing_info.discounts': newDiscount }});
+                } 
+
+                var updatedDiscount = _.extend({}, discount);
+                delete updatedDiscount.lefover;
+                delete updatedDiscount.toBeUsed;
+                updatedDiscount.used = true;
+                updatedDiscount.dateUsed = new Date();
+
+                Subscribers.update(sub._id, {$pull: {'billing_info.discounts': {'_id': discount._id}}});
+                Subscribers.update(sub._id, {$push: {'billing_info.discounts': updatedDiscount }});
+              }
+
+            });
+
+            payment.required = false;
+            var monthlyPayment = {
+              amount: 0,
+              start_date: payment.startDate,
+              end_date: payment.endDate,
+            };
+            Subscribers.update(sub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});         
+          }
         }
       }
     });
@@ -477,6 +520,10 @@ FRMethods = {
       result.required = true;
     }
 
+    if (result.dueToDate.required) {
+      result.required = true;
+    }
+
     // Check for any overall discounts and apply them
     if (typeof sub.billing_info.discounts === 'object') {
       result.discounts = [];
@@ -489,7 +536,10 @@ FRMethods = {
     return result;
   },
 
-  calcTotalPayment: function(sub, installmentAmount) {
+  // Because we need to actually change the discount state for required payments, we 
+  // need to add an optional parameter which if true will return the modified requiredPayments 
+  // object.
+  calcTotalPayment: function(sub, installmentAmount, returnRequiredPayments) {
     var requiredPayments = FRMethods.calculatePayments(sub);
     var total = 0;
     if (requiredPayments.required) {
@@ -527,7 +577,14 @@ FRMethods = {
     }
 
     total = total.formatMoney(2, '.', '');
-    return total;
+    if (returnRequiredPayments) {
+      return {
+        total: total,
+        requiredPayments: requiredPayments
+      } 
+    } else {
+      return total;
+    }
   }
 
 };
