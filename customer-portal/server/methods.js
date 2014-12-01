@@ -430,7 +430,11 @@ Meteor.methods({
     var contact;
     if (typeof sub.contacts === 'object') {
       _.each(sub.contacts, function(c) {
-        if (c.type === "billing") {
+        if (c.type === "billing" && 
+            typeof c.email === 'string' &&
+            c.email.trim() !== '' &&
+            FRMethods.isValidEmail(c.email)) {
+
           hasBillingContact = true;
           contact = Contacts.findOne(c.contact_id);
         }

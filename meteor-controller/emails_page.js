@@ -171,13 +171,64 @@ if (Meteor.isClient) {
         }
       });
 
-      Meteor.call('sendEmails', subs, emailKey, function(err, result) {
-        if (!err) {
-          console.log(result);
-        } else {
-          console.log(err);
+      var subsEmail = true;
+      var missingEmailSubs = [];
+      _.each(subs, function(subId) {
+        var hasEmail = false;
+        var sub = Subscribers.findOne(new Meteor.Collection.ObjectID(subId));
+
+        if (typeof sub.contacts === 'object') {
+          _.each(sub.contacts, function(c) {
+            if (c.type === "billing") {
+              var contact = Contacts.findOne(c.contact_id);
+              if(typeof contact.email === 'string') {
+                sub.billing_email = contact.email;
+                if (contact.email.trim !== '' && FRMethods.isValidEmail(contact.email)) {
+                  hasEmail = true;
+                }
+              }
+            }
+          });
+        }
+
+        if (typeof sub.prior_email === 'string' && 
+            sub.prior_email.trim() !== '' &&
+            FRMethods.isValidEmail(sub.prior_email)) {
+          hasEmail = true;
+        }
+
+        if (!hasEmail) {
+          subsEmail = false;
+          missingEmailSubs.push(sub);
         }
       });
+
+      var sendEmails = function(subs) {
+        Meteor.call('sendEmails', subs, emailKey, function(err, result) {
+          if (!err) {
+            console.log(result);
+          } else {
+            console.log(err);
+          }
+        });
+      }
+
+      if (!subsEmail) {
+        var errorMessage = 'The Following Subscribers either have invalid prior_email or invalid billing contact email: <br/><br/>';
+        _.each(missingEmailSubs, function(sub) {
+          errorMessage += sub.first_name + ' ' + sub.last_name + 
+                          ' prior_email: ' + sub.prior_email + 
+                          ' billing email: ' + sub.billing_email + '<br/>';
+        });
+        errorMessage += '<br/>Are you sure you want to send emails?';
+        bootbox.confirm(errorMessage, function(result) {
+          if (result) {
+            sendEmails(subs);
+          }
+        });
+      } else {
+        sendEmails(subs);
+      }
     },
     'click .name_header': function () {
       Session.set("name_sort", -1 * Session.get("name_sort"));

@@ -30,7 +30,7 @@ var sendEmail = function (to, from, subject, text, tries) {
       Email.send({
         to: FRSettings.email.notificationEmails,
         from: from,
-        subject: subject,
+        subject: errorSubject,
         text: text
       });
     }
@@ -107,20 +107,29 @@ Meteor.methods({
 
       sub.billingDate = billingDate;
 
+      if (typeof sub.prior_email === 'string' &&
+          FRMethods.isValidEmail(sub.prior_email)) {
+        sub.email = sub.prior_email;
+      } else {
+        if (typeof sub.contacts === 'object') {
+          _.each(sub.contacts, function(c) {
+            if (c.type === 'billing') {
+              contactObj = Contacts.findOne(c.contact_id);
+              if (typeof contactObj.email === 'string' &&
+                  contactObj.email.trim() !== '' &&
+                  FRMethods.isValidEmail(contactObj.email)) {
+
+                sub.email = contactObj.email;
+              }
+            }
+          });
+        }
+      }
+
       var body = emailObj.body(sub, userLink, accountId); 
 
-      if (typeof sub.prior_email === 'string') {
-        sendEmail(sub.prior_email, emailObj.from, subject, body);
-      }
-
-      if (typeof sub.contacts === 'object') {
-        _.each(sub.contacts, function(c) {
-          contactObj = Contacts.findOne(c.contact_id);
-          if (contactObj.type === 'billing' && typeof contactObj.email === 'string') {
-            sendEmail(contactObj.email, subject, body);
-          }
-        });
-      }
+      sendEmail(sub.email, emailObj.from, subject, body);
+      
     });
     return true;
   }

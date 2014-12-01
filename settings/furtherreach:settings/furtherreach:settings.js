@@ -179,6 +179,11 @@ FRMethods = {
     return typeof n !== 'undefined' && !isNaN(parseFloat(n)) && isFinite(n);
   },
 
+  isValidEmail: function(email) {
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+  },
+
   createBillingProperties: function(sub) {
     if (typeof sub.billing_info !== 'object') {
       // Create default billing info
@@ -515,7 +520,7 @@ FREmails = {
     body: function(context, userLink, accountNum) {
       context.first_name = (typeof context.first_name === 'string') ? context.first_name : '';
       context.last_name = (typeof context.last_name === 'string') ? context.last_name : '';
-      context.prior_email = (typeof context.prior_email === 'string') ? context.prior_email : '';
+      context.email = (typeof context.email === 'string') ? context.email : '';
       context.plan = (typeof context.plan === 'string') ? context.plan : '';
       return 'Dear ' + context.first_name + ' ' + context.last_name + 
              '\n\nA new bill for your Further Reach account is ready for viewing on the customer portal:\n' + 
@@ -525,7 +530,7 @@ FREmails = {
              'Note, if this is your first time accessing the customer portal please take the time to review and sign the Terms and Conditions, and verify your contact information.\n\n' +
              'Plan: ' + (context.plan.slice(0, 1).toUpperCase() + context.plan.slice(1)) + '\n' + // TODO: This is just capitalizing the first letter - we should move this to helpers
              'Account Number: ' + accountNum + '\n' + 
-             'User ID: ' + context.prior_email + '\n' + 
+             'User ID: ' + context.email + '\n' + 
              'Due Date: ' + context.billingDate + '\n' + //TODO: add due date!!!
              '\n\n\nThank you for choosing FurtherReach!' + 
              '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
@@ -541,7 +546,7 @@ FREmails = {
     body: function(context, userLink, accountNum) {
       context.first_name = (typeof context.first_name === 'string') ? context.first_name : '';
       context.last_name = (typeof context.last_name === 'string') ? context.last_name : '';
-      context.prior_email = (typeof context.prior_email === 'string') ? context.prior_email : '';
+      context.email = (typeof context.email === 'string') ? context.email : '';
       context.plan = (typeof context.plan === 'string') ? context.plan : '';
       return 'Dear ' + context.first_name + ' ' + context.last_name + 
              '\n\nYour bill for your Further Reach account is past due! Please go to the customer portal link and make a payment as soon as possible:\n' + 
@@ -550,7 +555,7 @@ FREmails = {
              '\n\nNote, if this is your first time accessing the customer portal please take the time to review and sign the Terms and Conditions, and verify your contact information.' + 
              '\n\nPlan: ' + (context.plan.slice(0, 1).toUpperCase() + context.plan.slice(1)) + '\n' + // TODO: This is just capitalizing the first letter - we should move this to helpers
              'Account Number: ' + accountNum + '\n' + 
-             'User ID: ' + context.prior_email + '\n' + 
+             'User ID: ' + context.email + '\n' + 
              'Due Date: ' + context.billingDate + '\n' + 
              '\n\nThank you for choosing FurtherReach!' + 
              '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
