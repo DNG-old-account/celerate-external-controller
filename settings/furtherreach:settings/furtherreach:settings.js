@@ -39,32 +39,38 @@ FRSettings = {
       "limited": {
         "label": "Limited",
         "monthly": 30,
-        "details": "Burst speeds up to 4Mbps"
+        "details": "Burst speeds up to 4Mbps",
+        "type": "residential"
       },
       "essential": {
         "label": "Essential",
         "monthly": 70,
-        "details": "Min: 4Mbps Typical: 8Mbps"
+        "details": "Min: 4Mbps Typical: 8Mbps",
+        "type": "residential"
       },
       "performance": {
         "label": "Performance",
         "monthly": 100,
-        "details": "Min: 8Mbps Typical: 15Mbps"
+        "details": "Min: 8Mbps Typical: 15Mbps",
+        "type": "residential"
       },
       "ultra": {
         "label": "Ultra",
         "monthly": 130,
-        "details": "Min: 15Mbps Typical: 30Mbps"
+        "details": "Min: 15Mbps Typical: 30Mbps",
+        "type": "residential"
       },
       "silver": {
         "label": "Silver",
         "monthly": 130,
-        "details": "Min: 15Mbps Typical: 30Mbps"
+        "details": "Min: 15Mbps Typical: 30Mbps",
+        "type": "business"
       },
       "gold": {
         "label": "Gold",
         "monthly": 200,
-        "details": "Min: 40Mbps Typical: 60Mbps"
+        "details": "Min: 40Mbps Typical: 60Mbps",
+        "type": "business"
       },
     }
   },

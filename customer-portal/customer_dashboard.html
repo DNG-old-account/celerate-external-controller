@@ -649,6 +649,10 @@
       <h3 class="sub-header">{{ planInfo.label }}</h3>
       <div class="row">
         <div class="col-xs-12">
+          <label>Account ID:</label> {{planInfo.accountNum}}
+        </div>
+      </div><div class="row">
+        <div class="col-xs-12">
           <label>Monthly Price:</label> ${{planInfo.monthly}}
         </div>
       </div>
@@ -658,6 +662,14 @@
           {{ planInfo.details }}
         </div>
       </div>
+      {{#if planInfo.type}}
+      <div class="row">
+        <div class="col-xs-12">
+          <label>Type:</label>
+          {{ capitalize planInfo.type }}
+        </div>
+      </div>
+      {{/if}}
       {{> manage_autopay}}
     </div>
   </div>

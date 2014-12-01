@@ -241,10 +241,9 @@ if (Meteor.isClient) {
     Meteor.call('planInfo', authToken, function(err, result) {
       if (!err && typeof result === 'object' && 
           typeof thisSub === 'object' && 
-          typeof thisSub.plan !== 'undefined' && 
-          result[thisSub.plan] !== 'undefined') {
+          typeof thisSub.plan !== 'undefined') {
 
-        Session.set('planInfo', result[thisSub.plan]);
+        Session.set('planInfo', result);
       } else {
         Router.go('/error/' + authToken);
       }
