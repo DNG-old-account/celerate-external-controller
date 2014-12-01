@@ -23,6 +23,11 @@ if (Meteor.isClient) {
     return Session.get('seeNeedsPayment');
   };
 
+  Template.subscribers_emails_list.seeNeedsPaymentChecked = function() {
+    var seeNeedsPayment = Session.get('seeNeedsPayment');
+    return seeNeedsPayment ? 'selected' : '';
+  };
+
   Template.subscribers_emails_list.current_search_fields = function () {
     console.log('current search fields.');
     var current_search_fields = Session.get("subscriber_search_fields");

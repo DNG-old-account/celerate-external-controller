@@ -13,6 +13,10 @@ FRSettings = {
       "nonprofit": function(amount) {
         return 0;
       },
+      "community - $30 off": function(amount) {
+        var newAmt = amount - 40;
+        return (newAmt > 0) ? newAmt : 0;
+      },
       "relay": function(amount) {
         var newAmt = amount - 40;
         return (newAmt > 0) ? newAmt : 0;
@@ -20,7 +24,10 @@ FRSettings = {
       "core-site": function(amount) {
         return 0;
       },
-      "landuse": function(amount) {
+      "partner": function(amount) {
+        return 0;
+      },
+      "community - $0": function(amount) {
         return 0;
       }
     },

@@ -416,10 +416,7 @@
       </div>
       {{#if this.discount}}
       <div class="row headers-row discount-headers">
-        <div class="col-xs-2">
-          Discount
-        </div>
-        <div class="col-xs-2">
+        <div class="col-xs-offset-1 col-xs-2">
           Original
         </div>
         <div class="col-xs-2">
@@ -430,10 +427,7 @@
         </div>
       </div>
       <div class="row discount-row">
-        <div class="col-xs-2">
-          {{ capitalize this.discount.label }}
-        </div>
-        <div class="col-xs-2">
+        <div class="col-xs-offset-1 col-xs-2">
           ${{ formatMoney this.discount.previousAmount }}
         </div>
         <div class="col-xs-2 negative-num-cell">
@@ -507,7 +501,7 @@
       {{#if requiredPayments.installation.showAdditionalEquipment }}
       <div class="row equipment-header">
         <div class="col-xs-6">
-          Additional Equipment
+          <span class="bolded-label">Additional Equipment:</span>
         </div>
       </div>
       {{#each requiredPayments.installation.additional_equipment }}
@@ -586,9 +580,9 @@
             <option value="full">
               Pay full installation 
               {{#if requiredPayments.installation.remaining_amount}} 
-              - ${{requiredPayments.installation.remaining_amount}} 
+              - ${{formatMoney requiredPayments.installation.remaining_amount}} 
               {{else}}
-              - ${{ installationTotalPayment }}
+              - ${{formatMoney installationTotalPayment }}
               {{/if}}
             </option>
             <option value="installment">
@@ -605,12 +599,11 @@
       {{#if requiredPayments.discounts}}
       <div class="row">
         <div class="col-xs-offset-6">
-          <div class="row headers-row discount-headers">
+          <div class="row headers-row one-time-discount-headers discount-headers">
             <div class="col-xs-8">
               Discount
             </div>
             <div class="col-xs-4">
-              Discount Amount
             </div>
           </div>
           {{#each requiredPayments.discounts}}

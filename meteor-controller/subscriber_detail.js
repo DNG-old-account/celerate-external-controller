@@ -16,6 +16,16 @@ if (Meteor.isClient) {
         // User clicked on save icon to save input.
         var formelement = evt.target.parentElement.previousElementSibling.firstChild;
 
+        if (formelement.id === 'prior_email') {
+          if (typeof formelement.value !== 'string' || 
+              formelement.value.trim() === '' ||
+              !FRMethods.isValidEmail(formelement.value)) {
+
+            bootbox.alert('"' + formelement.value + '" is not a valid email address');
+            return;
+          }
+        }
+
         // Confirm when marking as connected.
         if (formelement.id == "status" && formelement.value == "connected") {
           var context = this;
@@ -182,7 +192,7 @@ if (Meteor.isClient) {
     var status_options = ["connected", "new lead", "no coverage", "deferred", "not interested", "disconnected"];
     var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
     var plan_options = _.keys(FRSettings.billing.plans);
-    var discount_options = ["nonprofit", "relay", "core-site", "landuse"];
+    var discount_options = _.keys(FRSettings.billing.discounts);
 
     // Assemble the fields to display.
     var fields;

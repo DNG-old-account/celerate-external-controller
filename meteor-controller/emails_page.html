@@ -24,11 +24,7 @@
     <div class="row">
       <div class="col-sm-12">
         <label for="see-needs-payment">See who needs payment</label>
-        {{#if seeNeedsPayment}}
-        <input id="see-needs-payment" selected type="checkbox"/>
-        {{else}}
-        <input id="see-needs-payment" type="checkbox"/>
-        {{/if}}
+        <input id="see-needs-payment" {{seeNeedsPaymentChecked}} type="checkbox"/>
       </div>
     </div>
 
