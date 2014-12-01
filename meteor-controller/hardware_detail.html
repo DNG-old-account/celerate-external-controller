@@ -52,6 +52,11 @@
       <span class="glyphicon-save glyphicon text-gray" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Save" id="save"></span>
     </div>
     {{/with}}
+    {{#if display_price_text}}
+    <div class="col-xs-12">
+      <span class="help-block">Base Price is BEFORE tax.</span>
+    </div>
+    {{/if}}
   </div>
 </div>
 {{/if}}
