@@ -203,7 +203,6 @@ Meteor.methods({
       }
 
       var monthlyPayment = _.last(requiredPayments.monthlyPayments);
-      console.log(monthlyPayment);
       var planName = sub.plan + '-' + (monthlyPayment.amount * 100);
       var myPlan = _.find(plans, function(plan) {
         return planName === plan.id && plan.amount === monthlyPayment.amount * 100;
@@ -223,7 +222,6 @@ Meteor.methods({
             done(err, result);
           });
         });
-        console.log(stripeResp);
         if (stripeResp.err || !stripeResp.result) {
           console.log(stripeResp);
           throw new Meteor.Error("Stripe couldn't create plan", stripeResp);
@@ -243,7 +241,6 @@ Meteor.methods({
         });
       });
       
-      console.log(stripeResp);
       if (stripeResp.err || !stripeResp.result) {
         console.log(stripeResp);
         throw new Meteor.Error("Stripe couldn't create new subscription for customer", stripeResp);
@@ -332,7 +329,6 @@ Meteor.methods({
       });
     });
 
-    console.log(result);
     var dollarAmount = stripeConfig.amount / 100;
 
     if (!result.error && !result.result.err) {
@@ -413,8 +409,14 @@ Meteor.methods({
     return sub;
   },
 
+  calculateTotalPayments: function(token, installmentAmount) {
+    var subId = new Meteor.Collection.ObjectID(authenticate(token));
+    var sub = Subscribers.findOne(subId);
+
+    return FRMethods.calcTotalPayment(sub, installmentAmount);
+  },
+
   requiredPayments: function(token) {
-    var dbUpdate;
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
     var sub = Subscribers.findOne(subId);
 

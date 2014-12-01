@@ -33,7 +33,6 @@ if (Meteor.isClient) {
   };
 
   Template.payment_history.paymentInfo = Template.required_payments.paymentInfo = function() {
-    console.log(this);
     var authToken = Session.get('authToken');
     Meteor.call('getSubscriber', authToken, function(err, result) {
       if (!err && typeof result === 'object') {
@@ -90,10 +89,16 @@ if (Meteor.isClient) {
 
   var calcTotalPayment = function() {
     var thisSub = Session.get('subscriber');
+    var authToken = Session.get('authToken');
     if (typeof thisSub === 'object') {
       var installmentAmount = $('#installment-choices').val() === 'installment' ? Session.get('installmentAmount') : undefined;
-      var total = FRMethods.calcTotalPayment(thisSub, installmentAmount);
-      Session.set('totalPayment', total);
+      Meteor.call('calculateTotalPayments', authToken, installmentAmount, function(err, result) {
+        if (!err && typeof result !== 'undefined') {
+          Session.set('totalPayment', result);
+        } else {
+          Router.go('/error/' + authToken);
+        }
+      });
     }
   }
 
@@ -199,8 +204,6 @@ if (Meteor.isClient) {
           Session.set('loading', true);
           Meteor.call('chargeCard', authToken, stripeToken, stripeConfig, typesOfCharges, function(err, result) {
             Session.set('loading', false);
-            console.log(err);
-            console.log(result);
             if (err || result.error) {
               bootbox.alert('There seems to have been an error processing your card. If this persists, please contact support@furtherreach.net');
               $('.btn').on('click', function(evt) {
@@ -253,8 +256,6 @@ if (Meteor.isClient) {
 
   Template.agreement_info.events({ 
     'click button.terms-conditions': function (evt) {
-      console.log(this);
-      console.log(evt);
       var authToken = Session.get('authToken');
       Router.go('/customer_agreement/' + authToken);
     }
@@ -262,8 +263,6 @@ if (Meteor.isClient) {
 
   Template.customer_dashboard.events({
     'click': function (evt) {
-      console.log(evt);
-      console.log(this);
       var thisSub = this;
       var authToken = Session.get('authToken');
     }
@@ -291,7 +290,6 @@ if (Meteor.isClient) {
     var authToken = Session.get('authToken');
     Meteor.call('autoPayConfig', authToken, function(err, result) {
       if (!err && typeof result === 'object') {
-        console.log(result);
         if (result.on) {
           Session.set('autoPayOn', true);
           Session.set('autoPaySetup', true);

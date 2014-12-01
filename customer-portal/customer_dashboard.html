@@ -417,32 +417,38 @@
       </div>
       {{#if this.discount}}
       <div class="row headers-row discount-headers">
-        <div class="col-xs-5">
+        <div class="col-xs-2">
           Discount
         </div>
-        <div class="col-xs-5">
-          Original Amount
+        <div class="col-xs-2">
+          Original
         </div>
         <div class="col-xs-2">
-          Discount Amount
+          Discount 
+        </div>
+        <div class="col-xs-2">
+          You Pay
         </div>
       </div>
-      <div class="row monthly-row">
-        <div class="col-xs-5">
+      <div class="row discount-row">
+        <div class="col-xs-2">
           {{ capitalize this.discount.label }}
         </div>
-        <div class="col-xs-5">
+        <div class="col-xs-2">
           ${{ formatMoney this.discount.previousAmount }}
         </div>
         <div class="col-xs-2 negative-num-cell">
           - ${{ formatMoney this.discount.amount }}
+        </div>
+        <div class="col-xs-2">
+          ${{ formatMoney this.amount }}
         </div>
       </div>
       {{/if}}
       {{/each}}
       <div class="row monthly-charges-total-row">
         <div class="col-xs-4">
-          <span class="bolded-label">Monthly Total:</span>
+          <span class="totals-label">Monthly Total:</span>
         </div>
         <div class="col-xs-offset-6 col-xs-2">
           ${{ formatMoney requiredPayments.dueToDate.amount }}
@@ -609,7 +615,7 @@
             </div>
           </div>
           {{#each requiredPayments.discounts}}
-          <div class="row monthly-row">
+          <div class="row discount-row">
             <div class="col-xs-8">
               {{ capitalize this.label }}
             </div>
@@ -623,7 +629,7 @@
       {{/if}} 
       <div class="row">
         <div class="col-xs-offset-6 col-xs-6 total-payment">
-          <span class="bolded-label">Total:</span> ${{totalPayment}}
+          <span class="totals-label">Total:</span> ${{totalPayment}}
         </div>
       </div>
       <div class="row">

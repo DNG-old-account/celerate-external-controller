@@ -284,6 +284,9 @@ FRMethods = {
  
           monthlyPayment.plan = FRSettings.billing.plans[plan];
 
+          // Make sure we have the most up to date subscriber object
+          sub = Subscribers.findOne(sub._id);
+
           if (typeof sub.billing_info.monthly_payments === 'object') {
             _.each(sub.billing_info.monthly_payments, function(payment) {
               if (moment(payment.startDate).isValid() && 
@@ -350,7 +353,18 @@ FRMethods = {
 
     _.each(result.monthlyPayments, function(payment) {
       if (payment.required) {
-        result.required = true;
+        // If any bill is older than 1 month and is $0, mark it as "paid"
+        if (moment(payment.endDate).isBefore(moment(startOfThisMonth).add(-1, 'months')) && parseFloat(payment.amount) === 0) {
+          payment.required = false;
+          var monthlyPayment = {
+            amount: 0,
+            start_date: payment.startDate,
+            end_date: payment.endDate,
+          };
+          Subscribers.update(sub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
+        } else { 
+          result.required = true;
+        }
       }
     });
 
