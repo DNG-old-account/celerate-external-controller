@@ -411,30 +411,22 @@
           {{ this.plan.label }}
         </div>
         <div class="col-xs-2">
+          {{#if this.discount}}
+          ${{ formatMoney this.discount.previousAmount}}
+          {{else}}
           ${{ formatMoney this.amount }}
+          {{/if}}
         </div>
       </div>
       {{#if this.discount}}
-      <div class="row headers-row discount-headers">
-        <div class="col-xs-offset-1 col-xs-2">
-          Original
+      <div class="row monthly-row">
+        <div class="col-xs-5 bolded-label">
+          Discount:
         </div>
-        <div class="col-xs-2">
-          Discount 
-        </div>
-        <div class="col-xs-2">
-          You Pay
-        </div>
-      </div>
-      <div class="row discount-row">
-        <div class="col-xs-offset-1 col-xs-2">
-          ${{ formatMoney this.discount.previousAmount }}
+        <div class="col-xs-5">
         </div>
         <div class="col-xs-2 negative-num-cell">
-          - ${{ formatMoney this.discount.amount }}
-        </div>
-        <div class="col-xs-2">
-          ${{ formatMoney this.amount }}
+          - ${{ formatMoney this.discount.amount}}
         </div>
       </div>
       {{/if}}
