@@ -188,8 +188,10 @@ Meteor.methods({
           console.log(stripeResp);
           throw new Meteor.Error("Stripe couldn't list plans", stripeResp);
         }
-        lastPlan = _.last(stripeResp.result.data).id;
-        plans = plans.concat(stripeResp.result.data);
+        if (typeof _.last(stripeResp.result.data) === 'object') {
+          lastPlan = _.last(stripeResp.result.data).id;
+          plans = plans.concat(stripeResp.result.data);
+        }
         hasMore = plans.has_more;
       }
 
