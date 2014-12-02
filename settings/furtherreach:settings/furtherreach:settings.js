@@ -24,7 +24,7 @@ FRSettings = {
       "core-site": function(amount) {
         return 0;
       },
-      "partner": function(amount) {
+      "landuse": function(amount) {
         return 0;
       },
       "community - $0": function(amount) {
