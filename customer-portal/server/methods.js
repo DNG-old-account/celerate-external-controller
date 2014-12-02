@@ -96,8 +96,10 @@ Meteor.methods({
           console.log(stripeResp);
           throw new Meteor.Error("Stripe couldn't list customers", stripeResp);
         }
-        lastCustomer = _.last(stripeResp.result.data).id;
-        customers = customers.concat(stripeResp.result.data);
+        if (typeof _.last(stripeResp.result.data) === 'object') {
+          lastCustomer = _.last(stripeResp.result.data).id;
+          customers = customers.concat(stripeResp.result.data);
+        }
         hasMore = stripeResp.result.has_more;
       }
 
