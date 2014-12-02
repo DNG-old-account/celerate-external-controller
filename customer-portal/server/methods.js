@@ -443,7 +443,9 @@ Meteor.methods({
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
     var sub = Subscribers.findOne(subId);
     var planInfo = FRSettings.billing.plans[sub.plan];
-    planInfo.accountNum = FRMethods.generateSubscriberAccountId(sub._id._str);
+    if (typeof planInfo === 'object') {
+      planInfo.accountNum = FRMethods.generateSubscriberAccountId(sub._id._str);
+    }
     return planInfo;
   }
 
