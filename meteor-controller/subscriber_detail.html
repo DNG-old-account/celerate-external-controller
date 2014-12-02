@@ -144,7 +144,7 @@
             Price: 
           </label>
           <div class="col-sm-8">
-            <input type="text" class="form-control extra-equipment-price" value="{{selectedAdditionalEquipment.hardwareObj.price}}">
+            <input type="text" id="extra-equipment-price" class="form-control extra-equipment-price" value="{{selectedAdditionalEquipment.hardwareObj.price}}">
           </div>
         </div>
       </div>
@@ -154,7 +154,7 @@
             Tax (%): 
           </label>
           <div class="col-sm-8">
-            <input type="text" id="extra-equipment-tax-percent" class="form-control" value="0">
+            <input type="text" id="extra-equipment-tax-percent" class="form-control" value="{{communityTaxAmount}}">
           </div>
         </div>
       </div>

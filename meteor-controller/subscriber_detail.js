@@ -279,6 +279,9 @@ if (Meteor.isClient) {
       var selectedHardware = Session.get('selectedAdditionalEquipmentNode');
       var tax = parseFloat($('#extra-equipment-tax-percent').val());
       selectedHardware.hardwareObj.tax = tax;
+      if (FRMethods.isNumber($('#extra-equipment-price').val())) {
+        selectedHardware.hardwareObj.price = Math.round10(parseFloat($('#extra-equipment-price').val()), 2);
+      }
       var thisSub = this;
       Subscribers.update(thisSub._id, {$push: {'billing_info.installation.additional_equipment': selectedHardware }});
     },
@@ -362,6 +365,19 @@ if (Meteor.isClient) {
       Session.set('selectedAdditionalEquipmentNode', _.first(nodes));
       Session.set('additionalEquipmentNodes', nodes);
     }
+
+    Template.subscriber_billing_info.communityTaxAmount = function() {
+      var thisSub = this;
+      if (typeof thisSub.city === "string") {
+        city = thisSub.city.trim();
+      
+        if (typeof FRSettings.billing.taxRates[thisSub.city] === 'number') {
+          return FRSettings.billing.taxRates[thisSub.city];
+        }     
+      }
+
+      return 0;
+    };
 
     return {
       installedNodes: nodes,

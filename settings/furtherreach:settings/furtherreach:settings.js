@@ -78,7 +78,14 @@ FRSettings = {
         "monthly": 200,
         "details": "Min: 40Mbps Typical: 60Mbps",
         "type": "business"
-      },
+      }
+    },
+
+    "taxRates": {
+      "Point Arena": 8.125,
+      "Elk": 7.625,
+      "Manchester": 7.625,
+      "Gualala": 7.625
     }
   },
   helpers: {
