@@ -353,7 +353,7 @@ if (Meteor.isClient) {
     },
     'click #submit-autopay-config': function(evt) {
       evt.preventDefault();
-      bootbox.confirm("Turning on autopay will automatically charge your card when monthly bill is due.", function(result) {
+      bootbox.confirm("Turning on autopay will automatically charge your card when monthly bill is due. <br><br>If you have not yet paid for installation, please do so below with the 'make a payment' button.", function(result) {
         if (result) {
           $('.autopay-details .has-error').removeClass('has-error');
 
