@@ -408,9 +408,10 @@ FRMethods = {
                   var newDiscount = _.extend({}, discount);
                   newDiscount._id = new Meteor.Collection.ObjectID();
                   newDiscount.amount = discount.leftover;
+                  newDiscount.dateCreated = new Date();
                   delete newDiscount.lefover;
                   delete newDiscount.toBeUsed;
-                  newDiscount.notes = 'Leftover from ' + new Date() + '. ' + newDiscount.notes;
+                  newDiscount.notes = 'Leftover from ' + discount.dateCreated + '. ' + newDiscount.notes;
 
                   Subscribers.update(sub._id, {$push: {'billing_info.discounts': newDiscount }});
                 } 

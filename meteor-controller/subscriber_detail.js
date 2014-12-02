@@ -272,7 +272,7 @@ if (Meteor.isClient) {
     'click .delete-discount': function (evt) {
       evt.preventDefault();
       var thisSub = Session.get('thisSub');
-      Subscribers.update(thisSub._id, {$pull: {'billing_info.discounts': {'_id': this._id}}});
+      Subscribers.update(thisSub._id, {$pull: {'billing_info.discounts': this}});
     },
     'click #add-additional-hardware': function (evt) {
       evt.preventDefault();

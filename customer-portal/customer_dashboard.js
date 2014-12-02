@@ -353,68 +353,73 @@ if (Meteor.isClient) {
     },
     'click #submit-autopay-config': function(evt) {
       evt.preventDefault();
-      $('.autopay-details .has-error').removeClass('has-error');
+      bootbox.confirm("Turning on autopay will automatically charge your card when monthly bill is due.", function(result) {
+        if (result) {
+          $('.autopay-details .has-error').removeClass('has-error');
 
-      var creditNum = $('#credit-card-number');
-      var cvc = $('#credit-card-cvc');
-      var expDate = $('#credit-card-exp-date');
-      var expDateObj = $.payment.cardExpiryVal(expDate.val());
-      var valid = true;
-      if (!$.payment.validateCardNumber(creditNum.val())) {
-        creditNum.parent().addClass('has-error');
-        valid = false;
-      }
-      if (!$.payment.validateCardExpiry(expDateObj.month, expDateObj.year)) {
-        expDate.parent().addClass('has-error');
-        valid = false;
-      }
-      if (!$.payment.validateCardCVC(cvc.val())) {
-        cvc.parent().addClass('has-error');
-        valid = false;
-      }
+          var creditNum = $('#credit-card-number');
+          var cvc = $('#credit-card-cvc');
+          var expDate = $('#credit-card-exp-date');
+          var expDateObj = $.payment.cardExpiryVal(expDate.val());
+          var valid = true;
+          if (!$.payment.validateCardNumber(creditNum.val())) {
+            creditNum.parent().addClass('has-error');
+            valid = false;
+          }
+          if (!$.payment.validateCardExpiry(expDateObj.month, expDateObj.year)) {
+            expDate.parent().addClass('has-error');
+            valid = false;
+          }
+          if (!$.payment.validateCardCVC(cvc.val())) {
+            cvc.parent().addClass('has-error');
+            valid = false;
+          }
 
-      if (valid) {
-        var billingObj = {
-          cardNum: creditNum.val(),
-          expDate: expDateObj,
-          cvc: cvc.val()
-        }
+          if (valid) {
+            var billingObj = {
+              cardNum: creditNum.val(),
+              expDate: expDateObj,
+              cvc: cvc.val()
+            }
 
-        Session.set('autoPayLoading', true);
+            Session.set('autoPayLoading', true);
 
-        Stripe.card.createToken({
-          number: billingObj.cardNum,
-          cvc: billingObj.cvc,
-          exp_month: billingObj.expDate.month,
-          exp_year: billingObj.expDate.year,
-        }, function(status, response) {
-          if (response.error) {
-            // Show the errors on the form
-            Session.set('autoPayLoading', false);
-            $('.autopay-details .payment-errors').text(response.error.message);
-          } else {
-            billingObj.token = response.id;
-
-            // Don't send the actual card number to our servers
-            delete billingObj.number;
-
-            var authToken = Session.get('authToken');
-
-            Meteor.call('setupAutoPay', authToken, true, billingObj, function(err, result) {
-              if (!err && typeof result === 'object') {
-                
-                Session.set('autoPayConfig', result);
-                Session.set('autoPayOn', true);
-                Session.set('autoPaySetup', true);
+            Stripe.card.createToken({
+              number: billingObj.cardNum,
+              cvc: billingObj.cvc,
+              exp_month: billingObj.expDate.month,
+              exp_year: billingObj.expDate.year,
+            }, function(status, response) {
+              if (response.error) {
+                // Show the errors on the form
                 Session.set('autoPayLoading', false);
-                window.location.reload();
+                $('.autopay-details .payment-errors').text(response.error.message);
               } else {
-                Router.go('/error/' + authToken);
+                billingObj.token = response.id;
+
+                // Don't send the actual card number to our servers
+                delete billingObj.number;
+
+                var authToken = Session.get('authToken');
+
+                Meteor.call('setupAutoPay', authToken, true, billingObj, function(err, result) {
+                  if (!err && typeof result === 'object') {
+                    
+                    Session.set('autoPayConfig', result);
+                    Session.set('autoPayOn', true);
+                    Session.set('autoPaySetup', true);
+                    Session.set('autoPayLoading', false);
+                    Template.required_payments.requiredPayments();
+                    Template.payment_history.paymentInfo();
+                  } else {
+                    Router.go('/error/' + authToken);
+                  }
+                });
               }
             });
           }
-        });
-      }
+        }
+      });
     },
   });
 

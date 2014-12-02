@@ -36,7 +36,9 @@ Meteor.methods({
     var stripe = Meteor.npmRequire('stripe')(Meteor.settings.stripe.privateKey);
     var hasMore;
 
-    var requiredPayments = FRMethods.calculatePayments(sub);
+    var calcTotalPaymentObj = FRMethods.calcTotalPayment(sub, 0, true);
+    var totalPayment = Math.round(calcTotalPaymentObj.total * 100);
+    var requiredPayments = calcTotalPaymentObj.requiredPayments;
 
     if (!turnOn) {
       if (typeof sub.billing_info.autopay !== 'object') {
@@ -138,9 +140,7 @@ Meteor.methods({
         thisCustomer = stripeResp.result;
       }
 
-      // First check for outstanding monthly payments and pay those
-      if (requiredPayments.dueToDate.required) {
-
+      if (requiredPayments.dueToDate.required && totalPayment > 0) {
         var stripeConfig = {
             name: 'Further Reach',
             allowRememberMe: false,
@@ -159,9 +159,6 @@ Meteor.methods({
         stripeConfig.billingPeriodStartDate = billingPeriodStartDate;
         stripeConfig.billingPeriodEndDate = billingPeriodEndDate;
  
-        var stripeAmount = Math.round(requiredPayments.dueToDate.amount * 100); // Stripe does it by cents
-        stripeConfig.amount = parseInt(stripeAmount, 10); 
-
         var stripeTokenObj = {
           type: 'customer',
           id: thisCustomer.id
@@ -289,15 +286,11 @@ Meteor.methods({
     }
 
     var calcTotalPaymentObj = FRMethods.calcTotalPayment(thisSub, installmentAmount, true);
-    var totalPayment = calcTotalPaymentObj.total;
+    var totalPayment = Math.round(calcTotalPaymentObj.total * 100);
     var requiredPayments = calcTotalPaymentObj.requiredPayments;
 
-    if (Math.round(totalPayment * 100) !== stripeConfig.amount) {
-      throw new Meteor.Error("Stripe Charge Error", "Stripe Charge is going to not equal our calculated total payment.");
-    }
-
     var chargeObj = {
-      amount: stripeConfig.amount,
+      amount: totalPayment,
       currency: "usd",
       description: stripeConfig.description,
       receipt_email: stripeConfig.email,
@@ -323,7 +316,7 @@ Meteor.methods({
       });
     });
 
-    var dollarAmount = stripeConfig.amount / 100;
+    var dollarAmount = Math.round10(totalPayment / 100, 2);
 
     if (!result.error && !result.result.err) {
       if (_.contains(typesOfCharges, 'installation')) {
