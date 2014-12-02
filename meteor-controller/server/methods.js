@@ -98,7 +98,7 @@ Meteor.methods({
       var sub = Subscribers.findOne(subIdObj);
 
       var authToken = Meteor.call('generateAuthToken', subId);
-      var userLink = Meteor.settings.public.urls.customerPortal + authToken.iv + "+" + authToken.token + "+" + authToken.tag;
+      var userLink = Meteor.settings.public.urls.customerPortal + authToken;
       var subject = emailObj.subject(sub);
       var accountId = FRMethods.generateSubscriberAccountId(subId);
 

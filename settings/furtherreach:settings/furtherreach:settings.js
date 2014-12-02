@@ -616,6 +616,7 @@ FREmails = {
              '\nThere you can view your bill details, payment history, make a payment, and more.\n\n' +
              'Please click on the link above to make a payment. ' + 
              'Note, if this is your first time accessing the customer portal please take the time to review and sign the Terms and Conditions, and verify your contact information.\n\n' +
+             'We are glad to announce that we now support Auto-Pay! Just go to Manage Autopay and click On, enter your debit/credit card information and click Submit. That\'s it, done! You\'re card will automatically get billed on the first of each month.  As a reminder, we have taken extra steps to secure your information and deferred all handling of the credit card information to Stripe (https://stripe.com) that specializes in handling credit card transactions securely. We do not retain any of your financial information on our site. Note, Stripe has been certified as a PCI Level 1 Service Provider, the most stringent level of certification available. PCI, for those not familiar is the data security standard that the payment card industry relies on.\n\n' + 
              'Plan: ' + (context.plan.slice(0, 1).toUpperCase() + context.plan.slice(1)) + '\n' + // TODO: This is just capitalizing the first letter - we should move this to helpers
              'Account Number: ' + accountNum + '\n' + 
              'User ID: ' + context.email + '\n' + 
