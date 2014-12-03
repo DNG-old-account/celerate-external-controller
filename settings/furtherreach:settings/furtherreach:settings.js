@@ -307,7 +307,7 @@ FRMethods = {
                 plan = sub.plan;
               }
             }
-            calcAmount(first, last, plan);
+            result.monthlyPayments.push(calcAmount(first, last, plan));
           }
         }
 
@@ -359,7 +359,7 @@ FRMethods = {
 
           monthlyPayment.startDate = monthlyPayment.startDate.toISOString();
           monthlyPayment.endDate = monthlyPayment.endDate.toISOString();
-          result.monthlyPayments.push(monthlyPayment);
+          return monthlyPayment;
         }
 
         var dateCursor = moment(startOfThisMonth);
@@ -383,6 +383,12 @@ FRMethods = {
           // We have to translate back into Date obj for Meteor client <--> server
           dateCursor.subtract(1, 'months');
         }
+
+
+        // Lets find out what this person would owe for the next month
+        var first = moment(startOfThisMonth);
+        var last = moment(startOfThisMonth).add(1, 'months').add(-1, 'days');
+        result.nextMonthsPayment = calcAmount(first, last, sub.plan);
       }
     }
 

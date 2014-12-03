@@ -195,7 +195,14 @@ Meteor.methods({
         hasMore = plans.has_more;
       }
 
-      var monthlyPayment = _.last(requiredPayments.monthlyPayments);
+      if (typeof requiredPayments.nextMonthsPayment === 'object') {
+        var monthlyPayment = requiredPayments.nextMonthsPayment;
+      } else {
+        console.log('Couldn\'t find next months payment');
+        console.log(requiredPayments);
+        throw new Meteor.Error("Couldn't find next months payment", requiredPayments);
+      }
+
       var planName = sub.plan + '-' + (monthlyPayment.amount * 100);
       var myPlan = _.find(plans, function(plan) {
         return planName === plan.id && plan.amount === monthlyPayment.amount * 100;
