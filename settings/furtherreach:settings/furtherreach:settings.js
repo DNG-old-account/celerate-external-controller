@@ -655,7 +655,36 @@ FREmails = {
              '\n\nThank you for choosing FurtherReach!' + 
              '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
     }
-  }
+  },
+  emailProblems: {
+    slug: 'payment-problems',
+    label: 'Payment Problems',
+    from: 'Further Reach Billing <billing@furtherreach.net>',
+    subject: function(context) {
+      return 'Further Reach Message - Clarification on accessing the customer portal';
+    },
+    body: function(context, userLink, accountNum) {
+      context.first_name = (typeof context.first_name === 'string') ? context.first_name : '';
+      context.last_name = (typeof context.last_name === 'string') ? context.last_name : '';
+      context.email = (typeof context.email === 'string') ? context.email : '';
+      context.plan = (typeof context.plan === 'string') ? context.plan : '';
+      return 'Dear ' + context.first_name + ' ' + context.last_name + 
+             '\n\nWe have noticed a few subscribers had difficulty in accessing the customer portal in order to make a payment. The recurring theme is that those subscribers are using older versions of their browsers. We therefore ask that each subscriber download the latest version of either Chrome, FireFox, Safari or Internet Explorer. For your convenience we included the download links:\n' + 
+             'Chrome - https://www.google.com/intl/en/chrome/browser/desktop/index.html \n' +
+             'FireFox - https://www.mozilla.org/en-US/firefox/new/ \n' +
+             'Safari - http://support.apple.com/downloads/#safari \n' +
+             'Internet Explorer - http://windows.microsoft.com/en-us/internet-explorer/download-ie+ \n\n' +
+             'Please also make sure that Javascript is enabled on the browser you are using. \n\n' + 
+             'Lastly, for security reasons, the link to the customer portal sent each month with your monthly bill has an expiration set to one month so if you try to access it afterward it will not work. Typically we send a bill reminder if your bill is overdue so make sure to access the link from the latest email.\n' +
+             userLink +
+             '\n\nPlan: ' + (context.plan.slice(0, 1).toUpperCase() + context.plan.slice(1)) + '\n' + // TODO: This is just capitalizing the first letter - we should move this to helpers
+             'Account Number: ' + accountNum + '\n' + 
+             'User ID: ' + context.email + '\n' + 
+             '\n\n\nThank you for choosing FurtherReach!' + 
+             '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
+    }
+  },
+
 };
 
 (function(){
