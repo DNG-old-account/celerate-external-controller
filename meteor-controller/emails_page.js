@@ -19,8 +19,17 @@ if (Meteor.isClient) {
     return [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "prior_email", "archived", "current_provider", "bts_to_use"];
   };
 
+  Template.subscribers_emails_list.seePastDue = function() {
+    return Session.get('seePastDue');
+  };
+
   Template.subscribers_emails_list.seeNeedsPayment = function() {
     return Session.get('seeNeedsPayment');
+  };
+
+  Template.subscribers_emails_list.seePastDueChecked = function() {
+    var seePastDue = Session.get('seePastDue');
+    return seePastDue ? 'selected' : '';
   };
 
   Template.subscribers_emails_list.seeNeedsPaymentChecked = function() {
@@ -65,6 +74,18 @@ if (Meteor.isClient) {
       sub.billing_info.needsPayment = false;
       if (payments.dueToDate.required && payments.dueToDate.amount > 0) {
         sub.billing_info.needsPayment = true;
+        sub.billing_info.pastDue = false;
+
+        if (typeof payments.dueToDate.payments === 'object' && payments.dueToDate.payments.length > 1) {
+          var startOfMonth = moment().tz('America/Los_Angeles').startOf('month');
+          _.each(payments.dueToDate.payments, function(payment) {
+            if (startOfMonth.add(-2, 'months').add(-1, 'days').isBefore(moment(payment.startDate))) {
+              sub.billing_info.pastDue = true;
+              console.log(payments);
+            }
+          });
+        }
+
       }
     });
 
@@ -73,6 +94,13 @@ if (Meteor.isClient) {
         return sub.billing_info.needsPayment;
       });
     }
+
+    if (Session.get('seePastDue')) {
+      result = _.filter(result, function(sub) {
+        return sub.billing_info.pastDue;
+      });
+    }
+
     Session.set("subscriber_count", result.length);
     Session.set('subscribersList', result);
     return result;
@@ -104,6 +132,13 @@ if (Meteor.isClient) {
           $(elem).attr('checked', true);
         }
       });
+    },
+    'change #see-past-due': function (evt) {
+      if ($(evt.target).prop('checked')) {
+        Session.set('seePastDue', true);
+      } else {
+        Session.set('seePastDue', false);
+      }
     },
     'change #see-needs-payment': function (evt) {
       if ($(evt.target).prop('checked')) {
