@@ -11,7 +11,7 @@
   "aws": {
     "accessKeyId": "ACCESSKEYID",
     "secretAccessKey": "SECRETACCESSKEY"
-    "backupBucket": "celerate-external-controller-backups"
+    "backupsBucket": "celerate-external-controller-backups"
   },
   "serviceAuth": {
     "google": {
