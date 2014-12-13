@@ -41,6 +41,8 @@ localstorage@1.0.1
 logging@1.0.4
 meteor-platform@1.1.2
 meteor@1.1.2
+meteorhacks:async@1.0.0
+meteorhacks:npm@1.2.1
 minifiers@1.1.1
 minimongo@1.0.4
 mizzao:bootstrap-3@3.2.0_1
@@ -50,12 +52,14 @@ mobile-status-bar@1.0.1
 mongo@1.0.7
 mrt:moment-timezone@0.2.1
 mrt:moment@2.8.1
+npm-container@1.0.0
 oauth2@1.1.1
 oauth@1.1.1
 observe-sequence@1.0.3
 ordered-dict@1.0.1
 peerlibrary:aws-sdk@2.0.17_2
 peerlibrary:blocking@0.4.2
+percolatestudio:synced-cron@1.1.0
 rajit:accounts-ui-bootstrap-3@0.3.10
 random@1.0.1
 reactive-dict@1.0.4

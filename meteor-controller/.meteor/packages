@@ -18,4 +18,8 @@ furtherreach:settings
 email
 mrt:moment
 mrt:moment-timezone
+meteorhacks:npm
+percolatestudio:synced-cron
 
+
+npm-container
