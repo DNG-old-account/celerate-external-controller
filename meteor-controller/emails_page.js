@@ -87,6 +87,7 @@ if (Meteor.isClient) {
         }
 
       }
+
     });
 
     if (Session.get('seeNeedsPayment')) {
@@ -101,9 +102,13 @@ if (Meteor.isClient) {
       });
     }
 
-    Session.set("subscriber_count", result.length);
-    Session.set('subscribersList', result);
-    return result;
+    Meteor.call('generatePortalLogins', result, function(err, subs) {
+      if (!err && typeof subs === 'object') {
+        Session.set("subscriber_count", subs.length);
+        Session.set('subscribersList', subs);
+      }
+    });
+    return Session.get('subscribersList');
   };
 
   Template.subscribers_emails_list.subscriber_count = function () {
@@ -186,7 +191,7 @@ if (Meteor.isClient) {
     var sub = Session.get('subscribersList')[0];
     var emailKey = $('#email-choice').val();
     var accountId = '0000000';
-    var userLink = 'https://customerportal.furtherreach.net';
+    var userLink = Meteor.settings.public.urls.customerPortal;
     var emailObj = FREmails[emailKey];
     var body = emailObj.body(sub, userLink, accountId); 
     var subject = emailObj.subject(sub);
