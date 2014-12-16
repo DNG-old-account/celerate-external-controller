@@ -29,7 +29,7 @@ Router.map(function() {
   this.route('nodeDetails', {path: '/node_details/:_id', data: function() { return Nodes.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
 
   this.route('emailsPage', {
-    path: '/emailsPage',
+    path: '/emails_page',
     onBeforeAction: checkUser
   });
 
