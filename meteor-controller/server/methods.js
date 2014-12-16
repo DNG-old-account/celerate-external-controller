@@ -45,15 +45,6 @@ Meteor.methods({
     return result;
   },
 
-  generatePortalLogins: function (subs) {
-    _.each(subs, function(sub) {
-
-      var authToken = Meteor.call('generateAuthToken', sub._id._str);
-      sub.portalLink = Meteor.settings.public.urls.customerPortal + authToken;
-    });
-    return subs;
-  },
-
   getPictures: function(site) {
     if (typeof site.pictures !== 'object') {
       return;
