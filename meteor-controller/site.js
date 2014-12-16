@@ -13,37 +13,37 @@ if (Meteor.isClient) {
     Session.set("site_search_input", "");
   });
 
-  Template.site_overview.sites = function () {
-    var query = {};
-    if (Session.get("site_search_input") != null && !Session.equals("site_search_input", "")) {
-      console.log("Searching for: ["+Session.get("site_search_input")+"]");
-      var subquery = [];
-      for (s in search_fields) {
-        var field_query = {};
-        field_query[search_fields[s]] = { '$regex': Session.get("site_search_input"), '$options': 'i'};
-        subquery.push(field_query);
+  Template.siteOverview.helpers({
+    sites: function () {
+      var query = {};
+      if (Session.get("site_search_input") != null && !Session.equals("site_search_input", "")) {
+        console.log("Searching for: ["+Session.get("site_search_input")+"]");
+        var subquery = [];
+        for (s in search_fields) {
+          var field_query = {};
+          field_query[search_fields[s]] = { '$regex': Session.get("site_search_input"), '$options': 'i'};
+          subquery.push(field_query);
+        }
+        query = {$or: subquery};
       }
-      query = {$or: subquery};
+      console.log("query: " + JSON.stringify(query));
+
+      var include_fields = {'type': 1, 'name': 1, 'type': 1, 'pictures': 1};
+
+      var result = Sites.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_sites")});
+      Session.set("site_count", result.count());
+      return result;
+    },
+    site_count: function () {
+      return Session.get("site_count");
+    },
+    selected_site: function () {
+      var site = Sites.findOne(Session.get("selected_site"));
+      return site;
     }
-    console.log("query: " + JSON.stringify(query));
+  });
 
-    var include_fields = {'type': 1, 'name': 1, 'type': 1, 'pictures': 1};
-
-    var result = Sites.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_sites")});
-    Session.set("site_count", result.count());
-    return result;
-  };
-
-  Template.site_overview.site_count = function () {
-    return Session.get("site_count");
-  };
-
-  Template.site_overview.selected_site = function () {
-    var site = Sites.findOne(Session.get("selected_site"));
-    return site;
-  };
-
-  Template.site_overview.events({
+  Template.siteOverview.events({
     'keyup .site_search_input': function (evt) {
       Session.set("site_search_input", evt.target.value.trim());
     },
@@ -54,15 +54,7 @@ if (Meteor.isClient) {
       Tracker.afterFlush(function () {
         $('#site_details_modal').modal({show:true})
       });
-    }
-  });
-
-
-  Template.site.selected = function () {
-    return Session.equals("selected_site", this._id) ? 'info' : '';
-  };
-
-  Template.site_overview.events({
+    },
     'click .type_header': function () {
       Session.set("type_sort", -1 * Session.get("type_sort"));
       Session.set("primary_sort_field_sites", "type_sort");
@@ -74,6 +66,12 @@ if (Meteor.isClient) {
     'click .pictures_header': function () {
       Session.set("pictures_sort", -1 * Session.get("pictures_sort"));
       Session.set("primary_sort_field_sites", "pictures_sort");
+    }
+  });
+
+  Template.site.helpers({
+    selected: function () {
+      return Session.equals("selected_site", this._id) ? 'info' : '';
     }
   });
 

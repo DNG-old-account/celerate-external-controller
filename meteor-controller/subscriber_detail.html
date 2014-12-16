@@ -1,4 +1,4 @@
-<template name="subscriber_details">
+<template name="subscriberDetails">
 <div class="subscriber-details-container">
 {{#if is_archived}}
 <div class="alert alert-warning" role="alert"><strong>Warning:</strong> This is an ARCHIVED Subscriber</div>
@@ -56,7 +56,7 @@
 </div>
 
 <div class="tab-pane" id="billing_info">
-  {{> subscriber_billing_info }}
+  {{> subscriberBillingInfo }}
   
 </div>
 
@@ -87,7 +87,7 @@
 </div>
 
 <div class="tab-pane" id="extra_contact_info">
-  {{> subscriber_contacts}}
+  {{> subscriberContacts}}
 </div>
 
 </div>
@@ -95,7 +95,7 @@
 </div>
 </template>
 
-<template name="subscriber_billing_info">
+<template name="subscriberBillingInfo">
 <div class="container billing-info-container">
   <div class="agreed-to-terms"><h4>Has agreed to terms: {{{terms_info.agreed_to_terms}}}</h4></div>
   <form class="form-horizontal billing-form" role="form">

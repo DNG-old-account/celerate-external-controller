@@ -1,18 +1,35 @@
 if (Meteor.isClient) {
-  Template.subscriber_contacts.get_contacts = function() {
-    contacts = [];
-    for (var c in this.contacts) {
-      contacts.push({type: this.contacts[c].type, data: Contacts.findOne(this.contacts[c].contact_id)});
+  Template.subscriberContacts.helpers({
+    get_contacts: function() {
+      contacts = [];
+      for (var c in this.contacts) {
+        contacts.push({type: this.contacts[c].type, data: Contacts.findOne(this.contacts[c].contact_id)});
+      }
+      return contacts;
+    },
+    contact_fields: function () {
+      return [ { field: "first_name", label: "First Name", value: this.first_name },
+               { field: "last_name", label: "Last Name", value: this.last_name },
+               { field: "community", label: "Community", value: this.community },
+               { field: "street_address", label: "Street Address", value: this.street_address },
+               { field: "city", label: "City", value: this.city },
+               { field: "state", label: "State", value: this.state },
+               { field: "zip_code", label: "Zip Code", value: this.zip_code },
+               { field: "lat", label: "Location Lat", value: this.lat },
+               { field: "lng", label: "Location Lng", value: this.lng },
+               { field: "mobile", label: "Mobile", value: this.mobile },
+               { field: "landline", label: "Landline", value: this.landline },
+               { field: "email", label: "Email", value: this.email }
+             ];
     }
-    return contacts;
-  };
+  });
 
   Handlebars.registerHelper('new_contact_type_options', function () {
     return ["billing", "helpdesk"];
   });
 
   // Subscriber contacts functionality and events.
-  Template.subscriber_contacts.events({
+  Template.subscriberContacts.events({
     'click': function (evt) {
       console.log(evt);
 
@@ -63,20 +80,4 @@ if (Meteor.isClient) {
       }
     }
   });
-
-  Template.subscriber_contacts.contact_fields = function () {
-    return [ { field: "first_name", label: "First Name", value: this.first_name },
-             { field: "last_name", label: "Last Name", value: this.last_name },
-             { field: "community", label: "Community", value: this.community },
-             { field: "street_address", label: "Street Address", value: this.street_address },
-             { field: "city", label: "City", value: this.city },
-             { field: "state", label: "State", value: this.state },
-             { field: "zip_code", label: "Zip Code", value: this.zip_code },
-             { field: "lat", label: "Location Lat", value: this.lat },
-             { field: "lng", label: "Location Lng", value: this.lng },
-             { field: "mobile", label: "Mobile", value: this.mobile },
-             { field: "landline", label: "Landline", value: this.landline },
-             { field: "email", label: "Email", value: this.email }
-           ];
-  };
 }

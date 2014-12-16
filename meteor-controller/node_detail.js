@@ -1,6 +1,6 @@
 if (Meteor.isClient) {
   // Node details functionality and events.
-  Template.node_details.events({
+  Template.nodeDetails.events({
     'click': function (evt) {
       console.log(evt);
 
@@ -63,110 +63,109 @@ if (Meteor.isClient) {
     }
   });
 
-  Template.node_details.hardware_options = function () {
+  var get_hardware_options = function () {
     return Hardware.find({}, {sort: {make: 1, model: 1}});
   };
 
-  Template.node_details.site_options = function () {
+  var get_site_options = function () {
     return Sites.find({}, {sort: {name: 1}});
   };
 
-  Template.node_details.site_name = function () {
-    console.log(this);
-    var site_query = Sites.findOne(new Meteor.Collection.ObjectID(this.site));
-    console.log(site_query);
-    if (site_query) {
-      return site_query.name;
-    }
-
-    return "";
-  };
-
-  Template.node_details.ports_from_hardware = function () {
-    console.log(this);
-    var hardware_query = Hardware.findOne({name: this.hardware});
-    if (hardware_query) {
-      return hardware_query.ports;
-    }
-
-    return [];
-  };
-
-  Template.node_details.per_port_fields = function () {
-    console.log("per_port_fields");
-    console.log(this);
-
-    var remote_node_value = "";
-    var remote_port_value = "";
-
-    var remote_node_options = Nodes.find({}).map(function(item, index, cursor) {
-      return { value: item._id._str, label: item.name };
-    });
-
-    var remote_port_options = [];
-    if (this.node_instance.ports && this.node_instance.ports[this.context.name]) {
-      if (this.node_instance.ports[this.context.name].remote_node) {
-        remote_node_value = this.node_instance.ports[this.context.name].remote_node;
-        var remote_node = Nodes.findOne(new Meteor.Collection.ObjectID(remote_node_value));
-        var remote_node_hardware = Hardware.findOne({name: remote_node.hardware});
-
-        // Only show remote ports of the same type.
-        var port_type_to_match = this.context.type;
-        var matching_ports = _.filter(remote_node_hardware.ports, function(p) {
-          return p.type === port_type_to_match;
-        });
-        remote_port_options = _.map(matching_ports, function (item) {
-          return { value: item.name, label: item.name + " (" + item.type + ")" };
-        });
+  Template.nodeDetails.helpers({
+    hardware_options: get_hardware_options,
+    site_options: get_site_options,
+    site_name: function () {
+      console.log(this);
+      var site_query = Sites.findOne(new Meteor.Collection.ObjectID(this.site));
+      console.log(site_query);
+      if (site_query) {
+        return site_query.name;
       }
 
-      if (this.node_instance.ports[this.context.name].remote_port) {
-        remote_port_value = this.node_instance.ports[this.context.name].remote_port;
+      return "";
+    },
+    ports_from_hardware: function () {
+      console.log(this);
+      var hardware_query = Hardware.findOne({name: this.hardware});
+      if (hardware_query) {
+        return hardware_query.ports;
       }
-    }
 
-    var ip_value = "";
-    if (this.node_instance.ports && this.node_instance.ports[this.context.name] && this.node_instance.ports[this.context.name].ip) {
-      ip_value = this.node_instance.ports[this.context.name].ip;
-    }
+      return [];
+    },
+    per_port_fields: function () {
+      console.log("per_port_fields");
+      console.log(this);
 
-    return [ { field: "ports." + this.context.name + ".ip", label: "IP", value: ip_value },
-             { field: "ports." + this.context.name + ".remote_node", label: "Remote Node", value: remote_node_value, options: true, options_custom_view: remote_node_options },
-             { field: "ports." + this.context.name + ".remote_port", label: "Remote Port", value: remote_port_value, options: true, options_custom_view: remote_port_options },
-           ];
-  };
+      var remote_node_value = "";
+      var remote_port_value = "";
 
-  Template.node_details.node_fields = function () {
-    var type_options = ["client", "cpe", "ap", "base_station", "core", "other"];
-    var status_options = ["operational", "failed", "undeployed"];
+      var remote_node_options = Nodes.find({}).map(function(item, index, cursor) {
+        return { value: item._id._str, label: item.name };
+      });
 
-    var hardware_options = Template.node_details.hardware_options().map(function(item, index, cursor) {
-      return { value: item.name, label: (item.make + "/" + item.model + " (" + item.name + ")") };
-    });
+      var remote_port_options = [];
+      if (this.node_instance.ports && this.node_instance.ports[this.context.name]) {
+        if (this.node_instance.ports[this.context.name].remote_node) {
+          remote_node_value = this.node_instance.ports[this.context.name].remote_node;
+          var remote_node = Nodes.findOne(new Meteor.Collection.ObjectID(remote_node_value));
+          var remote_node_hardware = Hardware.findOne({name: remote_node.hardware});
 
-    var site_options = Template.node_details.site_options().map(function(item, index, cursor) {
-      var type_str = "";
-      if (item.type != null) {
-        type_str = "(" + _.keys(item.type).toString() + ")";
+          // Only show remote ports of the same type.
+          var port_type_to_match = this.context.type;
+          var matching_ports = _.filter(remote_node_hardware.ports, function(p) {
+            return p.type === port_type_to_match;
+          });
+          remote_port_options = _.map(matching_ports, function (item) {
+            return { value: item.name, label: item.name + " (" + item.type + ")" };
+          });
+        }
+
+        if (this.node_instance.ports[this.context.name].remote_port) {
+          remote_port_value = this.node_instance.ports[this.context.name].remote_port;
+        }
       }
-      return { value: item._id._str, label: (item.name + " " + type_str) };
-    });
 
-    return [ { field: "name", label: "Name", value: this.name },
-             { field: "hardware", label: "Hardware", value: this.hardware, options: true, options_custom_view: hardware_options },
-             { field: "type", label: "Type", value: this.type, options: type_options },
-             { field: "site", label: "Site", value: this.site, options: true, options_custom_view: site_options },
-             { field: "status", label: "Status", value: this.status, options: status_options },
-             { field: "mac", label: "MAC", value: this.mac },
-             { field: "lat", label: "Lat", value:this.lat },
-             { field: "lng", label: "Lng", value:this.lng },
-             { field: "notes", label: "Notes", value:this.notes },
-             { field: "ports", label: "Ports", value: this.ports, display_ports: true },
-           ];
-  };
+      var ip_value = "";
+      if (this.node_instance.ports && this.node_instance.ports[this.context.name] && this.node_instance.ports[this.context.name].ip) {
+        ip_value = this.node_instance.ports[this.context.name].ip;
+      }
 
-  Template.node_details.hardware_data = function () {
-    return Hardware.find({name: this.hardware});
-  };
+      return [ { field: "ports." + this.context.name + ".ip", label: "IP", value: ip_value },
+               { field: "ports." + this.context.name + ".remote_node", label: "Remote Node", value: remote_node_value, options: true, options_custom_view: remote_node_options },
+               { field: "ports." + this.context.name + ".remote_port", label: "Remote Port", value: remote_port_value, options: true, options_custom_view: remote_port_options },
+             ];
+    },
+    node_fields: function () {
+      var type_options = ["client", "cpe", "ap", "base_station", "core", "other"];
+      var status_options = ["operational", "failed", "undeployed"];
 
+      var hardware_options = get_hardware_options().map(function(item, index, cursor) {
+        return { value: item.name, label: (item.make + "/" + item.model + " (" + item.name + ")") };
+      });
+
+      var site_options = get_site_options().map(function(item, index, cursor) {
+        var type_str = "";
+        if (item.type != null) {
+          type_str = "(" + _.keys(item.type).toString() + ")";
+        }
+        return { value: item._id._str, label: (item.name + " " + type_str) };
+      });
+
+      return [ { field: "name", label: "Name", value: this.name },
+               { field: "hardware", label: "Hardware", value: this.hardware, options: true, options_custom_view: hardware_options },
+               { field: "type", label: "Type", value: this.type, options: type_options },
+               { field: "site", label: "Site", value: this.site, options: true, options_custom_view: site_options },
+               { field: "status", label: "Status", value: this.status, options: status_options },
+               { field: "mac", label: "MAC", value: this.mac },
+               { field: "lat", label: "Lat", value:this.lat },
+               { field: "lng", label: "Lng", value:this.lng },
+               { field: "notes", label: "Notes", value:this.notes },
+               { field: "ports", label: "Ports", value: this.ports, display_ports: true },
+             ];
+    },
+    hardware_data: function () {
+      return Hardware.find({name: this.hardware});
+    }
+  });
 }

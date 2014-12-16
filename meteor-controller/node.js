@@ -14,38 +14,38 @@ if (Meteor.isClient) {
     Session.set("node_search_input", "");
   });
 
-  Template.node_overview.nodes = function () {
-    var query = {};
-    if (Session.get("node_search_input") != null && !Session.equals("node_search_input", "")) {
-      console.log("Searching for: ["+Session.get("node_search_input")+"]");
-      var subquery = [];
-      for (s in search_fields) {
-        var field_query = {};
-        field_query[search_fields[s]] = { '$regex': Session.get("node_search_input"), '$options': 'i'};
-        subquery.push(field_query);
+  Template.nodeOverview.helpers({
+    nodes: function () {
+      var query = {};
+      if (Session.get("node_search_input") != null && !Session.equals("node_search_input", "")) {
+        console.log("Searching for: ["+Session.get("node_search_input")+"]");
+        var subquery = [];
+        for (s in search_fields) {
+          var field_query = {};
+          field_query[search_fields[s]] = { '$regex': Session.get("node_search_input"), '$options': 'i'};
+          subquery.push(field_query);
+        }
+        query = {$or: subquery};
       }
-      query = {$or: subquery};
-    }
-    console.log("query: " + JSON.stringify(query));
+      console.log("query: " + JSON.stringify(query));
 
-    var include_fields = {'name': 1, 'status': 1, 'hardware': 1, 'mac': 1};
+      var include_fields = {'name': 1, 'status': 1, 'hardware': 1, 'mac': 1};
 
-    var result = Nodes.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_nodes")});
-    Session.set("node_count", result.count());
-    return result;
-  };
+      var result = Nodes.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_nodes")});
+      Session.set("node_count", result.count());
+      return result;
+    },
+    node_count: function () {
+      return Session.get("node_count");
+    },
+    selected_node: function () {
+      var node = Nodes.findOne(Session.get("selected_node"));
+      return node;
+      //return _.map(node, function(val,key){return {'key': key, 'value': val}});
+    },
+  });
 
-  Template.node_overview.node_count = function () {
-    return Session.get("node_count");
-  };
-
-  Template.node_overview.selected_node = function () {
-    var node = Nodes.findOne(Session.get("selected_node"));
-    return node;
-    //return _.map(node, function(val,key){return {'key': key, 'value': val}});
-  };
-
-  Template.node_overview.events({
+  Template.nodeOverview.events({
     'keyup .node_search_input': function (evt) {
       Session.set("node_search_input", evt.target.value.trim());
     },
@@ -57,15 +57,7 @@ if (Meteor.isClient) {
       Tracker.afterFlush(function () {
         $('#node_details_modal').modal({show:true})
       });
-    }
-  });
-
-
-  Template.node.selected = function () {
-    return Session.equals("selected_node", this._id) ? 'info' : '';
-  };
-
-  Template.node_overview.events({
+    },
     'click .name_header': function () {
       Session.set("name_sort", -1 * Session.get("name_sort"));
       Session.set("primary_sort_field_nodes", "name_sort");
@@ -83,6 +75,11 @@ if (Meteor.isClient) {
       Session.set("primary_sort_field_nodes", "mac_sort");
     }
   });
+
+
+  Template.node.selected = function () {
+    return Session.equals("selected_node", this._id) ? 'info' : '';
+  };
 
   Template.node.events({
     'click': function (evt) {

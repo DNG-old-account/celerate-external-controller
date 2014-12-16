@@ -1,17 +1,17 @@
-<template name="site_page">
+<template name="sitePage">
 <body>
-  {{> celerate_navbar}}
+  {{> celerateNavbar}}
   <div class="container-fluid">
     <div class="row">
       <div class="main">
-        {{> site_overview}}
+        {{> siteOverview}}
       </div>
     </div>
   </div>
 </body>
 </template>
 
-<template name="site_overview">
+<template name="siteOverview">
   <div class="details">
     {{#if selected_site}}
     <div id="site_details_modal" class="modal fade" tabindex="-1" role="dialog">

@@ -21,16 +21,7 @@ if (Meteor.isClient) {
     Session.set("recenter_map", true);
   });
 
-  Template.subscriber_overview.searchable_fields = function () {
-    return [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "prior_email", "archived", "current_provider", "bts_to_use" ];
-  };
-
-  Template.subscriber_overview.current_search_fields = function () {
-    var current_search_fields = Session.get("subscriber_search_fields");
-    return current_search_fields;
-  };
-
-  Template.subscriber_overview.subscribers = function () {
+  getSubscribers = function () {
     var subquery = [];
     if (Session.get("subscriber_search_fields") != null) {
       var current_search_fields = Session.get("subscriber_search_fields");
@@ -43,7 +34,7 @@ if (Meteor.isClient) {
         var query_input = current_search_fields[s];
         if (s === 'global') {
           var global_query = [];
-          var searchable_fields = Template.subscriber_overview.searchable_fields();
+          var searchable_fields = Template.subscriberOverview.searchable_fields();
 
           for (f in searchable_fields) {
             var field = searchable_fields[f];
@@ -70,25 +61,33 @@ if (Meteor.isClient) {
     var result = Subscribers.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")});
     Session.set("subscriber_count", result.count());
     return result;
-  };
+  }
 
-  Template.subscriber_overview.subscriber_count = function () {
-    return Session.get("subscriber_count");
-  };
-
-  Template.subscriber_overview.selected_subscriber = function () {
-    var subscriber = Subscribers.findOne(Session.get("selected_subscriber"));
-    return subscriber;
-  };
-
-  Template.subscriber_overview.created = function () {
-    Tracker.afterFlush(function () {
-      archived_subscribers_dep.changed();
-    });
-  };
+  Template.subscriberOverview.helpers({
+    searchable_fields: function () {
+      return [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "prior_email", "archived", "current_provider", "bts_to_use" ];
+    },
+    current_search_fields: function () {
+      var current_search_fields = Session.get("subscriber_search_fields");
+      return current_search_fields;
+    },
+    subscribers: getSubscribers,
+    subscriber_count: function () {
+      return Session.get("subscriber_count");
+    },
+    selected_subscriber: function () {
+      var subscriber = Subscribers.findOne(Session.get("selected_subscriber"));
+      return subscriber;
+    },
+    created: function () {
+      Tracker.afterFlush(function () {
+        archived_subscribers_dep.changed();
+      });
+    }
+  });
 
   var subscriber_search_input_lag_ms = 500;
-  Template.subscriber_overview.events({
+  Template.subscriberOverview.events({
     'keyup .subscriber_search_input': function (evt) {
       var timeout = Session.get("subscriber_search_input_timeout");
       if (timeout) {
@@ -151,14 +150,7 @@ if (Meteor.isClient) {
     'click .recenter_map': function (evt) {
       console.log(evt);
       Session.set("recenter_map", evt.target.checked);
-    }
-  });
-
-  Template.subscriber.selected = function () {
-    return Session.equals("selected_subscriber", this._id) ? 'info' : '';
-  };
-
-  Template.subscriber_overview.events({
+    },
     'click .name_header': function () {
       Session.set("name_sort", -1 * Session.get("name_sort"));
       Session.set("primary_sort_field_subscribers", "name_sort");
@@ -178,6 +170,12 @@ if (Meteor.isClient) {
     'click .plan_header': function () {
       Session.set("plan_sort", -1 * Session.get("plan_sort"));
       Session.set("primary_sort_field_subscribers", "plan_sort");
+    }
+  });
+
+  Template.subscriber.helpers({
+    selected: function () {
+      return Session.equals("selected_subscriber", this._id) ? 'info' : '';
     }
   });
 
