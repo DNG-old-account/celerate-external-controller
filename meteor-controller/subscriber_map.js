@@ -1,10 +1,10 @@
 if (Meteor.isClient) {
-  Template.subscriber_map.destroyed = function() {
+  Template.subscriberMap.destroyed = function() {
     Session.set("subscriber_map", false);
     map = null;
   };
 
-  Template.subscriber_map.rendered = function() {
+  Template.subscriberMap.rendered = function() {
     map = null;
     markers = {};
     if (!Session.get("subscriber_map")) {
@@ -59,7 +59,7 @@ if (Meteor.isClient) {
 
       var bounds = new google.maps.LatLngBounds();
 
-      Template.subscriber_overview.subscribers().forEach(function (subscriber) {
+      getSubscribers().forEach(function (subscriber) {
         try {
         if ('lat' in subscriber && subscriber['lat'].trim().length > 0 && 'lng' in subscriber && subscriber['lng'].trim().length > 0) {
           var name = (subscriber.first_name ? subscriber.first_name : "") + " " + (subscriber.last_name ? subscriber.last_name : "");
@@ -88,6 +88,6 @@ if (Meteor.isClient) {
   };
 
   if (typeof google === 'object') {
-    google.maps.event.addDomListener(window, 'load', Template.subscriber_map.rendered);
+    google.maps.event.addDomListener(window, 'load', Template.subscriberMap.rendered);
   }
 }

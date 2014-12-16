@@ -1,6 +1,6 @@
 if (Meteor.isClient) {
   // Subscriber details functionality and events.
-  Template.subscriber_details.events({
+  Template.subscriberDetails.events({
     'click': function (evt) {
       console.log(evt);
 
@@ -157,101 +157,91 @@ if (Meteor.isClient) {
     });
   };
 
-  Template.subscriber_details.user_billing_link = function () {
-    console.log("re-getting user billing link: " + Session.get("user_billing_link"));
-    return Session.get("user_billing_link");
-  };
+  Template.subscriberDetails.helpers({
+    user_billing_link: function () {
+      console.log("re-getting user billing link: " + Session.get("user_billing_link"));
+      return Session.get("user_billing_link");
+    },
+    site_link: function () {
+      return Sites.findOne({'type.subscriber': this._id});
+    },
+    cpe_options: function () {
+      return Nodes.find({ type: 'cpe' });
+    },
+    terms_info: function () {
+      return {
+        agreed_to_terms: (typeof this.terms === "object" && this.terms.agreed) ? '<span class="glyphicon glyphicon-ok"></span> ' + this.terms.date : '<span class="glyphicon glyphicon-remove"></span>'
+      };
+    },
+    ap_options: function () {
+      return Nodes.find({ type: 'ap' });
+    },
+    basic_info_fields: function () {
+      // Set up the user billing link, since we know we have a subscriber id now.
+      getUserBillingLink(this._id._str);
 
-  Template.subscriber_details.site_link = function () {
-    return Sites.findOne({'type.subscriber': this._id});
-  };
+      var subscriber_type_options = ["residential", "business", "non profit organization"];
+      var status_options = ["connected", "new lead", "no coverage", "deferred", "not interested", "disconnected"];
+      var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
+      var plan_options = _.keys(FRSettings.billing.plans);
+      var discount_options = _.keys(FRSettings.billing.discounts);
 
-  Template.subscriber_details.cpe_options = function () {
-    return Nodes.find({ type: 'cpe' });
-  };
+      // Assemble the fields to display.
+      var fields;
+      fields = [ { field: "first_name", label: "First Name", value: this.first_name },
+                 { field: "last_name", label: "Last Name", value: this.last_name } ];
 
-  Template.subscriber_details.terms_info = function () {
-    return {
-      agreed_to_terms: (typeof this.terms === "object" && this.terms.agreed) ? '<span class="glyphicon glyphicon-ok"></span> ' + this.terms.date : '<span class="glyphicon glyphicon-remove"></span>'
-    };
-  };
+      // For non-residential subscribers, show a business name field.
+      // TODO(barath): Eventually only show a business name field for such subscribers.
+      if (this.subscriber_type !== 'residential') {
+        fields.push({ field: "business_name", label: "Business Name", value: this.business_name });
+      }
 
-  Template.subscriber_details.ap_options = function () {
-    return Nodes.find({ type: 'ap' });
-  };
-   
-  Template.subscriber_billing_info.selectedAdditionalEquipment = function () {
-    return Session.get('selectedAdditionalEquipmentNode');
-  };
+      fields.push({ field: "subscriber_type", label: "Subscriber Type", value: this.subscriber_type, options: subscriber_type_options },
+                  { field: "community", label: "Community", value: this.community },
+                  { field: "street_address", label: "Street Address", value: this.street_address },
+                  { field: "city", label: "City", value: this.city },
+                  { field: "state", label: "State", value: this.state },
+                  { field: "zip_code", label: "Zip Code", value: this.zip_code },
+                  { field: "lat", label: "Location Lat", value: this.lat },
+                  { field: "lng", label: "Location Lng", value: this.lng },
+                  { field: "mobile", label: "Mobile", value: this.mobile },
+                  { field: "landline", label: "Landline", value: this.landline },
+                  { field: "prior_email", label: "Prior Email", value: this.prior_email },
+                  { field: "status", label: "Status", value: this.status, options: status_options },
+                  { field: "plan", label: "Plan", value: this.plan, options: plan_options },
+                  { field: "discount", label: "Discount", value: this.discount, options: discount_options },
+                  { field: "discount_start_date", label: "Discount Start Date", value: this.discount_start_date },
+                  { field: "discount_end_date", label: "Discount End Date", value: this.discount_end_date },
+                  { field: "username", label: "Username", value: this.username },
+                  { field: "max_speed", label: "Max Speed", value: this.max_speed },
+                  { field: "activation_date", label: "Activation Date", value: this.activation_date },
+                  { field: "signup_date", label: "Signup Date", value: this.signup_date },
+                  { field: "end_date", label: "End Date", value: this.end_date },
+                  { field: "hold_date", label: "Hold Date", value: this.hold_date });
 
-  Template.subscriber_details.basic_info_fields = function () {
-    // Set up the user billing link, since we know we have a subscriber id now.
-    getUserBillingLink(this._id._str);
+      return fields;
+    },
+    is_archived: function () {
+      return this.archived == "true";
+    },
+    scheduling_fields: function () {
+      var priority_options = ["high", "medium", "low", "none", "unknown"];
+      var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
+      var bts_options = [ "RJ-N", "RJ-W", "RJ-E", "LH-E", "10M-W", "BH-N", "BH-E", "PAHS-SW", "PAHS-SE", "PAES-W", "PAES-S", "TH-W", "TH-E" ];
 
-    var subscriber_type_options = ["residential", "business", "non profit organization"];
-    var status_options = ["connected", "new lead", "no coverage", "deferred", "not interested", "disconnected"];
-    var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
-    var plan_options = _.keys(FRSettings.billing.plans);
-    var discount_options = _.keys(FRSettings.billing.discounts);
-
-    // Assemble the fields to display.
-    var fields;
-    fields = [ { field: "first_name", label: "First Name", value: this.first_name },
-               { field: "last_name", label: "Last Name", value: this.last_name } ];
-
-    // For non-residential subscribers, show a business name field.
-    // TODO(barath): Eventually only show a business name field for such subscribers.
-    if (this.subscriber_type !== 'residential') {
-      fields.push({ field: "business_name", label: "Business Name", value: this.business_name });
+      return [ { field: "priority", label: "Priority", value: this.priority, options: priority_options },
+               { field: "current_provider", label: "Current Provider", value: this.current_provider, options: provider_options },
+               { field: "relay_site", label: "Willing to be Relay Site", value: this.relay_site },
+               { field: "time_availability", label: "Time Availability", value: this.time_availability },
+               { field: "bts_to_use", label: "BTS to use", value: this.bts_to_use, options: bts_options },
+               { field: "notes", label: "Notes", value: this.notes },
+               { field: "signup_date", label: "Signup Date", value: this.signup_date }
+             ];
     }
+  });
 
-    fields.push({ field: "subscriber_type", label: "Subscriber Type", value: this.subscriber_type, options: subscriber_type_options },
-                { field: "community", label: "Community", value: this.community },
-                { field: "street_address", label: "Street Address", value: this.street_address },
-                { field: "city", label: "City", value: this.city },
-                { field: "state", label: "State", value: this.state },
-                { field: "zip_code", label: "Zip Code", value: this.zip_code },
-                { field: "lat", label: "Location Lat", value: this.lat },
-                { field: "lng", label: "Location Lng", value: this.lng },
-                { field: "mobile", label: "Mobile", value: this.mobile },
-                { field: "landline", label: "Landline", value: this.landline },
-                { field: "prior_email", label: "Prior Email", value: this.prior_email },
-                { field: "status", label: "Status", value: this.status, options: status_options },
-                { field: "plan", label: "Plan", value: this.plan, options: plan_options },
-                { field: "discount", label: "Discount", value: this.discount, options: discount_options },
-                { field: "discount_start_date", label: "Discount Start Date", value: this.discount_start_date },
-                { field: "discount_end_date", label: "Discount End Date", value: this.discount_end_date },
-                { field: "username", label: "Username", value: this.username },
-                { field: "max_speed", label: "Max Speed", value: this.max_speed },
-                { field: "activation_date", label: "Activation Date", value: this.activation_date },
-                { field: "signup_date", label: "Signup Date", value: this.signup_date },
-                { field: "end_date", label: "End Date", value: this.end_date },
-                { field: "hold_date", label: "Hold Date", value: this.hold_date });
-
-    return fields;
-  };
-
-
-  Template.subscriber_details.is_archived = function () {
-    return this.archived == "true";
-  };
-
-  Template.subscriber_details.scheduling_fields = function () {
-    var priority_options = ["high", "medium", "low", "none", "unknown"];
-    var provider_options = ["further reach", "cvc", "ukiah wireless", "mcn", "satellite", "none", "unknown"];
-    var bts_options = [ "RJ-N", "RJ-W", "RJ-E", "LH-E", "10M-W", "BH-N", "BH-E", "PAHS-SW", "PAHS-SE", "PAES-W", "PAES-S", "TH-W", "TH-E" ];
-
-    return [ { field: "priority", label: "Priority", value: this.priority, options: priority_options },
-             { field: "current_provider", label: "Current Provider", value: this.current_provider, options: provider_options },
-             { field: "relay_site", label: "Willing to be Relay Site", value: this.relay_site },
-             { field: "time_availability", label: "Time Availability", value: this.time_availability },
-             { field: "bts_to_use", label: "BTS to use", value: this.bts_to_use, options: bts_options },
-             { field: "notes", label: "Notes", value: this.notes },
-             { field: "signup_date", label: "Signup Date", value: this.signup_date }
-           ];
-  };
-
-  Template.subscriber_billing_info.events({
+  Template.subscriberBillingInfo.events({
     'click #add-discount': function (evt) {
       evt.preventDefault();
       var thisSub = Session.get('thisSub');
@@ -322,51 +312,17 @@ if (Meteor.isClient) {
     }
   });
 
-  Template.subscriber_billing_info.billing_info = function () {
-    if (typeof this.billing_info !== 'object') {
-      FRMethods.createBillingProperties(this);
-    }
-    return this.billing_info; 
-  };
-
-  Template.subscriber_billing_info.extraEquipment = function () {
-    var thisSub = this;
-    Session.set('thisSub', thisSub);
-
-    var billedHardware = thisSub.billing_info.installation.additional_equipment;
-    
-    var nodes = [];
-    // Now search through sites to see if any are associated with this subscriber
-    var thisSubsSites = Sites.find({'type.subscriber': thisSub._id}).fetch();
-    if (thisSubsSites.length > 0) {
-      // Now search through nodes to see if any are associated with these sites
-      _.each(thisSubsSites, function(site) {
-        var thisSitesNodes = Nodes.find({'site': site._id._str}).fetch();
-
-        // Get rid of any that we've already added to billing
-        thisSitesNodes = _.reject(thisSitesNodes, function(node) {
-          var reject = false;
-          _.each(billedHardware, function(billed) {
-            if (node._id._str === billed._id._str) {
-              reject = true;
-            }
-          });
-          return reject;
-        });
-
-        // Now add hardware details
-        _.each(thisSitesNodes, function(node) {
-          var thisHardware = Hardware.findOne({'name': node.hardware});
-          node.hardwareObj = thisHardware;
-        });
-
-        nodes = nodes.concat(thisSitesNodes);
-      });
-      Session.set('selectedAdditionalEquipmentNode', _.first(nodes));
-      Session.set('additionalEquipmentNodes', nodes);
-    }
-
-    Template.subscriber_billing_info.communityTaxAmount = function() {
+  Template.subscriberBillingInfo.helpers({
+    selectedAdditionalEquipment: function () {
+      return Session.get('selectedAdditionalEquipmentNode');
+    },
+    billing_info: function () {
+      if (typeof this.billing_info !== 'object') {
+        FRMethods.createBillingProperties(this);
+      }
+      return this.billing_info; 
+    },
+    communityTaxAmount: function() {
       var thisSub = this;
       if (typeof thisSub.city === "string") {
         city = thisSub.city.trim();
@@ -377,12 +333,47 @@ if (Meteor.isClient) {
       }
 
       return 0;
-    };
+    },
+    extraEquipment: function () {
+      var thisSub = this;
+      Session.set('thisSub', thisSub);
 
-    return {
-      installedNodes: nodes,
-    };
-  };
+      var billedHardware = thisSub.billing_info.installation.additional_equipment;
+      
+      var nodes = [];
+      // Now search through sites to see if any are associated with this subscriber
+      var thisSubsSites = Sites.find({'type.subscriber': thisSub._id}).fetch();
+      if (thisSubsSites.length > 0) {
+        // Now search through nodes to see if any are associated with these sites
+        _.each(thisSubsSites, function(site) {
+          var thisSitesNodes = Nodes.find({'site': site._id._str}).fetch();
 
+          // Get rid of any that we've already added to billing
+          thisSitesNodes = _.reject(thisSitesNodes, function(node) {
+            var reject = false;
+            _.each(billedHardware, function(billed) {
+              if (node._id._str === billed._id._str) {
+                reject = true;
+              }
+            });
+            return reject;
+          });
+
+          // Now add hardware details
+          _.each(thisSitesNodes, function(node) {
+            var thisHardware = Hardware.findOne({'name': node.hardware});
+            node.hardwareObj = thisHardware;
+          });
+
+          nodes = nodes.concat(thisSitesNodes);
+        });
+        Session.set('selectedAdditionalEquipmentNode', _.first(nodes));
+        Session.set('additionalEquipmentNodes', nodes);
+      }
+      return {
+        installedNodes: nodes,
+      };
+    }
+  });
 }
 

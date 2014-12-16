@@ -14,106 +14,93 @@ if (Meteor.isClient) {
     Session.set("subscriber_search_fields", {});
   });
 
-  Template.subscribers_emails_list.searchable_fields = function () {
-    console.log('searchable fields');
-    return [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "prior_email", "archived", "current_provider", "bts_to_use"];
-  };
-
-  Template.subscribers_emails_list.seePastDue = function() {
-    return Session.get('seePastDue');
-  };
-
-  Template.subscribers_emails_list.seeNeedsPayment = function() {
-    return Session.get('seeNeedsPayment');
-  };
-
-  Template.subscribers_emails_list.seePastDueChecked = function() {
-    var seePastDue = Session.get('seePastDue');
-    return seePastDue ? 'selected' : '';
-  };
-
-  Template.subscribers_emails_list.seeNeedsPaymentChecked = function() {
-    var seeNeedsPayment = Session.get('seeNeedsPayment');
-    return seeNeedsPayment ? 'selected' : '';
-  };
-
-  Template.subscribers_emails_list.current_search_fields = function () {
-    console.log('current search fields.');
-    var current_search_fields = Session.get("subscriber_search_fields");
-    return current_search_fields;
-  };
-
-  Template.subscribers_emails_list.subscribers = function () {
-    var subquery = [];
-    if (Session.get("subscriber_search_fields") != null) {
+  Template.subscribersEmailsList.helpers({
+    searchable_fields: function () {
+      console.log('searchable fields');
+      return [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "prior_email", "archived", "current_provider", "bts_to_use"];
+    },
+    seeNeedsPayment:  function() {
+      return Session.get('seeNeedsPayment');
+    },
+    seeNeedsPaymentChecked: function() {
+      var seeNeedsPayment = Session.get('seeNeedsPayment');
+      return seeNeedsPayment ? 'selected' : '';
+    },
+    current_search_fields: function () {
+      console.log('current search fields.');
       var current_search_fields = Session.get("subscriber_search_fields");
-      if (Session.get("subscriber_search_input").length > 0) {
-        var search_field = $("#search_tag").val().trim();
-        current_search_fields[search_field] = Session.get("subscriber_search_input");
-      }
+      return current_search_fields;
+    },
+    subscribers: function () {
+      var subquery = [];
+      if (Session.get("subscriber_search_fields") != null) {
+        var current_search_fields = Session.get("subscriber_search_fields");
+        if (Session.get("subscriber_search_input").length > 0) {
+          var search_field = $("#search_tag").val().trim();
+          current_search_fields[search_field] = Session.get("subscriber_search_input");
+        }
 
-      for (s in current_search_fields) {
-        var field_query = {};
-        field_query[s] = { '$regex': current_search_fields[s], '$options': 'i' };
-        subquery.push(field_query);
-      }
-
-    }
-    query = {};
-    if (subquery.length > 0) {
-      query = {$and: subquery};
-    }
-
-    // var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'activation_date': 1, 'billing_info': 1};
-
-    var result = Subscribers.find(query, {sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")}).fetch();
-
-    _.each(result, function(sub) {
-      var payments = FRMethods.calculatePayments(sub);
-
-      sub.billing_info.needsPayment = false;
-      if (payments.dueToDate.required && payments.dueToDate.amount > 0) {
-        sub.billing_info.needsPayment = true;
-        sub.billing_info.pastDue = false;
-
-        if (typeof payments.dueToDate.payments === 'object' && payments.dueToDate.payments.length > 1) {
-          var startOfMonth = moment().tz('America/Los_Angeles').startOf('month');
-          _.each(payments.dueToDate.payments, function(payment) {
-            if (startOfMonth.add(-2, 'months').add(-1, 'days').isBefore(moment(payment.startDate))) {
-              sub.billing_info.pastDue = true;
-              console.log(payments);
-            }
-          });
+        for (s in current_search_fields) {
+          var field_query = {};
+          field_query[s] = { '$regex': current_search_fields[s], '$options': 'i' };
+          subquery.push(field_query);
         }
 
       }
-    });
+      query = {};
+      if (subquery.length > 0) {
+        query = {$and: subquery};
+      }
 
-    if (Session.get('seeNeedsPayment')) {
-      result = _.filter(result, function(sub) {
-        return sub.billing_info.needsPayment;
+      // var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'activation_date': 1, 'billing_info': 1};
+
+      var result = Subscribers.find(query, {sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")}).fetch();
+
+      _.each(result, function(sub) {
+        var payments = FRMethods.calculatePayments(sub);
+
+        sub.billing_info.needsPayment = false;
+        if (payments.dueToDate.required && payments.dueToDate.amount > 0) {
+          sub.billing_info.needsPayment = true;
+        }
       });
-    }
 
-    if (Session.get('seePastDue')) {
-      result = _.filter(result, function(sub) {
-        return sub.billing_info.pastDue;
-      });
-    }
-
-    Session.set("subscriber_count", result.length);
-    Session.set('subscribersList', result);
-    return result;
-  };
-
-  Template.subscribers_emails_list.subscriber_count = function () {
-    return Session.get("subscriber_count");
-  };
+      if (Session.get('seeNeedsPayment')) {
+        result = _.filter(result, function(sub) {
+          return sub.billing_info.needsPayment;
+        });
+      }
+      Session.set("subscriber_count", result.length);
+      Session.set('subscribersList', result);
+      return result;
+    },
+    subscriber_count: function () {
+      return Session.get("subscriber_count");
+    },
+    emailChoices: function() {
+      return FREmails;
+    },
+    emailContents: function() {
+      return Session.get('emailContents') || '';
+    },
+  });
 
   var subscriber_search_input_timeout = false;
   var subscriber_search_input_lag_ms = 1000;
 
-  Template.subscribers_emails_list.events({
+  var setEmailContents = function() {
+    var sub = Session.get('subscribersList')[0];
+    var emailKey = $('#email-choice').val();
+    var accountId = '0000000';
+    var userLink = 'https://customerportal.furtherreach.net';
+    var emailObj = FREmails[emailKey];
+    var body = emailObj.body(sub, userLink, accountId); 
+    var subject = emailObj.subject(sub);
+    Session.set('emailContents', {subject: subject, body: body});
+    $('#subscriber_email').modal('show');
+  };
+
+  Template.subscribersEmailsList.events({
     'keyup .subscriber_search_input': function (evt) {
       if (Session.get("subscriber_search_input_timeout") != true) {
         subscriber_search_input_timeout = true;
@@ -171,30 +158,7 @@ if (Meteor.isClient) {
     },
     'click #show_non_archived_subscribers': function (evt) {
       non_archived_subscribers_dep.changed();
-    }
-  });
-
-  Template.subscribers_emails_list.emailChoices = function() {
-    return FREmails;
-  };
-
-  Template.subscribers_emails_list.emailContents = function() {
-    return Session.get('emailContents') || '';
-  };
-
-  var setEmailContents = function() {
-    var sub = Session.get('subscribersList')[0];
-    var emailKey = $('#email-choice').val();
-    var accountId = '0000000';
-    var userLink = 'https://customerportal.furtherreach.net';
-    var emailObj = FREmails[emailKey];
-    var body = emailObj.body(sub, userLink, accountId); 
-    var subject = emailObj.subject(sub);
-    Session.set('emailContents', {subject: subject, body: body});
-    $('#subscriber_email').modal('show');
-  };
-
-  Template.subscribers_emails_list.events({
+    },
     'click #open_send_email': function() {
       setEmailContents();
      },
@@ -291,5 +255,4 @@ if (Meteor.isClient) {
   close_subscriber_modal = function() {
     $('#subscriber_details_modal').modal('hide');
   };
-
 }

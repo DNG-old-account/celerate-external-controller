@@ -1,6 +1,6 @@
 if (Meteor.isClient) {
   // site details functionality and events.
-  Template.site_details.events({
+  Template.siteDetails.events({
     'click .delete-picture': function (evt) {
       evt.preventDefault();
       var thisPic = this;
@@ -21,7 +21,6 @@ if (Meteor.isClient) {
         }
       });
     },
-
     'click #upload-picture': function (evt) {
       evt.preventDefault();
       var thisSite = this;
@@ -170,20 +169,21 @@ if (Meteor.isClient) {
     }
   });
 
-  Template.site_details.nodes_in_site = function () {
-    return Nodes.find({'site': this._id._str});
-  };
+  Template.siteDetails.helpers({
+    nodes_in_site: function () {
+      return Nodes.find({'site': this._id._str});
+    },
+    picturesList: function() {
+      var thisSite = this;
+      Meteor.call('getPictures', thisSite, function(err, result) {
+        if (!err && typeof result === 'object') {
+          Session.set('pictureList', result);
+        }
+      });
 
-  Template.site_details.picturesList = function() {
-    var thisSite = this;
-    Meteor.call('getPictures', thisSite, function(err, result) {
-      if (!err && typeof result === 'object') {
-        Session.set('pictureList', result);
-      }
-    });
-
-    return Session.get('pictureList');
-  };
+      return Session.get('pictureList');
+    }
+  });
 
   Handlebars.registerHelper('site_type_deletable', function (key) {
     return (key in {'relay': '', 'core': '', 'storage': ''});

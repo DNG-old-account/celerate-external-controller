@@ -1,17 +1,17 @@
-<template name="hardware_page">
+<template name="hardwarePage">
 <body>
-  {{> celerate_navbar}}
+  {{> celerateNavbar}}
   <div class="container-fluid">
     <div class="row">
       <div class="main">
-        {{> hardware_overview}}
+        {{> hardwareOverview}}
       </div>
     </div>
   </div>
 </body>
 </template>
 
-<template name="hardware_overview">
+<template name="hardwareOverview">
   <div class="details">
     {{#if selected_hardware}}
     <div id="hardware_details_modal" class="modal fade" tabindex="-1" role="dialog">

@@ -13,40 +13,40 @@ if (Meteor.isClient) {
     Session.set("hardware_search_input", "");
   });
 
-  Template.hardware_overview.hardwares = function () {
-    var query = {};
-    if (Session.get("hardware_search_input") != null && !Session.equals("hardware_search_input", "")) {
-      console.log("Searching for: ["+Session.get("hardware_search_input")+"]");
-      var subquery = [];
-      for (s in search_fields) {
-        var field_query = {};
-        field_query[search_fields[s]] = { '$regex': Session.get("hardware_search_input"), '$options': 'i'};
-        subquery.push(field_query);
+  Template.hardwareOverview.helpers({
+    hardwares: function () {
+      var query = {};
+      if (Session.get("hardware_search_input") != null && !Session.equals("hardware_search_input", "")) {
+        console.log("Searching for: ["+Session.get("hardware_search_input")+"]");
+        var subquery = [];
+        for (s in search_fields) {
+          var field_query = {};
+          field_query[search_fields[s]] = { '$regex': Session.get("hardware_search_input"), '$options': 'i'};
+          subquery.push(field_query);
+        }
+        query = {$or: subquery};
       }
-      query = {$or: subquery};
+      console.log("query: " + JSON.stringify(query));
+
+      var include_fields = {'name': 1, 'make': 1, 'model': 1, 'ports': 1 };
+
+      var query_options = {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_hardware")};
+      console.log(JSON.stringify(query_options));
+      var result = Hardware.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_hardware")});
+      Session.set("hardware_count", result.count());
+      return result;
+    },
+    hardware_count: function () {
+      return Session.get("hardware_count");
+    },
+    selected_hardware: function () {
+      var hardware = Hardware.findOne(Session.get("selected_hardware"));
+      return hardware;
+      //return _.map(hardware, function(val,key){return {'key': key, 'value': val}});
     }
-    console.log("query: " + JSON.stringify(query));
+  });
 
-    var include_fields = {'name': 1, 'make': 1, 'model': 1, 'ports': 1 };
-
-    var query_options = {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_hardware")};
-    console.log(JSON.stringify(query_options));
-    var result = Hardware.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_hardware")});
-    Session.set("hardware_count", result.count());
-    return result;
-  };
-
-  Template.hardware_overview.hardware_count = function () {
-    return Session.get("hardware_count");
-  };
-
-  Template.hardware_overview.selected_hardware = function () {
-    var hardware = Hardware.findOne(Session.get("selected_hardware"));
-    return hardware;
-    //return _.map(hardware, function(val,key){return {'key': key, 'value': val}});
-  };
-
-  Template.hardware_overview.events({
+  Template.hardwareOverview.events({
     'keyup .hardware_search_input': function (evt) {
       Session.set("hardware_search_input", evt.target.value.trim());
     },
@@ -57,15 +57,7 @@ if (Meteor.isClient) {
       Tracker.afterFlush(function () {
         $('#hardware_details_modal').modal({show:true})
       });
-    }
-  });
-
-
-  Template.hardware.selected = function () {
-    return Session.equals("selected_hardware", this._id) ? 'info' : '';
-  };
-
-  Template.hardware_overview.events({
+    },
     'click .name_header': function () {
       Session.set("name_sort", -1 * Session.get("name_sort"));
       Session.set("primary_sort_field_hardware", "name_sort");
@@ -77,6 +69,13 @@ if (Meteor.isClient) {
     'click .model_header': function () {
       Session.set("model_sort", -1 * Session.get("model_sort"));
       Session.set("primary_sort_field_hardware", "model_sort");
+    }
+  });
+
+
+  Template.hardware.helpers({
+    selected: function () {
+      return Session.equals("selected_hardware", this._id) ? 'info' : '';
     }
   });
 

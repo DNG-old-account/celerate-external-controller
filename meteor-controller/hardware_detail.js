@@ -1,6 +1,6 @@
 if (Meteor.isClient) {
   // Hardware details functionality and events.
-  Template.hardware_details.events({
+  Template.hardwareDetails.events({
     'click .add-port': function (evt) {
       Hardware.update(this._id, {$push: {ports: {name: 'new_port', type: 'wired'}}});
     },
@@ -51,17 +51,19 @@ if (Meteor.isClient) {
     }
   });
 
-  Template.hardware_details.hardware_fields = function () {
-    for (var p in this.ports) {
-      this.ports[p].index = p;
-    }
+  Template.hardwareDetails.helpers({
+    hardware_fields: function () {
+      for (var p in this.ports) {
+        this.ports[p].index = p;
+      }
 
-    return [ { field: "name", label: "Name", value: this.name },
-             { field: "make", label: "Make", value: this.make },
-             { field: "model", label: "Model", value: this.model },
-             { field: "price", label: "Base Price", value: this.price, display_price_text: true },
-             { field: "voltage", label: "Voltage", value: this.voltage },
-             { field: "ports", label: "Ports", value: this.ports, display_ports: true },
-           ];
-  };
+      return [ { field: "name", label: "Name", value: this.name },
+               { field: "make", label: "Make", value: this.make },
+               { field: "model", label: "Model", value: this.model },
+               { field: "price", label: "Base Price", value: this.price, display_price_text: true },
+               { field: "voltage", label: "Voltage", value: this.voltage },
+               { field: "ports", label: "Ports", value: this.ports, display_ports: true },
+             ];
+    }
+  });
 }

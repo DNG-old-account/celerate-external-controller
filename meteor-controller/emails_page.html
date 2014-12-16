@@ -1,17 +1,17 @@
-<template name="emails_page">
+<template name="emailsPage">
 <body>
-  {{> celerate_navbar}}
+  {{> celerateNavbar}}
   <div class="container-fluid">
     <div class="row">
       <div class="main">
-        {{> subscribers_emails_list}}
+        {{> subscribersEmailsList}}
       </div>
     </div>
   </div>
 </body>
 </template>
 
-<template name="subscribers_emails_list">
+<template name="subscribersEmailsList">
   <div class="subscriber-table-header">
     <div class="row">
       {{#each key_value current_search_fields}}
@@ -101,7 +101,7 @@
   </div>
 </template>
 
-<template name="subscriber_email_row">
+<template name="subscriberEmailRow">
 <tr class="subscriber {{selected}}">
   <td>{{first_name}} {{last_name}}</td>
   <td>{{status}}</td>

@@ -2,20 +2,20 @@
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry"></script>
 </head>
 
-<template name="subscriber_page">
+<template name="subscriberPage">
 <body>
-  {{> celerate_navbar}}
+  {{> celerateNavbar}}
   <div class="container-fluid">
     <div class="row">
       <div class="main">
-        {{> subscriber_overview}}
+        {{> subscriberOverview}}
       </div>
     </div>
   </div>
 </body>
 </template>
 
-<template name="subscriber_overview">
+<template name="subscriberOverview">
   <div class="details">
     {{#if selected_subscriber}}
     <div id="subscriber_details_modal" class="modal fade" tabindex="-1" role="dialog">
@@ -76,7 +76,7 @@
     </div>
   </div>
   {{#if true}}
-    {{> subscriber_map}}
+    {{> subscriberMap}}
   {{/if}}
   <div class="table_responsive">
     <table class="table table-striped">

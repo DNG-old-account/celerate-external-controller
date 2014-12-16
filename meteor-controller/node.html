@@ -1,17 +1,17 @@
-<template name="node_page">
+<template name="nodePage">
 <body>
-  {{> celerate_navbar}}
+  {{> celerateNavbar}}
   <div class="container-fluid">
     <div class="row">
       <div class="main">
-        {{> node_overview}}
+        {{> nodeOverview}}
       </div>
     </div>
   </div>
 </body>
 </template>
 
-<template name="node_overview">
+<template name="nodeOverview">
   <div class="details">
     {{#if selected_node}}
     <div id="node_details_modal" class="modal fade" tabindex="-1" role="dialog">

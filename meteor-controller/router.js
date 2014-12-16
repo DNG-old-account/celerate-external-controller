@@ -1,40 +1,41 @@
-var checkUser = function (pause) {
+var checkUser = function () {
   if (!Meteor.user() || !Meteor.user().services.google || (Meteor.user().services.google.email.indexOf("denovogroup.org") == -1)) {
-    this.render('home_page');
-    pause();
+    this.render('homePage');
+  } else {
+    this.next();
   }
 };
 
 Router.onBeforeAction('loading');
 Router.map(function() {
-  this.route('home_page', {path: '/'});
+  this.route('homePage', {path: '/'});
 
-  this.route('hardware_page', {
+  this.route('hardwarePage', {
     path: '/hardware',
     onBeforeAction: checkUser
   });
-  this.route('hardware_details', {path: '/hardware_details/:_id', data: function() { return Hardware.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
+  this.route('hardwareDetails', {path: '/hardware_details/:_id', data: function() { return Hardware.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
 
-  this.route('site_page', {
+  this.route('sitePage', {
     path: '/site',
     onBeforeAction: checkUser
   });
-  this.route('site_details', {path: '/site_details/:_id', data: function() { return Sites.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
+  this.route('siteDetails', {path: '/site_details/:_id', data: function() { return Sites.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
 
-  this.route('node_page', {
+  this.route('nodePage', {
     path: '/node',
     onBeforeAction: checkUser
   });
-  this.route('node_details', {path: '/node_details/:_id', data: function() { return Nodes.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
+  this.route('nodeDetails', {path: '/node_details/:_id', data: function() { return Nodes.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
 
-  this.route('emails_page', {
+  this.route('emailsPage', {
     path: '/emails_page',
     onBeforeAction: checkUser
   });
 
-  this.route('subscriber_page', {
+  this.route('subscriberPage', {
     path: '/subscriber',
     onBeforeAction: checkUser
   });
-  this.route('subscriber_details', {path: '/subscriber_details/:_id', data: function() { return Subscribers.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
+  this.route('subscriberDetails', {path: '/subscriber_details/:_id', data: function() { return Subscribers.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
 });
