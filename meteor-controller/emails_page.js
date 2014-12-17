@@ -26,6 +26,13 @@ if (Meteor.isClient) {
       var seeNeedsPayment = Session.get('seeNeedsPayment');
       return seeNeedsPayment ? 'selected' : '';
     },
+    seePastDue: function() {
+      return Session.get('seePastDue');
+    },
+    seePastDueChecked: function() {
+      var seePastDue = Session.get('seePastDue');
+      return seePastDue ? 'selected' : '';
+    },
     current_search_fields: function () {
       console.log('current search fields.');
       var current_search_fields = Session.get("subscriber_search_fields");
@@ -60,14 +67,32 @@ if (Meteor.isClient) {
         var payments = FRMethods.calculatePayments(sub);
 
         sub.billing_info.needsPayment = false;
+
         if (payments.dueToDate.required && payments.dueToDate.amount > 0) {
           sub.billing_info.needsPayment = true;
+        }
+
+        sub.billing_info.pastDue = false;
+
+        if (typeof payments.dueToDate.payments === 'object' && payments.dueToDate.payments.length > 1) {
+          var startOfMonth = moment().tz('America/Los_Angeles').startOf('month');
+          _.each(payments.dueToDate.payments, function(payment) {
+            if (startOfMonth.add(-2, 'months').add(-1, 'days').isBefore(moment(payment.startDate))) {
+              sub.billing_info.pastDue = true;
+            }
+          });
         }
       });
 
       if (Session.get('seeNeedsPayment')) {
         result = _.filter(result, function(sub) {
           return sub.billing_info.needsPayment;
+        });
+      }
+
+      if (Session.get('seePastDue')) {
+        result = _.filter(result, function(sub) {
+          return sub.billing_info.pastDue;
         });
       }
       Session.set("subscriber_count", result.length);
