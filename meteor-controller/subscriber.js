@@ -34,10 +34,10 @@ if (Meteor.isClient) {
         var query_input = current_search_fields[s];
         if (s === 'global') {
           var global_query = [];
-          var searchable_fields = Template.subscriberOverview.searchable_fields();
+          var searchableFields = Session.get('searchableFields');
 
-          for (f in searchable_fields) {
-            var field = searchable_fields[f];
+          for (f in searchableFields) {
+            var field = searchableFields[f];
             var field_query = {};
             field_query[field] = { '$regex': query_input, '$options': 'i' };
             global_query.push(field_query);
@@ -65,7 +65,10 @@ if (Meteor.isClient) {
 
   Template.subscriberOverview.helpers({
     searchable_fields: function () {
-      return [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "prior_email", "archived", "current_provider", "bts_to_use" ];
+
+      var searchableFields =  [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "prior_email", "archived", "current_provider", "bts_to_use" ];
+      Session.set('searchableFields', searchableFields);
+      return searchableFields;
     },
     current_search_fields: function () {
       var current_search_fields = Session.get("subscriber_search_fields");
