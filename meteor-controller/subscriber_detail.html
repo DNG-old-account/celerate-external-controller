@@ -125,7 +125,12 @@
         <input type="text" class="form-control billing-field" id="billing-extra-labor" value="{{billing_info.installation.additional_labor}}">
       </div>
     </div>
+
     <div class="row">
+      <button id="update-billing" class="btn btn-success pull-right">Save</button>
+    </div>
+
+    <div class="row extra-equipment-form-container">
       <div class="col-sm-6">
         <div class="form-group">
           <label for="billing-extra-equipment" class="col-sm-4 control-label">Extra Equipment:</label>
@@ -189,7 +194,7 @@
       <span class="help-block">The Discount Label will show up on user's bill. Notes are internal documents.</span>
     </div>
     {{#if billing_info.plan_activity}}
-    <h3>Plan Activity</h3>
+    <h4>Plan Activity</h4>
     {{#each billing_info.plan_activity}}
     <div class="row">
       <div class="col-sm-4">
@@ -271,7 +276,6 @@
     </div>
     {{/each}}
     {{/if}}
-    <button id="update-billing" class="btn btn-success pull-right">Save</button>
   </form>
 </div>
 </template>

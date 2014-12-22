@@ -206,3 +206,7 @@ body {
 .subscriber-details-container .billing-info-container #update-billing {
   margin-top: 20px;
 }
+
+.subscriber-details-container .billing-info-container .extra-equipment-form-container {
+  margin-top: 20px;
+}
