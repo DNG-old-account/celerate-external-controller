@@ -188,6 +188,25 @@
     <div class="row">
       <span class="help-block">The Discount Label will show up on user's bill. Notes are internal documents.</span>
     </div>
+    {{#if billing_info.plan_activity}}
+    <h3>Plan Activity</h3>
+    {{#each billing_info.plan_activity}}
+    <div class="row">
+      <div class="col-sm-4">
+        <label>Previous Plan:</label>
+        {{ this.previousPlan }}
+      </div>
+      <div class="col-sm-4">
+        <label>New Plan:</label>
+        {{ this.newPlan }}
+      </div>
+      <div class="col-sm-4">
+        <label>Date:</label>
+        {{ this.date }}
+      </div>
+    </div>
+    {{/each}}
+    {{/if}}
     {{#if billing_info.installation.additional_equipment}}
     <h4 class="row additional-equipment-header">
       Additional Equipment
