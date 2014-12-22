@@ -53,6 +53,7 @@ if (Meteor.isClient) {
         if (subscriber.archived == "true") return "_black";
         if (subscriber.status == "new lead") return "_yellow";
         if (subscriber.status == "connected") return "_green";
+        if (subscriber.plan == "hold") return "_purple";
         if (subscriber.status == "no coverage") return ""; // red is default marker color
         return "_purple";
       };

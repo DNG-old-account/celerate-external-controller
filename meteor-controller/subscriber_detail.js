@@ -52,33 +52,67 @@ if (Meteor.isClient) {
 
             }
           });
-        } else {
-          if (formelement.id === 'plan') {
-            // Check if has current plan
-            if (typeof this.plan === 'string' && this.plan.trim() !== '') {
-              if (this.billing_info !== 'object') {
-                FRMethods.createBillingProperties(this);
-              }
+        } else if (formelement.id === 'plan') {
+          var planChanged = true;
 
-              if (typeof this.billing_info.plan_activity !== 'object') {
-                Subscribers.update(this._id, {$set: {'billing_info.plan_activity': []}}); 
-              }
-              var planChange = {
-                previousPlan: this.plan,
-                newPlan: formelement.value,
-                date: new Date()
-              }
-              Subscribers.update(this._id, {$push: {'billing_info.plan_activity': planChange}}); 
-              // TODO: we need to check to see if subscriber is autopay and then change their plans and do all that fancy magic
-              if (typeof this.billing_info.autopay === 'object' && this.billing_info.autopay.on) {
+          // Check if has current plan
+          if (typeof this.plan === 'string' && this.plan.trim() !== '') {
+            if (this.billing_info !== 'object') {
+              FRMethods.createBillingProperties(this);
+            }
 
-              }
+            if (typeof this.billing_info.plan_activity !== 'object') {
+              Subscribers.update(this._id, {$set: {'billing_info.plan_activity': []}}); 
+            }
+            var planChange = {
+              previousPlan: this.plan,
+              newPlan: formelement.value,
+              date: new Date()
+            }
+            Subscribers.update(this._id, {$push: {'billing_info.plan_activity': planChange}}); 
+            // TODO: we need to check to see if subscriber is autopay and then change their plans and do all that fancy magic
+            if (typeof this.billing_info.autopay === 'object' && this.billing_info.autopay.on) {
+
             }
           }
-          db_update = {};
-          db_update[formelement.id] = formelement.value;
-          Subscribers.update(this._id, {$set: db_update}); 
-          formelement.disabled = true;
+
+          var thisSub = this;
+          if (formelement.value === "hold") {
+            bootbox.confirm("Are you sure you want to put this subscriber on hold - this will send them an email notifying them of the hold?", function(result) {
+              if (result) {
+                Meteor.call('notifyHold', thisSub._id, function(err, result) {
+                  if (result) {
+                  } else {
+                    console.log(err);
+                    bootbox.alert('Error notifying customer of hold <br/> ' + JSON.stringify(err) ); 
+                  }
+                });
+              } else {
+                planChanged = false;
+              }
+            });
+          } else if (formelement.value !== 'hold' && thisSub.plan === 'hold') {
+            bootbox.confirm("Are you sure you want to remove this subscriber from hold? This will send them an email notifying them.", function(result) {
+              if (result) {
+                Meteor.call('notifyRemoveHold', thisSub._id, function(err, result) {
+                  if (result) {
+                  } else {
+                    console.log(err);
+                    bootbox.alert('Error notifying customer of hold removal <br/> ' + JSON.stringify(err) ); 
+                  }
+                });
+              } else {
+                planChanged = false;
+              }
+            });
+          }
+
+          if (planChanged) {
+            db_update = {};
+            db_update[formelement.id] = formelement.value;
+            Subscribers.update(this._id, {$set: db_update}); 
+            formelement.disabled = true;
+          }
         }
 
         // Toggle the icon visual state.

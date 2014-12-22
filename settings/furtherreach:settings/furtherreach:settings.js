@@ -271,13 +271,42 @@ FRMethods = {
           }         
 
           if (typeof sub.billing_info.plan_activity === 'object' && _.size(sub.billing_info.plan_activity) > 0) {
-            _.each(sub.billing_info.plan_activity, function(change) {
+            
+            var thisPeriodsActivity = _.filter(sub.billing_info.plan_activity, function(change) {;
+              var changeDate = moment(change.date).tz('America/Los_Angeles');
+              return (changeDate.isAfter(first) && !changeDate.isSame(first, 'day') && 
+                      changeDate.isBefore(last) && !changeDate.isSame(last, 'day'));
+          });
+
+            thisPeriodsActivity = _.sortBy(thisPeriodsActivity, function(change) {
+              return moment(change.date).unix();
+            });
+
+            _.each(thisPeriodsActivity, function(change, index, planActivity) {
               var changeDate = moment(change.date).tz('America/Los_Angeles');
               if (changeDate.isAfter(first) && !changeDate.isSame(first, 'day') && 
                   changeDate.isBefore(last) && !changeDate.isSame(last, 'day')) {
                 hasChange = true;
-                iterateDates(first, changeDate, change.previousPlan);
-                iterateDates(changeDate, last, change.newPlan);
+                if (planActivity.length === 1) {
+                  iterateDates(first, changeDate, change.previousPlan);
+                  iterateDates(changeDate, last, change.newPlan);
+                } else if (planActivity.length === 2){
+                  if (index === 0) {
+                    iterateDates(first, changeDate, change.previousPlan);
+                    iterateDates(changeDate, moment(planActivity[index + 1].date).tz('America/Los_Angeles'), change.newPlan);
+                  } else {
+                    iterateDates(changeDate, last, change.newPlan);
+                  }
+                } else {
+                  if (index === 0) {
+                    iterateDates(first, changeDate, change.previousPlan);
+                  } else if (index === planActivity.length - 1) {
+                    iterateDates(changeDate, last, change.newPlan);
+                  } else {
+                    iterateDates(moment(planActivity[index - 1].date).tz('America/Los_Angeles'), changeDate, change.previousPlan);
+                    iterateDates(changeDate, moment(planActivity[index + 1].date).tz('America/Los_Angeles'), change.newPlan);
+                  }
+                }
               }
             });
           } 
@@ -631,6 +660,7 @@ FREmails = {
              '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
     }
   },
+
   billingReminder: {
     slug: 'billing-reminder',
     label: 'Billing Reminder',
@@ -656,6 +686,7 @@ FREmails = {
              '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
     }
   },
+
   emailProblems: {
     slug: 'payment-problems',
     label: 'Payment Problems',
@@ -682,6 +713,49 @@ FREmails = {
              'User ID: ' + context.email + '\n' + 
              '\n\n\nThank you for choosing FurtherReach!' + 
              '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
+    }
+  },
+
+  notifyRemoveHold: {
+    slug: 'notify-remove-hold',
+    label: 'Notification of Hold Removal',
+    from: 'Further Reach Billing <billing@furtherreach.net>',
+    subject: function(context) {
+      return 'Further Reach Message - Your plan is no longer on hold';
+    },
+    body: function(context, userLink, accountNum) {
+      context.first_name = (typeof context.first_name === 'string') ? context.first_name : '';
+      context.last_name = (typeof context.last_name === 'string') ? context.last_name : '';
+      context.email = (typeof context.email === 'string') ? context.email : '';
+      context.plan = (typeof context.plan === 'string') ? context.plan : '';
+      return 'Dear ' + context.first_name + ' ' + context.last_name + 
+             '\n\nYour plan is no longer on hold. \n\n' +
+             'Account Number: ' + accountNum + '\n' + 
+             'User ID: ' + context.email + '\n' + 
+             '\n\n\nThank you for choosing FurtherReach!' + 
+             '\n\nQuestions? Send us an email at billing@furtherreach.net\n\n';
+    }
+  },
+
+  notifyHold: {
+    slug: 'notify-hold',
+    label: 'Notify of Hold',
+    from: 'Further Reach Billing <billing@furtherreach.net>',
+    subject: function(context) {
+      return 'Further Reach Message - Your plan is on hold';
+    },
+    body: function(context, userLink, accountNum) {
+      context.first_name = (typeof context.first_name === 'string') ? context.first_name : '';
+      context.last_name = (typeof context.last_name === 'string') ? context.last_name : '';
+      context.email = (typeof context.email === 'string') ? context.email : '';
+      context.plan = (typeof context.plan === 'string') ? context.plan : '';
+      return 'Dear ' + context.first_name + ' ' + context.last_name + 
+             '\n\nYour plan has been put on hold. You will be charged $20/month and you will not recieve service, ' + 
+             'but you will keep your hardware. Please give as at least a few days heads up before you would like your service resumed. \n\n' +
+             'Account Number: ' + accountNum + '\n' + 
+             'User ID: ' + context.email + '\n' + 
+             '\n\n\nThank you for choosing FurtherReach!' + 
+             '\n\nQuestions? Send us an email at billing@furtherreach.net\n\n';
     }
   },
 

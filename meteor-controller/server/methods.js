@@ -1,18 +1,25 @@
 // In your server code: define a method that the client can call
 
-var sendEmail = function (to, from, subject, text, tries) {
+var sendEmail = function (to, from, subject, text, tries, bcc) {
   var numTries = FRSettings.email.retries;
   tries = (typeof tries !== 'undefined') ? tries : 0;
 
   check([to, from, subject, text], [String]);
 
+  var emailConfig = {
+    to: to,
+    from: from,
+    subject: subject,
+    text: text
+  };
+
+  if (typeof bcc !== 'undefined') {
+    emailConfig.bcc = bcc;
+  }
+ 
+
   try {
-    Email.send({
-      to: to,
-      from: from,
-      subject: subject,
-      text: text
-    });
+    Email.send(emailConfig);
     console.log('Sent email to: ' + to);
   } catch (e) {
     console.log('Error sending email to: ' + to);
@@ -23,7 +30,7 @@ var sendEmail = function (to, from, subject, text, tries) {
     if (tries < numTries) {
       tries++;
       Meteor.setTimeout(function() {
-        sendEmail(to, from, subject, text, tries);
+        sendEmail(to, from, subject, text, tries, bcc);
       }, 1000);
     } else {
       var errorSubject = 'Error Sending Email to: ' + to;
@@ -36,6 +43,27 @@ var sendEmail = function (to, from, subject, text, tries) {
     }
   }
 };
+
+var getEmail = function(sub) {
+  if (typeof sub.prior_email === 'string' &&
+      FRMethods.isValidEmail(sub.prior_email)) {
+    return sub.prior_email
+  } else {
+    if (typeof sub.contacts === 'object') {
+      _.each(sub.contacts, function(c) {
+        if (c.type === 'billing') {
+          contactObj = Contacts.findOne(c.contact_id);
+          if (typeof contactObj.email === 'string' &&
+              contactObj.email.trim() !== '' &&
+              FRMethods.isValidEmail(contactObj.email)) {
+
+            return contactObj.email;
+          }
+        }
+      });
+    }
+  }
+}
 
 Meteor.methods({
   generateAuthToken: function (subscriber_id) {
@@ -102,29 +130,12 @@ Meteor.methods({
       var subject = emailObj.subject(sub);
       var accountId = FRMethods.generateSubscriberAccountId(subId);
 
+      sub.email = getEmail(sub);
+
       var startOfThisMonth = moment().add(1, 'days').startOf('month'); 
       var billingDate = (startOfThisMonth.month() + 1) + '/15/' + startOfThisMonth.year();
 
       sub.billingDate = billingDate;
-
-      if (typeof sub.prior_email === 'string' &&
-          FRMethods.isValidEmail(sub.prior_email)) {
-        sub.email = sub.prior_email;
-      } else {
-        if (typeof sub.contacts === 'object') {
-          _.each(sub.contacts, function(c) {
-            if (c.type === 'billing') {
-              contactObj = Contacts.findOne(c.contact_id);
-              if (typeof contactObj.email === 'string' &&
-                  contactObj.email.trim() !== '' &&
-                  FRMethods.isValidEmail(contactObj.email)) {
-
-                sub.email = contactObj.email;
-              }
-            }
-          });
-        }
-      }
 
       var body = emailObj.body(sub, userLink, accountId); 
 
@@ -134,6 +145,48 @@ Meteor.methods({
     return true;
   },
 
+  notifyRemoveHold: function(subId) {
+    var sub = Subscribers.findOne(subId);
+
+    // Let other method calls from the same client start running,
+    // without waiting for the email sending to complete.
+    this.unblock();
+
+    var emailObj = FREmails.notifyRemoveHold;
+    var authToken = Meteor.call('generateAuthToken', sub._id._str);
+    var userLink = Meteor.settings.public.urls.customerPortal + authToken;
+    var accountId = FRMethods.generateSubscriberAccountId(sub._id._str);
+
+    sub.email = getEmail(sub);
+
+    var body = emailObj.body(sub, userLink, accountId); 
+    var subject = emailObj.subject(sub);
+    sendEmail(sub.email, emailObj.from, subject, body, 0, FRSettings.email.notificationEmails);
+
+    return true;
+  },
+
+  notifyHold: function(subId) {
+    var sub = Subscribers.findOne(subId);
+
+    // Let other method calls from the same client start running,
+    // without waiting for the email sending to complete.
+    this.unblock();
+
+    var emailObj = FREmails.notifyHold;
+    var authToken = Meteor.call('generateAuthToken', sub._id._str);
+    var userLink = Meteor.settings.public.urls.customerPortal + authToken;
+    var accountId = FRMethods.generateSubscriberAccountId(sub._id._str);
+
+    sub.email = getEmail(sub);
+
+    var body = emailObj.body(sub, userLink, accountId); 
+    var subject = emailObj.subject(sub);
+    sendEmail(sub.email, emailObj.from, subject, body, 0, FRSettings.email.notificationEmails);
+
+    return true;
+  },
+      
   discountAutopay: function(subId, discount) {
     var thisSub = Subscribers.findOne(subId);
     var stripe = Meteor.npmRequire('stripe')(Meteor.settings.stripe.privateKey);
