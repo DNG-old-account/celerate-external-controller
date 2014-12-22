@@ -255,8 +255,26 @@ if (Meteor.isClient) {
         notes: notes,
         label: label
       };
-      // TODO: (max) - need to figure out if autopay is on, and then apply a discount to their subscription
-      Subscribers.update(thisSub._id, {$push: {'billing_info.discounts': discount }});
+
+      if (thisSub.billing_info.installation.paid &&
+          typeof thisSub.billing_info.autopay === 'object' &&
+          thisSub.billing_info.autopay.on === true) {
+
+        Meteor.call('discountAutopay', thisSub._id, discount, function(err, result) {
+          if (result) {
+            result.discount.used = true;
+            result.discount.stripeCoupon = result.coupon;
+            result.discount.dateUsed = new Date();
+            result.discount.notes += " - Applied to Autopay."
+            Subscribers.update(thisSub._id, {$push: {'billing_info.discounts': result.discount }});
+          } else {
+            console.log(err);
+            bootbox.alert('Error adding discount to autopay <br/> ' + JSON.stringify(err) ); 
+          }
+        });
+      } else {
+        Subscribers.update(thisSub._id, {$push: {'billing_info.discounts': discount }});
+      }
     },
 
     'click .delete-discount': function (evt) {

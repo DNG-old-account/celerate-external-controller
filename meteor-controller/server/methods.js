@@ -132,5 +132,50 @@ Meteor.methods({
       
     });
     return true;
+  },
+
+  discountAutopay: function(subId, discount) {
+    var thisSub = Subscribers.findOne(subId);
+    var stripe = Meteor.npmRequire('stripe')(Meteor.settings.stripe.privateKey);
+    var stripeResp;
+ 
+    // Add stripe "coupon" - amount in cents as always
+    stripeResp = Async.runSync(function(done) {
+      stripe.coupons.create({
+        amount_off: parseInt(discount.amount * 100, 10),
+        currency: 'usd',
+        duration: 'once',
+      }, 
+      function(err, result) {
+        done(err, result);
+      });
+    });
+
+    if (stripeResp.err || !stripeResp.result) {
+      console.log(stripeResp);
+      throw new Meteor.Error("Couldn't create the Stripe Coupon.", stripeResp);
+    }
+
+    var coupon = stripeResp.result;
+
+    // Apply stripe "coupon" to actual customer 
+    stripeResp = Async.runSync(function(done) {
+      stripe.customers.update(thisSub.billing_info.autopay.customer.id, {
+        coupon: coupon.id,
+      }, 
+      function(err, result) {
+        done(err, result);
+      });
+    });
+
+    if (stripeResp.err || !stripeResp.result) {
+      console.log(stripeResp);
+      throw new Meteor.Error("Couldn't apply coupon to customer", stripeResp);
+    }
+
+    return {
+      coupon: coupon,
+      discount: discount
+    }
   }
 });
