@@ -29,6 +29,10 @@ FRSettings = {
       },
       "community - $0": function(amount) {
         return 0;
+      },
+      "annual discount - 1/12 off": function(amount) {
+        var newAmt = amount - (amount / 12);
+        return Math.round10(newAmt, 2);
       }
     },
 
