@@ -186,7 +186,99 @@ Meteor.methods({
 
     return true;
   },
-      
+       
+  autopayPlanChange: function(subId, planChange) {
+    var sub = Subscribers.findOne(subId);
+    var stripe = Meteor.npmRequire('stripe')(Meteor.settings.stripe.privateKey);
+    var stripeResp;
+
+    var calcTotalPaymentObj = FRMethods.calcTotalPayment(sub, 0, true);
+    var totalPayment = Math.round(calcTotalPaymentObj.total * 100);
+    var requiredPayments = calcTotalPaymentObj.requiredPayments;
+ 
+    var hasMore = true;
+    var plans = [];
+    var lastPlan = undefined;
+    var stripeRestConfig = {limit: 100};
+
+    // Check to see if a plan already exists with the proper name and amount
+    while (hasMore) {
+      if (typeof lastPlan === 'string') {
+        stripeRestConfig.starting_after = lastPlan;
+      }
+      stripeResp = Async.runSync(function(done) {
+        stripe.plans.list(stripeRestConfig, function(err, result) {
+          done(err, result);
+        });
+      });
+
+      if (stripeResp.err || !stripeResp.result) {
+        console.log(stripeResp);
+        throw new Meteor.Error("Stripe couldn't list plans", stripeResp);
+      }
+      if (typeof _.last(stripeResp.result.data) === 'object') {
+        lastPlan = _.last(stripeResp.result.data).id;
+        plans = plans.concat(stripeResp.result.data);
+      }
+      hasMore = plans.has_more;
+    }
+
+    if (typeof requiredPayments.nextMonthsPayment === 'object') {
+      var monthlyPayment = requiredPayments.nextMonthsPayment;
+    } else {
+      console.log('Couldn\'t find next months payment');
+      console.log(requiredPayments);
+      throw new Meteor.Error("Couldn't find next months payment", requiredPayments);
+    }
+
+    var planName = sub.plan + '-' + (monthlyPayment.amount * 100);
+    var myPlan = _.find(plans, function(plan) {
+      return planName === plan.id && plan.amount === monthlyPayment.amount * 100;
+    });
+
+    // If there isn't already a plan for this sub we gotta create one!
+    if (typeof myPlan !== 'object') {
+      stripeResp = Async.runSync(function(done) {
+        stripe.plans.create({
+          id: planName,
+          amount: monthlyPayment.amount * 100,
+          currency: 'usd',
+          interval: 'month',
+          name: FRSettings.billing.plans[sub.plan].label,
+          statement_description: 'FR Monthly',
+        }, function(err, result) {
+          done(err, result);
+        });
+      });
+      if (stripeResp.err || !stripeResp.result) {
+        console.log(stripeResp);
+        throw new Meteor.Error("Stripe couldn't create plan", stripeResp);
+      }
+      myPlan = stripeResp.result;
+    }
+
+
+    stripeResp = Async.runSync(function(done) {
+      stripe.customers.updateSubscription(sub.billing_info.autopay.customer.id, sub.billing_info.autopay.subscription.id, {
+        plan: myPlan.id,
+        prorate: true,
+        trial_end: sub.billing_info.autopay.subscription.trial_end
+      }, 
+      function(err, result) {
+        done(err, result);
+      });
+    });
+
+    if (stripeResp.err || !stripeResp.result) {
+      console.log(stripeResp);
+      throw new Meteor.Error("Couldn't change customers plans", stripeResp);
+    }
+
+    var subscription = stripeResp.result;
+    Subscribers.update(sub._id, {$set: {'billing_info.autopay.subscription': subscription }});
+    return subscription;
+  },
+
   discountAutopay: function(subId, discount) {
     var thisSub = Subscribers.findOne(subId);
     var stripe = Meteor.npmRequire('stripe')(Meteor.settings.stripe.privateKey);

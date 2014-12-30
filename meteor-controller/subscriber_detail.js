@@ -2,6 +2,7 @@ if (Meteor.isClient) {
   // Subscriber details functionality and events.
   Template.subscriberDetails.events({
     'click': function (evt) {
+      var thisSub = this;
       console.log(evt);
 
       if (evt.target.id == "edit" && !evt.target.classList.contains("text-gray")) {
@@ -70,13 +71,9 @@ if (Meteor.isClient) {
               date: new Date()
             }
             Subscribers.update(this._id, {$push: {'billing_info.plan_activity': planChange}}); 
-            // TODO: we need to check to see if subscriber is autopay and then change their plans and do all that fancy magic
-            if (typeof this.billing_info.autopay === 'object' && this.billing_info.autopay.on) {
-
-            }
+            
           }
 
-          var thisSub = this;
           if (formelement.value === "hold") {
             bootbox.confirm("Are you sure you want to put this subscriber on hold - this will send them an email notifying them of the hold?", function(result) {
               if (result) {
@@ -108,12 +105,37 @@ if (Meteor.isClient) {
           }
 
           if (planChanged) {
+            // We actually have to update the db for our server methods
             db_update = {};
-            db_update[formelement.id] = formelement.value;
-            Subscribers.update(this._id, {$set: db_update}); 
-            formelement.disabled = true;
+            var formerPlan = thisSub.plan;
+            db_update.plan = formelement.value;
+            Subscribers.update(thisSub._id, {$set: db_update}); 
+
+            if (typeof thisSub.billing_info.autopay === 'object' && thisSub.billing_info.autopay.on) {
+              Meteor.call('autopayPlanChange', thisSub._id, planChange, function(err, result) {
+                // Toggle the icon visual state.
+                evt.target.classList.add("text-gray");
+                evt.target.previousElementSibling.classList.remove("text-gray");
+                formelement.disabled = true;
+                if (result) {
+                  // then our dbUpdate is fine
+                } else {
+                  console.log(err);
+                  bootbox.alert('Error changing autopay plan <br/> ' + JSON.stringify(err) ); 
+                  // Now we need to roll back our db update
+                  $(formelement).val(thisSub.plan);
+                  db_update = {};
+                  db_update['plan'] = formerPlan;
+                }
+              });
+            }
+            return;
           }
         }
+        db_update = {};
+        db_update[formelement.id] = formelement.value;
+        Subscribers.update(thisSub._id, {$set: db_update}); 
+        formelement.disabled = true;
 
         // Toggle the icon visual state.
         evt.target.classList.add("text-gray");
