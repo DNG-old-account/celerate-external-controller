@@ -14,6 +14,7 @@ coffeescript@1.0.4
 ctl-helper@1.0.4
 ctl@1.0.2
 ddp@1.0.12
+deepwell:raven@0.3.0
 deps@1.0.5
 ejson@1.0.4
 fastclick@1.0.1
