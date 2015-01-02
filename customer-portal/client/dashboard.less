@@ -10,6 +10,24 @@ body {
   font-family: "Roboto Slab","Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
+/* 
+ * Noscript content 
+*/
+body:after {
+  content: "Javascript is required to view the customer portal. If you have an issue enabling javascript, please contact support at support@furtherreach.net or (707) 278-8899";
+  text-align: center;
+  display: block;
+  width: 85%;
+  margin: auto;
+  margin-top: 100px;
+  font-size: 34px;
+}
+
+body.loaded:after {
+  content: none;
+}
+
+
 /*
  * Global add-ons
  */
