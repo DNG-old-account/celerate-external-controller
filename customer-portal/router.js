@@ -60,7 +60,12 @@ Router.map(function() {
         throw new Meteor.Error("Couldn't retrieve the stripe event.", stripeResp);
       }
 
-      var sEvent = stripeResp.result;
+      var sObjectWrapper = stripeResp.result;
+      if (typeof sObjectWrapper.data !== 'object') {
+        console.log(sObjectWrapper);
+        throw new Meteor.Error("Couldn't retrieve the stripe event.", stripeResp);
+      }
+      var sEvent = sObjectWrapper.data;
 
       if (sEvent.object === 'invoice' &&
           sEvent.paid === true) {
