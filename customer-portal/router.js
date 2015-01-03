@@ -74,7 +74,7 @@ Router.map(function() {
         var sub = Subscribers.find({'billing_info.autopay.subscription.id': sEvent.subscription});
         var totalPaid = sEvent.total / 100; // stripe does cents
 
-        var requiredPayments = FRMethods.calculatePayments();
+        var requiredPayments = FRMethods.calculatePayments(sub);
         var chargeStart = requiredPayments.dueToDate.startDate;
         var chargeEnd = requiredPayments.dueToDate.endDate;
 
