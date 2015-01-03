@@ -71,7 +71,7 @@ Router.map(function() {
 
       if (sEvent.object === 'invoice' &&
           sEvent.paid === true) {
-        var sub = Subscribers.find({'billing_info.autopay.subscription.id': sEvent.subscription});
+        var sub = Subscribers.findOne({'billing_info.autopay.subscription.id': sEvent.subscription});
         var totalPaid = sEvent.total / 100; // stripe does cents
 
         var requiredPayments = FRMethods.calculatePayments(sub);
@@ -92,7 +92,7 @@ Router.map(function() {
 
         var charge = stripeResp.result;
 
-        if (requiredPayments.dueToDate.amount === total) {
+        if (requiredPayments.dueToDate.amount === totalPaid) {
 
           var monthlyPayment = {
             amount: totalPaid,
@@ -100,7 +100,7 @@ Router.map(function() {
             end_date: chargeEnd,
             charge: charge
           };
-          Subscribers.update(thisSub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
+          Subscribers.update(sub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
         }
       }
 
