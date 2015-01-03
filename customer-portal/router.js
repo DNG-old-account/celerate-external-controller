@@ -94,6 +94,8 @@ Router.map(function() {
 
         if (requiredPayments.dueToDate.amount === totalPaid) {
 
+          charge.description = 'Monthly payment for the period ' + moment(chargeStart).format('MM/DD/YYYY') + ' to ' + moment(chargeEnd).format('MM/DD/YYYY') + '.'
+
           var monthlyPayment = {
             amount: totalPaid,
             start_date: chargeStart,
@@ -101,6 +103,7 @@ Router.map(function() {
             charge: charge
           };
           Subscribers.update(sub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
+          Subscribers.update(sub._id, {$push: {'billing_info.charges': charge}});
         }
       }
 
