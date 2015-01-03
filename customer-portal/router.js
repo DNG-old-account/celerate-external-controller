@@ -61,11 +61,13 @@ Router.map(function() {
       }
 
       var sObjectWrapper = stripeResp.result;
-      if (typeof sObjectWrapper.data !== 'object') {
+      if (typeof sObjectWrapper.data !== 'object' || 
+          typeof sObjectWrapper.data.object !== 'object') {
         console.log(sObjectWrapper);
         throw new Meteor.Error("Couldn't retrieve the stripe event.", stripeResp);
       }
-      var sEvent = sObjectWrapper.data;
+      var sEvent = sObjectWrapper.data.object;
+      console.log(sEvent);
 
       if (sEvent.object === 'invoice' &&
           sEvent.paid === true) {
