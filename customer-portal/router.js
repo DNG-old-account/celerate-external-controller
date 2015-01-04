@@ -78,32 +78,34 @@ Router.map(function() {
         var chargeStart = requiredPayments.dueToDate.startDate;
         var chargeEnd = requiredPayments.dueToDate.endDate;
 
-        stripeResp = Async.runSync(function(done) {
-          stripe.charges.retrieve(sEvent.charge, function(err, charge) {
-            done(err, charge);
+        if (typeof sEvent.charge === "string") {
+          stripeResp = Async.runSync(function(done) {
+            stripe.charges.retrieve(sEvent.charge, function(err, charge) {
+              done(err, charge);
+            });
           });
-        });
- 
-        console.log(stripeResp);
-        if (stripeResp.err || !stripeResp.result) {
+   
           console.log(stripeResp);
-          throw new Meteor.Error("Couldn't retrieve the stripe charge.", stripeResp);
-        }
+          if (stripeResp.err || !stripeResp.result) {
+            console.log(stripeResp);
+            throw new Meteor.Error("Couldn't retrieve the stripe charge.", stripeResp);
+          }
 
-        var charge = stripeResp.result;
+          var charge = stripeResp.result;
 
-        if (requiredPayments.dueToDate.amount === totalPaid) {
+          if (requiredPayments.dueToDate.amount === totalPaid) {
 
-          charge.description = 'Monthly payment for the period ' + moment(chargeStart).format('MM/DD/YYYY') + ' to ' + moment(chargeEnd).format('MM/DD/YYYY') + '.'
+            charge.description = 'Monthly payment for the period ' + moment(chargeStart).format('MM/DD/YYYY') + ' to ' + moment(chargeEnd).format('MM/DD/YYYY') + '.'
 
-          var monthlyPayment = {
-            amount: totalPaid,
-            start_date: chargeStart,
-            end_date: chargeEnd,
-            charge: charge
-          };
-          Subscribers.update(sub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
-          Subscribers.update(sub._id, {$push: {'billing_info.charges': charge}});
+            var monthlyPayment = {
+              amount: totalPaid,
+              start_date: chargeStart,
+              end_date: chargeEnd,
+              charge: charge
+            };
+            Subscribers.update(sub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
+            Subscribers.update(sub._id, {$push: {'billing_info.charges': charge}});
+          }
         }
       }
 
