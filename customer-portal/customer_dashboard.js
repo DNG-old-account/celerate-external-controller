@@ -173,7 +173,6 @@ if (Meteor.isClient) {
           email: billingInfo.contact.email,
           description: '',
           requiredPayments: requiredPayments,
-          installmentAmount: Session.get('installmentAmount')
       }
       if (requiredPayments.dueToDate.required) {
         typesOfCharges.push('monthly');
@@ -192,6 +191,7 @@ if (Meteor.isClient) {
 
         if ($('#installment-choices').val() === 'installment') {
           typesOfCharges.push('installment');
+          stripeConfig.installmentAmount = Session.get('installmentAmount');
           stripeConfig.description += 'Installation Installment Payment';
 
         } else {
