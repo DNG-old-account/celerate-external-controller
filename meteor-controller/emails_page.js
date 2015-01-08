@@ -137,13 +137,11 @@ if (Meteor.isClient) {
       }
     },
     'click #select-all-emails': function (evt) {
-      $('.email-sub').each(function(index, elem) {
-        if ($(elem).prop('checked')) {
-          $(elem).attr('checked', false);
-        } else {
-          $(elem).attr('checked', true);
-        }
-      });
+      if ($(evt.target).prop('checked')) {
+        $('.email-sub').prop('checked', true);
+      } else {
+        $('.email-sub').prop('checked', false);
+      }
     },
     'change #see-past-due': function (evt) {
       if ($(evt.target).prop('checked')) {
