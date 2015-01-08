@@ -688,33 +688,6 @@ FREmails = {
              '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
     }
   },
-  installationBillingIssue: {
-    slug: 'installation-billing-issue',
-    label: 'Installation Billing Issue',
-    from: 'Further Reach Billing <billing@furtherreach.net>',
-    subject: function(context) {
-      return 'Further Reach Message - Installation Payment Error';
-    },
-    body: function(context, userLink, accountNum) {
-      context.first_name = (typeof context.first_name === 'string') ? context.first_name : '';
-      context.last_name = (typeof context.last_name === 'string') ? context.last_name : '';
-      context.email = (typeof context.email === 'string') ? context.email : '';
-      context.plan = (typeof context.plan === 'string') ? context.plan : '';
-      return 'Dear ' + context.first_name + ' ' + context.last_name + 
-             '\n\nIt has recently come to our attention that, due to an error in our software, you were charged $25 ' + 
-             'instead of $150 for your installation. \n' + 
-             'We apologize for the mix up and any confustion it might have caused. As a token of our appreciation ' +
-             'of your patience, we\'ve discounted your installation bill by $25.' +
-             '\nPlease let us know if you have any questions or concerns.' + 
-             '\n\nYour customer dashboard can be viewed here: \n' +
-             userLink +
-             '\n\nPlan: ' + (context.plan.slice(0, 1).toUpperCase() + context.plan.slice(1)) + '\n' + // TODO: This is just capitalizing the first letter - we should move this to helpers
-             'Account Number: ' + accountNum + '\n' + 
-             'User ID: ' + context.email + '\n' + 
-             '\n\n\nThank you for choosing FurtherReach!' + 
-             '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
-    }
-  }
 
 };
 
