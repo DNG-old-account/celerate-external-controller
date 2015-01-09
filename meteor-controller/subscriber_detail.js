@@ -249,6 +249,7 @@ if (Meteor.isClient) {
       var notes = $('#discount-notes').val();
       var label = $('#discount-label').val();
       var discount = {
+        _id: new Meteor.Collection.ObjectID(),
         amount: amount,
         dateCreated: new Date(),
         used: false,

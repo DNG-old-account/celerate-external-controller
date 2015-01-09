@@ -374,8 +374,9 @@ Meteor.methods({
 
             updatedDiscount.used = true;
             updatedDiscount.dateUsed = new Date();
+            updatedDiscount._id = new Meteor.Collection.ObjectID();
 
-            Subscribers.update(thisSub._id, {$pull: {'billing_info.discounts': {'dateCreated': discount._id}}});
+            Subscribers.update(thisSub._id, {$pull: {'billing_info.discounts': {'_id': discount._id}}});
             Subscribers.update(thisSub._id, {$push: {'billing_info.discounts': updatedDiscount }});
           }
         });
