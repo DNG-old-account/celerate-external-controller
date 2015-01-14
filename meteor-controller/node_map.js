@@ -50,7 +50,8 @@ if (Meteor.isClient) {
       markers = {};
 
       var node_to_color = function (node) {
-        var defaultcolor = "_grey";
+        var defaultcolor = ""; // red
+        var ignorecolor = "_grey";
         var colormap = {
           "core": "_orange",
           "cpe": "_green",
@@ -73,7 +74,7 @@ if (Meteor.isClient) {
             return type_to_color(node.type);
           }
 
-          return defaultcolor;
+          return ignorecolor;
         }
 
         // No node is selected, so show normal colors.

@@ -1,10 +1,10 @@
 if (Meteor.isClient) {
-  var sort_fields = ["status_sort", "name_sort", "hardware_sort", "mac_sort"];
-  var sort_fields_to_label = {"status_sort": "status", "name_sort": "name", "hardware_sort": "hardware", "mac_sort": "mac"};
+  var sort_fields = ["mapped_sort", "name_sort", "hardware_sort", "mac_sort"];
+  var sort_fields_to_label = {"mapped_sort": "lat", "name_sort": "name", "hardware_sort": "hardware", "mac_sort": "mac"};
 
   Meteor.startup(function() {
-    Session.set("primary_sort_field_nodes", "status_sort");
-    Session.set("status_sort", -1);
+    Session.set("primary_sort_field_nodes", "name_sort");
+    Session.set("mapped_sort", -1);
     Session.set("name_sort", 1);
     Session.set("hardware_sort", 1);
     Session.set("mac_sort", 1);
@@ -131,9 +131,9 @@ if (Meteor.isClient) {
       Session.set("name_sort", -1 * Session.get("name_sort"));
       Session.set("primary_sort_field_nodes", "name_sort");
     },
-    'click .status_header': function () {
-      Session.set("status_sort", -1 * Session.get("status_sort"));
-      Session.set("primary_sort_field_nodes", "status_sort");
+    'click .mapped_header': function () {
+      Session.set("mapped_sort", -1 * Session.get("mapped_sort"));
+      Session.set("primary_sort_field_nodes", "mapped_sort");
     },
     'click .hardware_header': function () {
       Session.set("hardware_sort", -1 * Session.get("hardware_sort"));
