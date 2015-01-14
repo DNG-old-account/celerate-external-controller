@@ -64,5 +64,6 @@ if (Meteor.isClient) {
     return typeof collection === "object";
   });
 
+  search_input_lag_ms = 500;
 }
 

@@ -158,10 +158,13 @@ if (Meteor.isClient) {
                { field: "site", label: "Site", value: this.site, options: true, options_custom_view: site_options },
                { field: "status", label: "Status", value: this.status, options: status_options },
                { field: "mac", label: "MAC", value: this.mac },
+               { field: "vendor_uid", label: "Vendor UID", value: this.vendor_uid },
                { field: "lat", label: "Lat", value:this.lat },
                { field: "lng", label: "Lng", value:this.lng },
+               { field: "alt", label: "Altitude", value:this.alt },
+               { field: "management_ip", label: "Management IP", value:this.management_ip },
                { field: "notes", label: "Notes", value:this.notes },
-               { field: "ports", label: "Ports", value: this.ports, display_ports: true },
+               // { field: "ports", label: "Ports", value: this.ports, display_ports: true },
              ];
     },
     hardware_data: function () {

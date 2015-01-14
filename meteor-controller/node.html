@@ -1,3 +1,7 @@
+<head>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry"></script>
+</head>
+
 <template name="nodePage">
 <body>
   {{> celerateNavbar}}
@@ -36,11 +40,45 @@
 
   <br><br>
   <div class="node_table_header">
-    <span class="glyphicon glyphicon-search"></span>
-    <span class="badge">{{node_count}}</span>
-    <input class="node_search_input" id="node_search_input" type="search" placeholder="Search nodes" value="">
-    <button type="button" class="new_node_button btn btn-warning" id="new_node_button">Add New Node</button>
+    <div class="row">
+      {{#each key_value current_search_fields}}
+      <div class="col-md-2">
+        <h4><span class="delete_search_field label label-default">{{key}}: {{value}}</span></h4>
+      </div>
+      {{/each}}
+    </div>
+
+    <div class="row">
+      <div class="col-md-3">
+        <select class="form-control" id="search_tag">
+          <option value="global">global</option>
+          {{#each searchable_fields}}
+          <option value="{{this}}">{{this}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <button type="button" class="btn btn-success" id="add_search_field">Add Search Field</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8">
+        <span class="glyphicon glyphicon-search"></span>
+        <span class="badge">{{node_count}}</span>
+        <input class="node_search_input" id="node_search_input" type="search" placeholder="Search nodes" value="">
+      </div>
+      <div class="col-md-2">
+        <div class="show_map checkbox"><label><input type="checkbox" id="show_map" checked>Show Map</label></div>
+        <div class="recenter_map checkbox"><label><input type="checkbox" id="recenter_map" checked>Recenter Map</label></div>
+      </div>
+      <div class="col-md-2">
+        <button type="button" class="new_user_button btn btn-warning" id="new_node_button">Add New Node</button>
+      </div>
+    </div>
   </div>
+  {{#if true}}
+    {{> nodeMap}}
+  {{/if}}
   <div class="table_responsive">
     <table class="table table-striped">
       <thead><tr><th class="name_header">Name</th><th class="status_header">Status</th><th class="hardware_header">Hardware</th><th class="mac_header">MAC</th><th class="col-sm-1"></th><th class="edit_row_column"></th></tr></thead>
