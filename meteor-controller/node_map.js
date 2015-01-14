@@ -29,7 +29,7 @@ if (Meteor.isClient) {
 
     Deps.autorun(function() {
       if (!Session.equals("selected_node", null)) {
-        var m = markers[Session.get("selected_node")];
+        var m = markers[Session.get("selected_node")._str];
         if (m != null) {
           if (Session.get("recenter_map")) {
             map.setCenter(m.position);
@@ -70,7 +70,7 @@ if (Meteor.isClient) {
           if (node._id._str === selected_node._str) {
             return type_to_color(node.type);
           }
-          if (adjacent_nodes[node._id]) {
+          if (adjacent_nodes[node._id._str]) {
             return type_to_color(node.type);
           }
 
@@ -83,8 +83,24 @@ if (Meteor.isClient) {
 
       var bounds = new google.maps.LatLngBounds();
 
+      // Sets all the foregrounded markers back to a z-index of 0.
+      var reset_existing_z_index_values = function () {
+        var selected_node = Session.get("selected_map_node");
+        if (selected_node) {
+          markers[selected_node._str].setZIndex(0);
+        }
+
+        var adj_nodes = Session.get("selected_map_node_adjacent_nodes");
+        for (n in adj_nodes) {
+          console.log("resetting z-index for: ");
+          console.log(n);
+          markers[n].setZIndex(0);
+        }
+      };
+
       // Add a listener to unset the selected node when you click someplace on the map.
       google.maps.event.addListener(map, 'click', function() {
+        reset_existing_z_index_values();
         Session.set("selected_map_node", null);
         Session.set("selected_map_node_adjacent_nodes", null);
       });
@@ -96,21 +112,27 @@ if (Meteor.isClient) {
           var latlng = new google.maps.LatLng(node.lat, node.lng);
           bounds.extend(latlng);
 
-          markers[node._id] = new google.maps.Marker({
+          markers[node._id._str] = new google.maps.Marker({
             position: latlng,
             title: name,
+            zIndex: 0,
             icon: 'http://maps.google.com/mapfiles/marker' + node_to_color(node) + '.png',
             map: map
           });
 
-          google.maps.event.addListener(markers[node._id], 'click', function() {
+          google.maps.event.addListener(markers[node._id._str], 'click', function() {
+            reset_existing_z_index_values();
+
+            markers[node._id._str].setZIndex(10000);
+
             Session.set("selected_map_node", node._id);
 
             // Find adjacent nodes and store them for later use.
             var outbound_edges = Edges.find({'local_node': node._id});
             var adjacent_nodes = {};
             outbound_edges.forEach(function(edge) {
-              adjacent_nodes[edge.remote_node] = true;
+              adjacent_nodes[edge.remote_node._str] = true;
+              markers[edge.remote_node._str].setZIndex(10000);
             });
             console.log("Adjacent nodes:");
             console.log(adjacent_nodes);
