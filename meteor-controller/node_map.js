@@ -82,6 +82,12 @@ if (Meteor.isClient) {
 
       var bounds = new google.maps.LatLngBounds();
 
+      // Add a listener to unset the selected node when you click someplace on the map.
+      google.maps.event.addListener(map, 'click', function() {
+        Session.set("selected_map_node", null);
+        Session.set("selected_map_node_adjacent_nodes", null);
+      });
+
       getNodes().forEach(function (node) {
         try {
         if ('lat' in node && node['lat'].trim().length > 0 && 'lng' in node && node['lng'].trim().length > 0) {
