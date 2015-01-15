@@ -12,6 +12,10 @@ if (Meteor.isClient) {
 
         var formelement = evt.target.parentElement.previousElementSibling.firstElementChild;
         formelement.disabled = false;
+        
+        if (evt.target.parentElement.previousElementSibling.firstElementChild === 'SELECT') {
+          $('select.site-select').select2();
+        }
       } else if (evt.target.id == "save" && !evt.target.classList.contains("text-gray")) {
         // User clicked on save icon to save input.
         var formelement = evt.target.parentElement.previousElementSibling.firstElementChild;
@@ -69,11 +73,6 @@ if (Meteor.isClient) {
 
   var get_site_options = function () {
     return Sites.find({}, {sort: {name: 1}});
-  };
-
-  Template.nodeDetails.rendered = function() {
-    console.log('loaded');
-    $('select.site-select').select2();
   };
 
   Template.nodeDetails.helpers({
