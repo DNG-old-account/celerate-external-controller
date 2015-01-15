@@ -71,6 +71,11 @@ if (Meteor.isClient) {
     return Sites.find({}, {sort: {name: 1}});
   };
 
+  Template.nodeDetails.rendered = function() {
+    console.log('loaded');
+    $('select.site-select').select2();
+  };
+
   Template.nodeDetails.helpers({
     hardware_options: get_hardware_options,
     site_options: get_site_options,
