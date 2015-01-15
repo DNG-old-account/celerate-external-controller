@@ -81,7 +81,16 @@
   {{/if}}
   <div class="table_responsive">
     <table class="table table-striped">
-      <thead><tr><th class="edit_column"></th><th class="name_header" style="cursor:pointer;">Name</th><th class="hardware_header">Hardware</th><th class="mac_header">MAC</th>    <th class="mapped_header" style="cursor:pointer;"><span class="glyphicon-globe glyphicon" style="padding: 10px 0px 0px 0px; font-size: 18px;" title="Mapped?"></span></th></tr></thead>
+      <thead>
+        <tr>
+          <th class="edit_column"></th>
+          <th class="name_header" style="cursor:pointer;">Name</th>
+          <th class="hardware_header">Hardware</th>
+          <th class="mac_header">MAC</th> 
+          <th class="management-address-header">Management Link</th>  
+          <th class="mapped_header" style="cursor:pointer;"><span class="glyphicon-globe glyphicon" style="padding: 10px 0px 0px 0px; font-size: 18px;" title="Mapped?"></span></th>
+        </tr>
+      </thead>
       <tbody>
         {{#each nodes}}
         {{> node}}
@@ -98,6 +107,7 @@
   <td>{{name}}</td>
   <td>{{hardware}}</td>
   <td>{{mac}}</td>
+  <td>{{#if management_ip}}<a href="http://{{management_ip}}">{{management_ip}}</a>{{/if}}</td>
   <td>{{#if lat}}<span class="glyphicon-globe glyphicon" style="padding: 10px 0px 0px 0px; font-size: 18px;" title="Mapped"></span>{{/if}}</td>
 </tr>
 </template>
