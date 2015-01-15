@@ -13,7 +13,7 @@ if (Meteor.isClient) {
         var formelement = evt.target.parentElement.previousElementSibling.firstElementChild;
         formelement.disabled = false;
         
-        if (evt.target.parentElement.previousElementSibling.firstElementChild === 'SELECT') {
+        if (evt.target.parentElement.previousElementSibling.firstElementChild.nodeName === 'SELECT') {
           $('select.site-select').select2();
         }
       } else if (evt.target.id == "save" && !evt.target.classList.contains("text-gray")) {
