@@ -116,8 +116,16 @@ if (Meteor.isClient) {
             console.log(adjacent_nodes);
             Session.set("selected_map_node_adjacent_nodes", adjacent_nodes);
 
-            // var bubble_body = '<iframe src="/node_details/'+node._id._str+'" height="400px" width="500px" frameborder="0"> </iframe>';
-            // (new google.maps.InfoWindow({ content: bubble_body })).open(map, markers[node._id]);
+            var bubble_body = '<div>';
+            if (typeof node.management_ip === 'string' && node.management_ip.trim().length > 0) {
+              bubble_body += '<a target="_blank" href="http://' + node.management_ip + '">' + node.name + '</a>';
+            } else {
+              bubble_body += node.name;
+            }
+            bubble_body += (typeof node.hardware === 'string' && node.hardware.trim().length > 0) ? '<br>' + node.hardware : '';
+            bubble_body += (typeof node.mac === 'string' && node.mac.trim().length > 0) ? '<br>' + node.mac : '';
+            bubble_body += '</div>';
+            (new google.maps.InfoWindow({ content: bubble_body })).open(map, markers[node._id]);
           });
         }
       } catch (e) { console.log("failed to map node " + JSON.stringify(node)); console.log(e); }
@@ -125,6 +133,12 @@ if (Meteor.isClient) {
 
       if (Session.get("recenter_map")) {
         map.fitBounds(bounds);
+      }
+      try {
+        var selectedMarker = markers[Session.get('selected_map_node')];
+        new google.maps.event.trigger(selectedMarker, 'click');
+      } catch (e) {
+        console.log(e);
       }
     });
   };
