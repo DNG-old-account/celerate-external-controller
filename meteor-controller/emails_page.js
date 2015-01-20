@@ -125,6 +125,25 @@ if (Meteor.isClient) {
     $('#subscriber_email').modal('show');
   };
 
+  var getUserBillingLink = function (subscriber_id) {
+    console.log("about to call generateAuthToken with " + subscriber_id);
+    Meteor.call('generateAuthToken', subscriber_id, function (err, result) {
+      if (err) {
+        console.log("generateAuthToken call failed: " + err);
+      } else {
+        console.log("Called generateAuthToken, got: " + result);
+        if (!result) {
+          console.log("generateAuthToken failed.");
+        } else {
+          var user_link = Meteor.settings.public.urls.customerPortal + result;
+          console.log("setting user billing link " + user_link);
+          Session.set("user_billing_link", user_link);
+        }
+      }
+    });
+    return Session.get('user_billing_link');
+  };
+
   Template.subscribersEmailsList.events({
     'keyup .subscriber_search_input': function (evt) {
       if (Session.get("subscriber_search_input_timeout") != true) {
@@ -135,6 +154,13 @@ if (Meteor.isClient) {
           subscriber_search_input_timeout = false;
         }, subscriber_search_input_lag_ms);
       }
+    },
+    'click .customer-portal-button': function (evt) {
+      console.log(this);
+      console.log(evt);
+      var userBillingLink = getUserBillingLink(this._id._str);
+      var elem = evt.target;
+      $(elem).prop('href', userBillingLink);
     },
     'click #select-all-emails': function (evt) {
       if ($(evt.target).prop('checked')) {
