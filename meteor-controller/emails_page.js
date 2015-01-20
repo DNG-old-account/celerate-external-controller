@@ -161,6 +161,8 @@ if (Meteor.isClient) {
       var userBillingLink = getUserBillingLink(this._id._str);
       var elem = evt.target;
       $(elem).prop('href', userBillingLink);
+      evt.preventDefault();
+      var win = window.open(userBillingLink, '_blank');
     },
     'click #select-all-emails': function (evt) {
       if ($(evt.target).prop('checked')) {
