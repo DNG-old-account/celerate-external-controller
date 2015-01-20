@@ -31,40 +31,50 @@
       {{/each}}
       {{#with context=this node_instance=..}}
       {{#each per_port_fields}}
+      {{#if has_edges}}
+        {{#with ..}}
+        <button type="button" class="add_edge_button btn btn-primary">Add Edge</button>
+        {{/with}}
+        {{#each edges.outgoing_edges}}
+        <div class="form-group">
+          <div class="container-fluid">
+            <div class="col-xs-2"><label for="remote_node" class="control-label">Remote Node</label></div>
+            <div class="col-xs-3">
+              <select class="form-control" id="remote_node" disabled>
+                <option value="" {{selected_if_empty remote_node}}></option>
+                {{#each ../edges.all_nodes}}
+                <option value="{{_id}}" {{selected_if_equal _id ../remote_node}}>{{name}}</option>
+                {{/each}}
+              </select>
+            </div>
+            <div class="col-xs-2"><label for="remote_port" class="control-label">Remote Port</label></div>
+            <div class="col-xs-3">
+              <select class="form-control" id="remote_port" disabled>
+                <option value="" {{selected_if_empty remote_port}}></option>
+                {{#each ports_for_node}}
+                <option value="{{name}}" {{selected_if_equal name ../remote_port}}>{{name}}</option>
+                {{/each}}
+              </select>
+            </div>
+            <div class="col-xs-2">
+              <span class="glyphicon-pencil glyphicon" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Edit" id="edit-edge"></span>
+              <span class="glyphicon-save glyphicon text-gray" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Save" id="save-edge"></span>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+      {{else}}
       <div class="form-group">
         <div class="container-fluid">
           <div class="col-xs-2"><label for="{{field}}" class="control-label">{{label}}</label></div>
-          {{#if options}}
-          {{#if isIterable options_custom_view}}
-          <div class="col-xs-8"><select class="form-control {{field}}-select" id="{{field}}" disabled>
-              <option value="" {{selected_if_empty ../value}}></option>
-              {{#each options_custom_view}}
-              <option value="{{this.value}}" {{selected_if_equal this.value ../value}}>{{this.label}}</option>
-              {{/each}}
-          </select></div>
-          {{else}}
-          {{#if isIterable options}}
-          <div class="col-xs-8">
-            <select class="form-control {{field}}-select" id="{{field}}" disabled>
-              <option value="" {{selected_if_empty ../value}}></option>
-              {{#each options}}
-              <option value="{{this}}" {{selected_if_equal this ../value}}>{{this}}</option>
-              {{/each}}
-            </select>
-          </div>
-          {{/if}}
-          {{/if}}
-          {{else}}
           <div class="col-xs-8"><input class="form-control" id="{{field}}" type="text" value="{{value}}" disabled></div>
-          {{/if}}
-          {{#with ../node_instance}}
           <div class="col-xs-2">
             <span class="glyphicon-pencil glyphicon" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Edit" id="edit"></span>
             <span class="glyphicon-save glyphicon text-gray" style="padding: 10px 18px 0px 0px; font-size: 18px;" title="Save" id="save"></span>
           </div>
-          {{/with}}
         </div>
       </div>
+      {{/if}}
       {{/each}}
       {{/with}}
     </div>
