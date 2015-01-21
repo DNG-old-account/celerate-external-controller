@@ -61,10 +61,20 @@ if (Meteor.isClient) {
         // Store the edge.
         Edges.update(this._id, {$set: {"remote_node": new Meteor.Collection.ObjectID(node_selector.value), "remote_port": port_selector.value}});
       } else if (evt.target.id == "delete-edge") {
+        var formparent = evt.target.parentElement.parentElement;
+        var node_id_str = formparent.children[1].children[0].value;
+        var node_name = "";
+        var node = Nodes.findOne(new Meteor.Collection.ObjectID(node_id_str));
+        if (node) {
+          node_name = node.name;
+        }
+
+        var port_name = formparent.children[3].children[0].value;
+
         var id = this._id;
-        bootbox.confirm("Are you sure you want to delete this edge?", function(first_result) {
+        bootbox.confirm("Are you sure you want to delete the edge to node/port:<br>" + node_name + "/" + port_name, function(first_result) {
           if (first_result) {
-            bootbox.confirm("Are you REALLY REALLY sure you want to delete this edge?", function(second_result) {
+            bootbox.confirm("Are you REALLY REALLY sure you want to delete the edge to node/port:<br>" + node_name + "/" + port_name, function(second_result) {
               if (second_result) {
                 Edges.remove(id);
               }
