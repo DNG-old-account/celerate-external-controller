@@ -178,6 +178,9 @@ if (Meteor.isClient) {
       // Returns the ports for the hardware of the current remote node.
       console.log(this);
       var node = Session.get('selectedNodeEdge' + this._id._str);
+      if (typeof node === 'undefined') {
+        node = Nodes.findOne(this.remote_node);
+      }
       if (node) {
         console.log("found remote node: " + node.name + " with hw " + node.hardware);
         var hardware_query = Hardware.findOne({name: node.hardware});
