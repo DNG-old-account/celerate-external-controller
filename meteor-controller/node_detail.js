@@ -14,6 +14,11 @@ if (Meteor.isClient) {
         formelement.disabled = false;
         
         if (evt.target.parentElement.previousElementSibling.firstElementChild.nodeName === 'SELECT') {
+          // Try to remove a select2 that's already been instantiated
+          try {
+            $('select.site-select').select2('destroy');
+          } catch (e) {
+          }
           $('select.site-select').select2();
         }
       } else if (evt.target.id == "save" && !evt.target.classList.contains("text-gray")) {
@@ -42,6 +47,23 @@ if (Meteor.isClient) {
         var port_selector = formparent.children[3].children[0];
         node_selector.disabled = false;
         port_selector.disabled = false;
+
+        // Try to remove a select2 that's already been instantiated
+        try {
+          $('select#remote_node').select2('destroy');
+        } catch (e) {
+        }
+
+        $('select#remote_node').select2();
+
+        var node = Nodes.findOne(this.remote_node);
+        if (node) {
+          Session.set('selectedNode', node);
+        }
+        $('select#remote_node').on("change", function (e) { 
+          var node = Nodes.findOne(new Meteor.Collection.ObjectID($(this).val()));
+          Session.set('selectedNode', node);
+        });
       } else if (evt.target.id == "save-edge" && !evt.target.classList.contains("text-gray")) {
         // Special case for saving an edge, since it's a (node,port) pair.
         // Toggle the icon visual state.
@@ -153,7 +175,7 @@ if (Meteor.isClient) {
     ports_for_node: function() {
       // Returns the ports for the hardware of the current remote node.
       console.log(this);
-      var node = Nodes.findOne(this.remote_node);
+      var node = Session.get('selectedNode');
       if (node) {
         console.log("found remote node: " + node.name + " with hw " + node.hardware);
         var hardware_query = Hardware.findOne({name: node.hardware});
