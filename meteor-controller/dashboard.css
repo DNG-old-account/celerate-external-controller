@@ -206,3 +206,9 @@ body {
 .subscriber-details-container .billing-info-container #update-billing {
   margin-top: 20px;
 }
+
+/* Node Details */
+
+.select2-container {
+  width: 100%;
+}
