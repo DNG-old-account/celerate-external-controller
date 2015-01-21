@@ -59,11 +59,11 @@ if (Meteor.isClient) {
         var edge = this;
         var node = Nodes.findOne(edge.remote_node);
         if (node) {
-          Session.set('selectedNodeEdge' + edge._id, node);
+          Session.set('selectedNodeEdge' + edge._id._str, node);
         }
         $('select#remote_node').on("change", function (e) { 
           var node = Nodes.findOne(new Meteor.Collection.ObjectID($(this).val()));
-          Session.set('selectedNodeEdge' + edge._id, node);
+          Session.set('selectedNodeEdge' + edge._id._str, node);
         });
       } else if (evt.target.id == "save-edge" && !evt.target.classList.contains("text-gray")) {
         // Special case for saving an edge, since it's a (node,port) pair.
@@ -139,7 +139,8 @@ if (Meteor.isClient) {
       }); 
     },
     'click .add_edge_button': function (evt) {
-      Edges.insert({"local_node": this.node_instance._id, "local_port": this.context.name});
+      var newId = new Meteor.Collection.ObjectID();
+      Edges.insert({"_id": newId, "local_node": this.node_instance._id, "local_port": this.context.name});
     }
   });
 
@@ -176,7 +177,10 @@ if (Meteor.isClient) {
     ports_for_node: function() {
       // Returns the ports for the hardware of the current remote node.
       console.log(this);
-      var node = Session.get('selectedNodeEdge' + this._id);
+      var node = Session.get('selectedNodeEdge' + this._id._str);
+      if (typeof node === 'undefined') {
+        node = Nodes.findOne(this.remote_node);
+      }
       if (node) {
         console.log("found remote node: " + node.name + " with hw " + node.hardware);
         var hardware_query = Hardware.findOne({name: node.hardware});
