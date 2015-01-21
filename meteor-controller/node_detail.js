@@ -60,6 +60,17 @@ if (Meteor.isClient) {
 
         // Store the edge.
         Edges.update(this._id, {$set: {"remote_node": new Meteor.Collection.ObjectID(node_selector.value), "remote_port": port_selector.value}});
+      } else if (evt.target.id == "delete-edge") {
+        var id = this._id;
+        bootbox.confirm("Are you sure you want to delete this edge?", function(first_result) {
+          if (first_result) {
+            bootbox.confirm("Are you REALLY REALLY sure you want to delete this edge?", function(second_result) {
+              if (second_result) {
+                Edges.remove(id);
+              }
+            });
+          }
+        }); 
       }
     },
     'click .get_location_button': function (evt) {
