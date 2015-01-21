@@ -9,6 +9,15 @@ var checkAdmin = function(pause) {
 
 // Checks a user signup JSON data object and returns true if it is valid.
 var validateUserSignup = function(signup_data) {
+  // Verify that all fields are strings and that signup_data is an object.
+  if (typeof signup_data !== 'object') {
+    return false;
+  }
+  for (k in signup_data) {
+    if (typeof signup_data[k] !== 'string') {
+      return false;
+    }
+  }
 
   return true;   
 };
@@ -22,9 +31,12 @@ Router.map(function() {
     console.log("User signup: " + JSON.stringify(eventJson));
 
     var response = this.response;
-    response.setHeader("Access-Control-Allow-Origin", "*"); // FIX to restrict more.
     if (!validateUserSignup(eventJson)) {
-      response.write('400');
+      response.writeHead(400, {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      });
+      response.write("{ 'status': 'Bad form data.'");
     } else {
       // Insert the user signup into the subscriber collection.
       var new_user = {
@@ -52,7 +64,11 @@ Router.map(function() {
 
       Subscribers.insert(new_user);
 
-      response.write('200');
+      response.writeHead(200, {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      });
+      response.write("{ 'status': 'Stored signup data.'");
     }
 
     response.end();
