@@ -688,6 +688,28 @@ FREmails = {
              '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
     }
   },
+  serviceProblem: {
+    slug: 'service-problems',
+    label: 'Service Problems',
+    from: 'Yahel <yahel@furtherreach.net>',
+    subject: function(context) {
+      return 'Further Reach Message - Apologies for network downtime today';
+    },
+    body: function(context, userLink, accountNum) {
+      context.first_name = (typeof context.first_name === 'string') ? context.first_name : '';
+      context.last_name = (typeof context.last_name === 'string') ? context.last_name : '';
+      context.email = (typeof context.email === 'string') ? context.email : '';
+      context.plan = (typeof context.plan === 'string') ? context.plan : '';
+      return 'Dear subscribers,' + 
+             '\n\nAs many of you may have noticed, we had a pretty bad Internet day today...\n' +
+             'Since around noon, until about 3:40pm, many of you experienced intermittent connectivity.\n' + 
+             'This is due to an upgrade operation that has gone bad.' + 
+             '\n\nWorse - I had replied to some that the interruptions were shorter and fewer than it actually was, this is was false information I received from the system being upgraded..\n\n' + 
+             'We now have all the reasons to believe that everything is really back to normal.\n\n' + 
+             'Apologies for these interruptions - the growing pains of a young network, that is getting better and better every day.\n\n' + 
+             'Yahel Ben-David';
+    }
+  },
 
 };
 
