@@ -339,6 +339,12 @@ if (Meteor.isClient) {
       var thisSub = this;
       Session.set('thisSub', thisSub);
 
+      if (typeof thisSub.billing_info !== 'object' || thisSub.billing_info.installation !== 'object' ||
+          typeof thisSub.billing_info.installation.additional_equipment === 'undefined') {
+        return {
+          installedNodes: []
+        };
+      }
       var billedHardware = thisSub.billing_info.installation.additional_equipment;
       
       var nodes = [];
