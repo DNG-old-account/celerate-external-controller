@@ -168,11 +168,6 @@ if (Meteor.isClient) {
     cpe_options: function () {
       return Nodes.find({ type: 'cpe' });
     },
-    terms_info: function () {
-      return {
-        agreed_to_terms: (typeof this.terms === "object" && this.terms.agreed) ? '<span class="glyphicon glyphicon-ok"></span> ' + this.terms.date : '<span class="glyphicon glyphicon-remove"></span>'
-      };
-    },
     ap_options: function () {
       return Nodes.find({ type: 'ap' });
     },
@@ -316,6 +311,11 @@ if (Meteor.isClient) {
   Template.subscriberBillingInfo.helpers({
     selectedAdditionalEquipment: function () {
       return Session.get('selectedAdditionalEquipmentNode');
+    },
+    terms_info: function () {
+      return {
+        agreed_to_terms: (typeof this.terms === "object" && this.terms.agreed) ? '<span class="glyphicon glyphicon-ok"></span> ' + this.terms.date : '<span class="glyphicon glyphicon-remove"></span>'
+      };
     },
     billing_info: function () {
       if (typeof this.billing_info !== 'object') {
