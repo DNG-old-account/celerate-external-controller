@@ -55,7 +55,7 @@ Router.map(function() {
         current_provider: eventJson.current_provider,
         relay_site: eventJson.relay_site,
         notes: eventJson.notes,
-        how_did_you_hear_about_us: eventJson.how_did_you_hear_about_us,
+        how_did_you_hear_of_us: eventJson.how_did_you_hear_of_us,
         terms: { agreed: (eventJson.terms === "true") ? true : false,
                  date: new Date()
         },
