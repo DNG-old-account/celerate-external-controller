@@ -14,19 +14,37 @@ Router.map(function() {
     path: '/hardware',
     onBeforeAction: checkUser
   });
-  this.route('hardwareDetails', {path: '/hardware_details/:_id', data: function() { return Hardware.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
+  this.route('hardwareDetails', {
+    path: '/hardware_details/:_id',
+    data: function() { return Hardware.findOne(new Meteor.Collection.ObjectID(this.params._id)); },
+    onBeforeAction: checkUser
+  });
 
   this.route('sitePage', {
     path: '/site',
     onBeforeAction: checkUser
   });
-  this.route('siteDetails', {path: '/site_details/:_id', data: function() { return Sites.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
-
-  this.route('nodePage', {
-    path: '/node',
+  this.route('siteDetails', {
+    path: '/site_details/:_id', 
+    data: function() { return Sites.findOne(new Meteor.Collection.ObjectID(this.params._id)); },
     onBeforeAction: checkUser
   });
-  this.route('nodeDetails', {path: '/node_details/:_id', data: function() { return Nodes.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
+
+  this.route('nodePage', {
+    path: '/node/:_id',
+    data: function() {
+      var node = Nodes.findOne(new Meteor.Collection.ObjectID(this.params._id));
+      if (node) {
+        Session.set("selected_node", node._id);
+      }
+    },
+    onBeforeAction: checkUser
+  });
+  this.route('nodeDetails', {
+    path: '/node_details/:_id',
+    data: function() { return Nodes.findOne(new Meteor.Collection.ObjectID(this.params._id)); },
+    onBeforeAction: checkUser
+  });
 
   this.route('emailsPage', {
     path: '/emails_page',
@@ -37,5 +55,9 @@ Router.map(function() {
     path: '/subscriber',
     onBeforeAction: checkUser
   });
-  this.route('subscriberDetails', {path: '/subscriber_details/:_id', data: function() { return Subscribers.findOne(new Meteor.Collection.ObjectID(this.params._id)); }});
+  this.route('subscriberDetails', {
+    path: '/subscriber_details/:_id',
+    data: function() { return Subscribers.findOne(new Meteor.Collection.ObjectID(this.params._id)); },
+    onBeforeAction: checkUser
+  });
 });

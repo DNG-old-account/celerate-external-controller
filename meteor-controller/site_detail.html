@@ -70,7 +70,7 @@
 
     {{#each nodes_in_site}}
     <div class="form-group">
-      <label class="col-sm-2 control-label" id="node_{{name}}">Node Name</label><div class="col-sm-8"><p class="form-control-static">{{type}}: {{name}} ({{hardware}})</p></div>
+      <label class="col-sm-2 control-label" id="node_{{name}}">Node Name</label><div class="col-sm-8"><p class="form-control-static"><a href="/node/{{_id._str}}">{{type}}: {{name}} ({{hardware}})</a></p></div>
     </div>
     {{/each}}
 
