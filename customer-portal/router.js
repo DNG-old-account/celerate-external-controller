@@ -36,7 +36,7 @@ Router.map(function() {
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'
       });
-      response.write("{ 'status': 'Bad form data.'");
+      response.write(JSON.stringify({ 'status': 'Bad form data.' }));
     } else {
       // Insert the user signup into the subscriber collection.
       var new_user = {
@@ -68,7 +68,7 @@ Router.map(function() {
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'
       });
-      response.write("{ 'status': 'Stored signup data.'");
+      response.write(JSON.stringify({ 'status': 'Stored signup data, thanks!' }));
     }
 
     response.end();
