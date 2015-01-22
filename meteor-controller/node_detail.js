@@ -27,9 +27,9 @@ if (Meteor.isClient) {
         console.log(formelement);
         console.log(this);
  
-          db_update = {};
-          db_update[formelement.id] = formelement.value;
-          Nodes.update(this._id, {$set: db_update});
+        db_update = {};
+        db_update[formelement.id] = formelement.value;
+        Nodes.update(this._id, {$set: db_update});
 
         formelement.disabled = true;
 
@@ -83,6 +83,34 @@ if (Meteor.isClient) {
 
         // Store the edge.
         Edges.update(this._id, {$set: {"remote_node": new Meteor.Collection.ObjectID(node_selector.value), "remote_port": port_selector.value}});
+      } else if (evt.target.id == "add-reverse-edge") {
+        var formparent = evt.target.parentElement.parentElement;
+        var node_selector = formparent.children[1].children[0];
+        var port_selector = formparent.children[3].children[0];
+
+        var node = Nodes.findOne(new Meteor.Collection.ObjectID(node_selector.value));
+
+        // There are a few possible cases:
+        // 1. The current edge is underspecified; refuse to make a reverse edge.
+        // 2. The current edge is ok, but the reverse exists; refuse.
+        // 3. The current edge is ok, but the reverse is different; refuse.
+        // 4. The current edge is ok, but the reverse doesn't exist; create it.
+        if (!node || (typeof port_selector.value !== 'string') || port_selector.value.length == 0) {
+          bootbox.alert("Current forward edge is underspecified -- please fill in a valid node and port first.", function() {});
+        } else {
+          // Look up reverse edge.
+          console.log("Forward edge ok, looking for reverse.");
+          var reverse_edge = Edges.findOne({'local_node': this.remote_node, 'local_port': this.remote_port, 'remote_node': this.local_node});
+
+          if (reverse_edge) {
+            bootbox.alert("Found a reverse edge already from the remote node and port pointing here.");
+          } else {
+            // Create a reverse edge.
+            var newId = new Meteor.Collection.ObjectID();
+            Edges.insert({"_id": newId, "local_node": this.remote_node, "local_port": this.remote_port, "remote_node": this.local_node, "remote_port": this.local_port});
+            bootbox.alert("Reverse edge added.");
+          }
+        }
       } else if (evt.target.id == "delete-edge") {
         var formparent = evt.target.parentElement.parentElement;
         var node_id_str = formparent.children[1].children[0].value;
