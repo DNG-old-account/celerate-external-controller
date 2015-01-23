@@ -31,11 +31,15 @@ Router.map(function() {
   });
 
   this.route('nodePage', {
-    path: '/node/:_id',
+    path: '/node',
     data: function() {
-      var node = Nodes.findOne(new Meteor.Collection.ObjectID(this.params._id));
-      if (node) {
-        Session.set("selected_node", node._id);
+      try {
+        var node = Nodes.findOne(new Meteor.Collection.ObjectID(this.params.query.id));
+        if (node) {
+          Session.set("selected_node", node._id);
+        }
+      } catch (e) {
+        console.log(e);
       }
     },
     onBeforeAction: checkUser
