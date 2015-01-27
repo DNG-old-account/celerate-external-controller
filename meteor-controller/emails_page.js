@@ -126,7 +126,7 @@ if (Meteor.isClient) {
     $('#subscriber_email').modal('show');
   };
 
-  var getUserBillingLink = function (subscriber_id) {
+  var getUserBillingLink = function (subscriber_id, callback) {
     console.log("about to call generateAuthToken with " + subscriber_id);
     Meteor.call('generateAuthToken', subscriber_id, function (err, result) {
       if (err) {
@@ -139,6 +139,9 @@ if (Meteor.isClient) {
           var user_link = Meteor.settings.public.urls.customerPortal + result;
           console.log("setting user billing link " + user_link);
           Session.set("user_billing_link", user_link);
+          if (typeof callback === 'function') {
+            callback(user_link);
+          }
         }
       }
     });
@@ -159,11 +162,12 @@ if (Meteor.isClient) {
     'click .customer-portal-button': function (evt) {
       console.log(this);
       console.log(evt);
-      var userBillingLink = getUserBillingLink(this._id._str);
-      var elem = evt.target;
-      $(elem).prop('href', userBillingLink);
       evt.preventDefault();
-      var win = window.open(userBillingLink, '_blank');
+      var elem = evt.target;
+      getUserBillingLink(this._id._str, function(userBillingLink) {
+        $(elem).prop('href', userBillingLink);
+        var win = window.open(userBillingLink, '_blank');
+      });
     },
     'click #select-all-emails': function (evt) {
       if ($(evt.target).prop('checked')) {
