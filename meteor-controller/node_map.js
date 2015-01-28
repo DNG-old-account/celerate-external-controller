@@ -7,6 +7,8 @@ if (Meteor.isClient) {
   Template.nodeMap.rendered = function() {
     map = null;
     markers = {};
+    links = {};
+    linkinfo = {};
     if (!Session.get("node_map")) {
       google.maps.visualRefresh=true;
       var mapOptions = {
@@ -139,6 +141,64 @@ if (Meteor.isClient) {
         new google.maps.event.trigger(selectedMarker, 'click');
       } catch (e) {
         console.log(e);
+      }
+
+      if (Session.get("show_all_links")) {
+        // Returns a point fraction of the distance from the from LatLng towards the to
+        // LatLng.
+        function interpolate(from, to, fraction) {
+          var lat = (from.lat() * (1.0 - fraction)) + (to.lat() * fraction);
+          var lng = (from.lng() * (1.0 - fraction)) + (to.lng() * fraction);
+          return new google.maps.LatLng(lat, lng);
+        }
+
+        Edges.find({}).forEach(function(edge) {
+          if (!markers[edge.local_node] || !markers[edge.remote_node]) {
+            return;
+          }
+
+          var edgeColor = '#428bca';
+          if (edge.local_node._id < edge.remote_node._id) {
+            edgeColor = '#5bc0de';
+          }
+          links[edge._id] = new google.maps.Polyline({
+            path : [ markers[edge.local_node].position,
+                     interpolate(markers[edge.local_node].position,
+                                 markers[edge.remote_node].position, 0.5) ],
+            strokeColor: edgeColor,
+            strokeOpacity: 1.0,
+            strokeWeight : 3,
+            map : map
+          });
+
+          var local_node_name = Nodes.findOne(edge.local_node).name;
+          var remote_node_name = Nodes.findOne(edge.remote_node).name;
+          var infoText = "<h5>"+local_node_name+"->"+remote_node_name+"</h5>";
+
+          // Create an info box, and add listeners to show and hide it when the user
+          // hovers over the associated edge polyline.
+          linkinfo[edge._id] = new google.maps.InfoWindow({ content : infoText });
+
+          var linkTimeout = {};
+          google.maps.event.addListener(links[edge._id], 'mouseover', function() {
+            linkinfo[edge._id].setPosition(interpolate(
+                markers[edge.local_node].position,
+                markers[edge.remote_node].position,
+                0.25
+                ));
+            if (linkTimeout[edge._id]) {
+              clearTimeout(linkTimeout[edge._id]);
+              delete linkTimeout[edge._id];
+            }
+            linkinfo[edge._id].open(map);
+          });
+
+          google.maps.event.addListener(links[edge._id], 'mouseout', function() {
+            linkTimeout[edge._id] = setTimeout(function() {
+              linkinfo[edge._id].close(map)
+            }, 1000);
+          });
+        });
       }
     });
   };
