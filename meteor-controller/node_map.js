@@ -199,6 +199,14 @@ if (Meteor.isClient) {
             }, 1000);
           });
         });
+      } else {
+        for (l in links) {
+          links[l].setMap(null);
+          delete links[l];
+        }
+        for (l in linkinfo) {
+          delete linkinfo[l];
+        }
       }
     });
   };
