@@ -157,9 +157,9 @@ if (Meteor.isClient) {
             return;
           }
 
-          var edgeColor = '#428bca';
-          if (edge.local_node._id < edge.remote_node._id) {
-            edgeColor = '#5bc0de';
+          var edgeColor = '#BBDEFB';
+          if (edge.local_node._str < edge.remote_node._str) {
+            edgeColor = '#1565C0';
           }
           links[edge._id] = new google.maps.Polyline({
             path : [ markers[edge.local_node].position,
