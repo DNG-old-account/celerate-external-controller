@@ -15,6 +15,7 @@ if (Meteor.isClient) {
     Session.set("search_tag_selection", "global");
 
     Session.set("recenter_map", true);
+    Session.set("show_all_links", false);
     Session.set("selected_map_node", null);
     Session.set("selected_map_node_adjacent_nodes", null);
   });
@@ -151,6 +152,10 @@ if (Meteor.isClient) {
       } else {
         $("#node_map").slideUp();
       }
+    },
+    'click .show_all_links': function (evt) {
+      var show_all_links = evt.target.checked;
+      Session.set("show_all_links", show_all_links);
     },
     'click .recenter_map': function (evt) {
       console.log(evt);

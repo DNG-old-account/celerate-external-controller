@@ -413,12 +413,15 @@ if (Meteor.isClient) {
       var thisSub = this;
       Session.set('thisSub', thisSub);
 
-      if (typeof thisSub.billing_info !== 'object' || thisSub.billing_info.installation !== 'object' ||
-          typeof thisSub.billing_info.installation.additional_equipment === 'undefined') {
+      if (typeof thisSub.billing_info !== 'object' || typeof thisSub.billing_info.installation !== 'object') {
         return {
           installedNodes: []
         };
       }
+      if (typeof thisSub.billing_info.installation.additional_equipment === 'undefined') {
+        Subscribers.update(thisSub._id, {$set: {'billing_info.installation.additional_equipment': {} }});
+      }
+
       var billedHardware = thisSub.billing_info.installation.additional_equipment;
       
       var nodes = [];
