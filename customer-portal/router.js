@@ -90,6 +90,12 @@ Router.map(function() {
     action: function() {
       var thisRoute = this;
       Session.set('authToken', thisRoute.params._authToken);
+      if (typeof thisRoute.params.query.fastForward !== 'undefined') {
+        var fastForward = thisRoute.params.query.fastForward;
+        if (FRMethods.isNumber(fastForward)) {
+          Session.set('fastForward', parseInt(fastForward, 10));
+        }
+      }
       thisRoute.render('customer_dashboard');
     }
   });

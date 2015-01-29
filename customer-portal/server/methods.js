@@ -400,18 +400,18 @@ Meteor.methods({
     return sub;
   },
 
-  calculateTotalPayments: function(token, installmentAmount) {
+  calculateTotalPayments: function(token, installmentAmount, fastForward) {
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
     var sub = Subscribers.findOne(subId);
 
-    return FRMethods.calcTotalPayment(sub, installmentAmount);
+    return FRMethods.calcTotalPayment(sub, installmentAmount, false, fastForward);
   },
 
-  requiredPayments: function(token) {
+  requiredPayments: function(token, fastForward) {
     var subId = new Meteor.Collection.ObjectID(authenticate(token));
     var sub = Subscribers.findOne(subId);
 
-    return FRMethods.calculatePayments(sub);
+    return FRMethods.calculatePayments(sub, fastForward);
   },
 
   billingInfo: function(token) {

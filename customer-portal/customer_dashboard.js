@@ -98,7 +98,8 @@ if (Meteor.isClient) {
     var authToken = Session.get('authToken');
     if (typeof thisSub === 'object') {
       var installmentAmount = $('#installment-choices').val() === 'installment' ? Session.get('installmentAmount') : undefined;
-      Meteor.call('calculateTotalPayments', authToken, installmentAmount, function(err, result) {
+      var fastForward = (typeof Session.get('fastForward') === 'number') ? Session.get('fastForward') : undefined;
+      Meteor.call('calculateTotalPayments', authToken, installmentAmount, fastForward, function(err, result) {
         if (!err && typeof result !== 'undefined') {
           Session.set('totalPayment', result);
         } else {
@@ -120,7 +121,8 @@ if (Meteor.isClient) {
 
   Template.required_payments.requiredPayments = function() {
     var authToken = Session.get('authToken');
-    Meteor.call('requiredPayments', authToken, function(err, result) {
+    var fastForward = (typeof Session.get('fastForward') === 'number') ? Session.get('fastForward') : undefined;
+    Meteor.call('requiredPayments', authToken, fastForward, function(err, result) {
       if (!err && typeof result === 'object') {
         Session.set('requiredPayments', result);
       } else {

@@ -242,7 +242,7 @@ FRMethods = {
     return sub;
   },
 
-  calculatePayments: function(sub) {
+  calculatePayments: function(sub, fastForward) {
     var result = {};
     // If a subscriber doesn't have billing info yet, we can just create it here
     sub = FRMethods.createBillingProperties(sub);
@@ -250,8 +250,9 @@ FRMethods = {
     result.monthlyPayments = [];
     result.required = false;
 
+    fastForward = (typeof fastForward === 'number') ? fastForward : 1;
     // Will show users the billing info one day before the 1st of the month
-    var startOfThisMonth = moment().tz('America/Los_Angeles').add(1, 'days').startOf('month'); 
+    var startOfThisMonth = moment().tz('America/Los_Angeles').add(fastForward, 'days').startOf('month'); 
     var activationDate;
 
     if ((sub.status === 'connected' || sub.status === 'disconnected') && 
@@ -586,8 +587,8 @@ FRMethods = {
   // Because we need to actually change the discount state for required payments, we 
   // need to add an optional parameter which if true will return the modified requiredPayments 
   // object.
-  calcTotalPayment: function(sub, installmentAmount, returnRequiredPayments) {
-    var requiredPayments = FRMethods.calculatePayments(sub);
+  calcTotalPayment: function(sub, installmentAmount, returnRequiredPayments, fastForward) {
+    var requiredPayments = FRMethods.calculatePayments(sub, fastForward);
     var total = 0;
     if (requiredPayments.required) {
       if (!requiredPayments.installation.paid) {
