@@ -7,7 +7,74 @@ var checkAdmin = function(pause) {
   }
 };
 
+// Checks a user signup JSON data object and returns true if it is valid.
+var validateUserSignup = function(signup_data) {
+  // Verify that all fields are strings and that signup_data is an object.
+  if (typeof signup_data !== 'object') {
+    return false;
+  }
+  for (k in signup_data) {
+    if (typeof signup_data[k] !== 'string') {
+      return false;
+    }
+  }
+
+  return true;   
+};
+
 Router.map(function() {
+  // Allows for user signups from our website.
+  this.route('/user_signup', { where: 'server' }).post(function () {
+    var request = this.request;
+    var eventJson = request.body;
+
+    console.log("User signup: " + JSON.stringify(eventJson));
+
+    var response = this.response;
+    if (!validateUserSignup(eventJson)) {
+      response.writeHead(400, {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      });
+      response.write(JSON.stringify({ 'status': 'Bad form data.' }));
+    } else {
+      // Insert the user signup into the subscriber collection.
+      var new_user = {
+        _id: new Meteor.Collection.ObjectID(),
+        first_name: eventJson.first_name,
+        last_name: eventJson.last_name,
+        subscriber_type: eventJson.subscriber_type,
+        plan: eventJson.plan,
+        city: eventJson.city,
+        street_address: eventJson.street_address,
+        lat: eventJson.lat,
+        lng: eventJson.lng,
+        mobile: eventJson.mobile,
+        landline: eventJson.landline,
+        prior_email: eventJson.prior_email,
+        current_provider: eventJson.current_provider,
+        relay_site: eventJson.relay_site,
+        notes: eventJson.notes,
+        how_did_you_hear_of_us: eventJson.how_did_you_hear_of_us,
+        terms: { agreed: (eventJson.terms === "true") ? true : false,
+                 date: new Date()
+        },
+        status: "new lead",
+        signup_date: (new Date()).toISOString(),
+      };
+
+      Subscribers.insert(new_user);
+
+      response.writeHead(200, {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      });
+      response.write(JSON.stringify({ 'status': 'Stored signup data, thanks!' }));
+    }
+
+    response.end();
+  });
+    
 
   this.route('customer_agreement', {
     path: 'customer_agreement/:_authToken',
@@ -60,48 +127,56 @@ Router.map(function() {
         throw new Meteor.Error("Couldn't retrieve the stripe event.", stripeResp);
       }
 
-      var sEvent = stripeResp.result;
+      var sObjectWrapper = stripeResp.result;
+      if (typeof sObjectWrapper.data !== 'object' || 
+          typeof sObjectWrapper.data.object !== 'object') {
+        console.log(sObjectWrapper);
+        throw new Meteor.Error("Couldn't retrieve the stripe event.", stripeResp);
+      }
+      var sEvent = sObjectWrapper.data.object;
+      console.log(sEvent);
 
       if (sEvent.object === 'invoice' &&
           sEvent.paid === true) {
-        var sub = Subscribers.find({'billing_info.autopay.subscription.id': sEvent.subscription});
+        var sub = Subscribers.findOne({'billing_info.autopay.subscription.id': sEvent.subscription});
         var totalPaid = sEvent.total / 100; // stripe does cents
 
-        var requiredPayments = FRMethods.calculatePayments();
+        var requiredPayments = FRMethods.calculatePayments(sub);
         var chargeStart = requiredPayments.dueToDate.startDate;
         var chargeEnd = requiredPayments.dueToDate.endDate;
 
-        stripeResp = Async.runSync(function(done) {
-          stripe.charges.retrieve(sEvent.charge, function(err, charge) {
-            done(err, charge);
+        if (typeof sEvent.charge === "string") {
+          stripeResp = Async.runSync(function(done) {
+            stripe.charges.retrieve(sEvent.charge, function(err, charge) {
+              done(err, charge);
+            });
           });
-        });
- 
-        console.log(stripeResp);
-        if (stripeResp.err || !stripeResp.result) {
+   
           console.log(stripeResp);
-          throw new Meteor.Error("Couldn't retrieve the stripe charge.", stripeResp);
-        }
+          if (stripeResp.err || !stripeResp.result) {
+            console.log(stripeResp);
+            throw new Meteor.Error("Couldn't retrieve the stripe charge.", stripeResp);
+          }
 
-        var charge = stripeResp.result;
+          var charge = stripeResp.result;
 
-        if (requiredPayments.dueToDate.amount === total) {
+          if (requiredPayments.dueToDate.amount === totalPaid) {
 
-          var monthlyPayment = {
-            amount: totalPaid,
-            start_date: chargeStart,
-            end_date: chargeEnd,
-            charge: charge
-          };
-          Subscribers.update(thisSub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
+            charge.description = 'Monthly payment for the period ' + moment(chargeStart).format('MM/DD/YYYY') + ' to ' + moment(chargeEnd).format('MM/DD/YYYY') + '.'
+
+            var monthlyPayment = {
+              amount: totalPaid,
+              start_date: chargeStart,
+              end_date: chargeEnd,
+              charge: charge
+            };
+            Subscribers.update(sub._id, {$push: {'billing_info.monthly_payments': monthlyPayment}});
+            Subscribers.update(sub._id, {$push: {'billing_info.charges': charge}});
+          }
         }
       }
 
       var response = this.response;
-      console.log("\n\n\nRESPONSE\n\n");
-      console.log(response);
-      console.log(response.write);
-      console.log(response.end);
       response.write('200');
       response.end();
     })

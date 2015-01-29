@@ -25,6 +25,14 @@ Handlebars.registerHelper('json', function(obj) {
   return JSON.stringify(obj);
 });
 
+Handlebars.registerHelper('urlencode', function(str) {
+  return encodeURI(str);
+});
+
+Handlebars.registerHelper('remove_spaces_in_string', function(str) {
+  return str.replace(" ", "-space-");
+});
+
 Handlebars.registerHelper('key_value', function(context, options) {
   var result = [];
   _.each(context, function(value, key, list) {
@@ -64,5 +72,6 @@ if (Meteor.isClient) {
     return typeof collection === "object";
   });
 
+  search_input_lag_ms = 500;
 }
 

@@ -224,11 +224,6 @@ if (Meteor.isClient) {
     cpe_options: function () {
       return Nodes.find({ type: 'cpe' });
     },
-    terms_info: function () {
-      return {
-        agreed_to_terms: (typeof this.terms === "object" && this.terms.agreed) ? '<span class="glyphicon glyphicon-ok"></span> ' + this.terms.date : '<span class="glyphicon glyphicon-remove"></span>'
-      };
-    },
     ap_options: function () {
       return Nodes.find({ type: 'ap' });
     },
@@ -305,6 +300,7 @@ if (Meteor.isClient) {
       var notes = $('#discount-notes').val();
       var label = $('#discount-label').val();
       var discount = {
+        _id: new Meteor.Collection.ObjectID(),
         amount: amount,
         dateCreated: new Date(),
         used: false,
@@ -390,6 +386,11 @@ if (Meteor.isClient) {
     selectedAdditionalEquipment: function () {
       return Session.get('selectedAdditionalEquipmentNode');
     },
+    terms_info: function () {
+      return {
+        agreed_to_terms: (typeof this.terms === "object" && this.terms.agreed) ? '<span class="glyphicon glyphicon-ok"></span> ' + this.terms.date : '<span class="glyphicon glyphicon-remove"></span>'
+      };
+    },
     billing_info: function () {
       if (typeof this.billing_info !== 'object') {
         FRMethods.createBillingProperties(this);
@@ -412,6 +413,12 @@ if (Meteor.isClient) {
       var thisSub = this;
       Session.set('thisSub', thisSub);
 
+      if (typeof thisSub.billing_info !== 'object' || thisSub.billing_info.installation !== 'object' ||
+          typeof thisSub.billing_info.installation.additional_equipment === 'undefined') {
+        return {
+          installedNodes: []
+        };
+      }
       var billedHardware = thisSub.billing_info.installation.additional_equipment;
       
       var nodes = [];

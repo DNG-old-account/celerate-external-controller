@@ -63,28 +63,29 @@ if (Meteor.isClient) {
 
       var result = Subscribers.find(query, {sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")}).fetch();
 
-      _.each(result, function(sub) {
-        var payments = FRMethods.calculatePayments(sub);
-
-        sub.billing_info.needsPayment = false;
-
-        if (payments.dueToDate.required && payments.dueToDate.amount > 0) {
-          sub.billing_info.needsPayment = true;
-        }
-
-        sub.billing_info.pastDue = false;
-
-        if (typeof payments.dueToDate.payments === 'object' && payments.dueToDate.payments.length > 1) {
-          var startOfMonth = moment().tz('America/Los_Angeles').startOf('month');
-          _.each(payments.dueToDate.payments, function(payment) {
-            if (startOfMonth.add(-2, 'months').add(-1, 'days').isBefore(moment(payment.startDate))) {
-              sub.billing_info.pastDue = true;
-            }
-          });
-        }
-      });
 
       if (Session.get('seeNeedsPayment')) {
+        _.each(result, function(sub) {
+          var payments = FRMethods.calculatePayments(sub);
+
+          sub.billing_info.needsPayment = false;
+
+          if (payments.dueToDate.required && payments.dueToDate.amount > 0) {
+            sub.billing_info.needsPayment = true;
+          }
+
+          sub.billing_info.pastDue = false;
+
+          if (typeof payments.dueToDate.payments === 'object' && payments.dueToDate.payments.length > 1) {
+            var startOfMonth = moment().tz('America/Los_Angeles').startOf('month');
+            _.each(payments.dueToDate.payments, function(payment) {
+              if (startOfMonth.add(-2, 'months').add(-1, 'days').isBefore(moment(payment.startDate))) {
+                sub.billing_info.pastDue = true;
+              }
+            });
+          }
+        });
+
         result = _.filter(result, function(sub) {
           return sub.billing_info.needsPayment;
         });
@@ -125,6 +126,28 @@ if (Meteor.isClient) {
     $('#subscriber_email').modal('show');
   };
 
+  var getUserBillingLink = function (subscriber_id, callback) {
+    console.log("about to call generateAuthToken with " + subscriber_id);
+    Meteor.call('generateAuthToken', subscriber_id, function (err, result) {
+      if (err) {
+        console.log("generateAuthToken call failed: " + err);
+      } else {
+        console.log("Called generateAuthToken, got: " + result);
+        if (!result) {
+          console.log("generateAuthToken failed.");
+        } else {
+          var user_link = Meteor.settings.public.urls.customerPortal + result;
+          console.log("setting user billing link " + user_link);
+          Session.set("user_billing_link", user_link);
+          if (typeof callback === 'function') {
+            callback(user_link);
+          }
+        }
+      }
+    });
+    return Session.get('user_billing_link');
+  };
+
   Template.subscribersEmailsList.events({
     'keyup .subscriber_search_input': function (evt) {
       if (Session.get("subscriber_search_input_timeout") != true) {
@@ -136,14 +159,22 @@ if (Meteor.isClient) {
         }, subscriber_search_input_lag_ms);
       }
     },
-    'click #select-all-emails': function (evt) {
-      $('.email-sub').each(function(index, elem) {
-        if ($(elem).prop('checked')) {
-          $(elem).attr('checked', false);
-        } else {
-          $(elem).attr('checked', true);
-        }
+    'click .customer-portal-button': function (evt) {
+      console.log(this);
+      console.log(evt);
+      evt.preventDefault();
+      var elem = evt.target;
+      getUserBillingLink(this._id._str, function(userBillingLink) {
+        $(elem).prop('href', userBillingLink);
+        var win = window.open(userBillingLink, '_blank');
       });
+    },
+    'click #select-all-emails': function (evt) {
+      if ($(evt.target).prop('checked')) {
+        $('.email-sub').prop('checked', true);
+      } else {
+        $('.email-sub').prop('checked', false);
+      }
     },
     'change #see-past-due': function (evt) {
       if ($(evt.target).prop('checked')) {

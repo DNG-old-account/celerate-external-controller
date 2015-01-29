@@ -210,3 +210,8 @@ body {
 .subscriber-details-container .billing-info-container .extra-equipment-form-container {
   margin-top: 20px;
 }
+
+/* Node Details */
+.select2-container {
+  width: 100%;
+}

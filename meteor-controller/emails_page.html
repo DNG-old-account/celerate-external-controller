@@ -67,7 +67,7 @@
           <th>Email</th>
           <th>Install Paid</th>
           <th>Needs Payment</th>
-          <th id="select-all-emails">Send Email?</th>
+          <th>Send Email?<input type="checkbox" id="select-all-emails"></th>
         </tr>
       </thead>
       <tbody>
@@ -103,7 +103,7 @@
 
 <template name="subscriberEmailRow">
 <tr class="subscriber {{selected}}">
-  <td>{{first_name}} {{last_name}}</td>
+  <td><a href="#" target="_blank" class="customer-portal-button">{{first_name}} {{last_name}}</a></td>
   <td>{{status}}</td>
   <td>{{street_address}}</td>
   <td>{{city}}</td>

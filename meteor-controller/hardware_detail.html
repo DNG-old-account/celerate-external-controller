@@ -14,12 +14,12 @@
     {{/with}}
     <ul class="nav nav-pills" role="tablist">
       {{#each value}}
-      <li><a href="#port_{{name}}" role="tab" data-toggle="tab">Port {{name}} ({{type}})</a></li>
+      <li><a href="#port_{{remove_spaces_in_string name}}" role="tab" data-toggle="tab">Port {{name}} ({{type}})</a></li>
       {{/each}}
     </ul>
     <div class="tab-content">
       {{#each value}}
-      <div class="tab-pane" id="port_{{name}}">
+      <div class="tab-pane" id="port_{{remove_spaces_in_string name}}">
         {{#each key_value_without_index this}}
         <div class="form-group">
           <div class="container-fluid">

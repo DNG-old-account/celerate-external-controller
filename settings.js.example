@@ -27,7 +27,13 @@
     "encryptionMode" : "AES-128-CTR",
     "hashMode" : "sha1"
   },
+  "sentry": {
+    "dsn": "PRIVATE_DSN_URL"
+  },
   "public": {
+    "sentry": {
+      "dsn": "PUBLIC_DSN_URL"
+    },
     "stripe": {
       "publicKey": "pk_test_6pRNASCoBOKtIshFeQd4XMUh" // This is a stripe demo key
     },

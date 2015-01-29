@@ -374,8 +374,9 @@ Meteor.methods({
 
             updatedDiscount.used = true;
             updatedDiscount.dateUsed = new Date();
+            updatedDiscount._id = new Meteor.Collection.ObjectID();
 
-            Subscribers.update(thisSub._id, {$pull: {'billing_info.discounts': {'dateCreated': discount._id}}});
+            Subscribers.update(thisSub._id, {$pull: {'billing_info.discounts': {'_id': discount._id}}});
             Subscribers.update(thisSub._id, {$push: {'billing_info.discounts': updatedDiscount }});
           }
         });
@@ -418,15 +419,26 @@ Meteor.methods({
     var sub = Subscribers.findOne(subId);
     var hasBillingContact = false;
     var contact;
+
     if (typeof sub.contacts === 'object') {
       _.each(sub.contacts, function(c) {
-        if (c.type === "billing" && 
-            typeof c.email === 'string' &&
-            c.email.trim() !== '' &&
-            FRMethods.isValidEmail(c.email)) {
 
-          hasBillingContact = true;
+        if (typeof c === 'object' &&
+            typeof c.type === 'string' &&
+            c.type === "billing" && 
+            typeof c.contact_id === 'object' &&
+            typeof c.contact_id._str === 'string') {
+
           contact = Contacts.findOne(c.contact_id);
+
+          if (typeof contact === 'object' &&
+              typeof contact.email === 'string' &&  
+              FRMethods.isValidEmail(contact.email)) {
+
+            hasBillingContact = true;
+          } else {
+            contact = undefined;
+          }
         }
       });
     }
