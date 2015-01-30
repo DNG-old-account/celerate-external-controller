@@ -77,8 +77,8 @@ if (Meteor.isClient) {
           sub.billing_info.pastDue = false;
 
           if (typeof payments.dueToDate.payments === 'object' && payments.dueToDate.payments.length > 1) {
+            var startOfMonth = moment().tz('America/Los_Angeles').startOf('month');
             _.each(payments.dueToDate.payments, function(payment) {
-              var startOfMonth = moment().tz('America/Los_Angeles').startOf('month');
               if (startOfMonth.add(-2, 'months').add(-1, 'days').isBefore(moment(payment.startDate))) {
                 sub.billing_info.pastDue = true;
               }
