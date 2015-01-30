@@ -1,6 +1,6 @@
 if (Meteor.isClient) {
-  var sort_fields = ["status_sort", "name_sort", "city_sort", "mapped_sort", "plan_sort"];
-  var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "city_sort": "city", "mapped_sort": "lat", "plan_sort": "plan"};
+  var sort_fields = ["status_sort", "name_sort", "city_sort", "mapped_sort", "plan_sort", "signup_date_sort"];
+  var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "city_sort": "city", "mapped_sort": "lat", "plan_sort": "plan", "signup_date_sort": "signup_date"};
 
   var archived_subscribers_dep = new Tracker.Dependency;
   var non_archived_subscribers_dep = new Tracker.Dependency;
@@ -12,6 +12,7 @@ if (Meteor.isClient) {
     Session.set("city_sort", 1);
     Session.set("mapped_sort", 1);
     Session.set("plan_sort", 1);
+    Session.set("signup_date_sort", 1);
 
     Session.set("selected_subscriber", null);
     Session.set("subscriber_search_input", "");
@@ -56,7 +57,7 @@ if (Meteor.isClient) {
       query = {$and: subquery};
     }
 
-    var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'billing_info': 1, 'mobile': 1, 'landline': 1};
+    var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'billing_info': 1, 'mobile': 1, 'landline': 1, 'signup_date': 1};
 
     var result = Subscribers.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")});
     Session.set("subscriber_count", result.count());
@@ -172,6 +173,10 @@ if (Meteor.isClient) {
     'click .plan_header': function () {
       Session.set("plan_sort", -1 * Session.get("plan_sort"));
       Session.set("primary_sort_field_subscribers", "plan_sort");
+    },
+    'click .signup_date_header': function () {
+      Session.set("signup_date_sort", -1 * Session.get("signup_date_sort"));
+      Session.set("primary_sort_field_subscribers", "signup_date_sort");
     }
   });
 
