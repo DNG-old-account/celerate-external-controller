@@ -138,7 +138,7 @@ Router.map(function() {
 
       if (sEvent.object === 'invoice' &&
           sEvent.paid === true) {
-        var sub = Subscribers.findOne({'billing_info.autopay.subscription.id': sEvent.subscription});
+        var sub = Subscribers.findOne({'billing_info.autopay.customer.id': sEvent.customer});
         var totalPaid = sEvent.total / 100; // stripe does cents
 
         var requiredPayments = FRMethods.calculatePayments(sub);
