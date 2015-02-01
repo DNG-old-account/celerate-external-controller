@@ -29,6 +29,14 @@ Handlebars.registerHelper('urlencode', function(str) {
   return encodeURI(str);
 });
 
+Handlebars.registerHelper('format_date', function(str) {
+  try {
+    return moment(str).format("MM-DD-YY");
+  } catch (e) {
+  }
+  return "";
+});
+
 Handlebars.registerHelper('remove_spaces_in_string', function(str) {
   return str.replace(" ", "-space-");
 });

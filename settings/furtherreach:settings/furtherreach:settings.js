@@ -356,12 +356,14 @@ FRMethods = {
           // Make sure we have the most up to date subscriber object
           sub = Subscribers.findOne(sub._id);
 
+          // TODO: Maxb - It would be nice to have a better, stricter check here!
+          //       but due to plans being able to be split, we need to be flexible
           if (typeof sub.billing_info.monthly_payments === 'object') {
             _.each(sub.billing_info.monthly_payments, function(payment) {
-              if (moment(payment.startDate).isValid() && 
-                  monthlyPayment.startDate.isSame(moment(payment.start_date), 'day') &&
-                  moment(payment.endDate).isValid() && 
-                  monthlyPayment.endDate.isSame(moment(payment.end_date), 'day')) {
+              if ((moment(payment.startDate).isValid() && 
+                  monthlyPayment.startDate.isSame(moment(payment.start_date), 'day')) ||
+                  (moment(payment.endDate).isValid() && 
+                  monthlyPayment.endDate.isSame(moment(payment.end_date), 'day'))) {
                 monthlyPayment.required = false;
                 monthlyPayment.startDate = moment(payment.start_date).tz('America/Los_Angeles');
                 monthlyPayment.endDate = moment(payment.end_date).tz('America/Los_Angeles');
