@@ -140,6 +140,7 @@ Meteor.methods({
     _.each(result, function(sub) {
       var payments = FRMethods.calculatePayments(sub);
 
+      sub.billing_info = sub.billing_info || {};
       sub.billing_info.needsPayment = false;
 
       if (payments.dueToDate.required && payments.dueToDate.amount > 0) {
