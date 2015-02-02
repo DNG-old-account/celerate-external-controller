@@ -60,45 +60,35 @@ if (Meteor.isClient) {
       }
 
       // var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'activation_date': 1, 'billing_info': 1};
+      //
+      var seeNeedsPayment = Session.get('seeNeedsPayment');
+      var headerSort = GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers");
+      Meteor.call('getEmailsList', query, headerSort, function (err, result) {
+        if (err) {
+          console.log("getEmailsList call failed: " + err);
+        } else {
+          if (!result) {
+            console.log("getEmailsList call failed");
 
-      var result = Subscribers.find(query, {sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")}).fetch();
+          } else {
+            if (seeNeedsPayment) {
+              result = _.filter(result, function(sub) {
+              return sub.billing_info.needsPayment;
+              });
+            }
 
-
-      if (Session.get('seeNeedsPayment')) {
-        _.each(result, function(sub) {
-          var payments = FRMethods.calculatePayments(sub);
-
-          sub.billing_info.needsPayment = false;
-
-          if (payments.dueToDate.required && payments.dueToDate.amount > 0) {
-            sub.billing_info.needsPayment = true;
+            if (Session.get('seePastDue')) {
+              result = _.filter(result, function(sub) {
+                return sub.billing_info.pastDue;
+              });
+            }
+            Session.set("subscriber_count", result.length);
+            Session.set('subscribersList', result);
           }
-
-          sub.billing_info.pastDue = false;
-
-          if (typeof payments.dueToDate.payments === 'object' && payments.dueToDate.payments.length > 1) {
-            var startOfMonth = moment().tz('America/Los_Angeles').startOf('month');
-            _.each(payments.dueToDate.payments, function(payment) {
-              if (startOfMonth.add(-2, 'months').add(-1, 'days').isBefore(moment(payment.startDate))) {
-                sub.billing_info.pastDue = true;
-              }
-            });
-          }
-        });
-
-        result = _.filter(result, function(sub) {
-          return sub.billing_info.needsPayment;
-        });
-      }
-
-      if (Session.get('seePastDue')) {
-        result = _.filter(result, function(sub) {
-          return sub.billing_info.pastDue;
-        });
-      }
-      Session.set("subscriber_count", result.length);
-      Session.set('subscribersList', result);
-      return result;
+        }
+      });
+       
+      return Session.get('subscribersList');
     },
     subscriber_count: function () {
       return Session.get("subscriber_count");
