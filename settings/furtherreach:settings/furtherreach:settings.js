@@ -750,7 +750,7 @@ FREmails = {
     label: 'Notification of Hold Removal',
     from: 'Further Reach Billing <billing@furtherreach.net>',
     subject: function(context) {
-      return 'Further Reach Message - Your plan is no longer on hold';
+      return 'Your service has been resumed';
     },
     body: function(context, userLink, accountNum) {
       context.first_name = (typeof context.first_name === 'string') ? context.first_name : '';
@@ -758,7 +758,8 @@ FREmails = {
       context.email = (typeof context.email === 'string') ? context.email : '';
       context.plan = (typeof context.plan === 'string') ? context.plan : '';
       return 'Dear ' + context.first_name + ' ' + context.last_name + 
-             '\n\nYour plan is no longer on hold. \n\n' +
+             '\n\nYour service has been resumed and you can now access the internet. ' +
+             'The next monthly bill will be pro-rated according to your plan. \n\n' +
              'Account Number: ' + accountNum + '\n' + 
              'User ID: ' + context.email + '\n' + 
              '\n\n\nThank you for choosing FurtherReach!' + 
@@ -771,7 +772,7 @@ FREmails = {
     label: 'Notify of Hold',
     from: 'Further Reach Billing <billing@furtherreach.net>',
     subject: function(context) {
-      return 'Further Reach Message - Your plan is on hold';
+      return 'Your service has been put on hold';
     },
     body: function(context, userLink, accountNum) {
       context.first_name = (typeof context.first_name === 'string') ? context.first_name : '';
@@ -779,8 +780,9 @@ FREmails = {
       context.email = (typeof context.email === 'string') ? context.email : '';
       context.plan = (typeof context.plan === 'string') ? context.plan : '';
       return 'Dear ' + context.first_name + ' ' + context.last_name + 
-             '\n\nYour plan has been put on hold. You will be charged $20/month and you will not recieve service, ' + 
-             'but you will keep your hardware. Please give as at least a few days heads up before you would like your service resumed. \n\n' +
+             '\n\nYour plan has been put on hold. The account maintenance cost while on hold is $20/month. ' + 
+             'You can resume your service at any time, at which point your original service plan will be restored. ' +
+             'Please give as at least a few days heads up before you would like your service resumed. \n\n' +
              'Account Number: ' + accountNum + '\n' + 
              'User ID: ' + context.email + '\n' + 
              '\n\n\nThank you for choosing FurtherReach!' + 
