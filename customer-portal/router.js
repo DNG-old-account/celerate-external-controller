@@ -1,9 +1,10 @@
-var checkAdmin = function(pause) {
-  if (!Meteor.user() || !Meteor.user().services.google || typeof Meteor.user().services.google.email !== "string" || 
-      (Meteor.user().services.google.email.indexOf("@furtherreach.net") == -1 && 
-       Meteor.user().services.google.email.indexOf("@denovogroup.org") == -1)) {
-    this.render('login');
-    pause();
+var checkAdmin = function() {
+  // client
+  Meteor.subscribe("userData");
+  if (!Meteor.user() || !Meteor.user().services.google || (Meteor.user().services.google.email.indexOf("denovogroup.org") == -1)) {
+    this.render('homePage');
+  } else {
+    this.next();
   }
 };
 
@@ -75,7 +76,13 @@ Router.map(function() {
     response.end();
   });
     
-
+  this.route('admin', {
+    path: 'admin',
+    action: function() {
+      var thisRoute = this;
+      thisRoute.render('homePage');
+    }
+  });
   this.route('customer_agreement', {
     path: 'customer_agreement/:_authToken',
     action: function() {
@@ -85,8 +92,8 @@ Router.map(function() {
     }
   });
 
-  this.route('customer_dashboard', {
-    path: '/:_authToken',
+  this.route('customer_dashboard_fast_forward', {
+    path: 'fast_forward/:_authToken',
     action: function() {
       var thisRoute = this;
       Session.set('authToken', thisRoute.params._authToken);
@@ -96,6 +103,16 @@ Router.map(function() {
           Session.set('fastForward', parseInt(fastForward, 10));
         }
       }
+      thisRoute.render('customer_dashboard');
+    },
+    onBeforeAction: checkAdmin
+  });
+
+  this.route('customer_dashboard', {
+    path: '/:_authToken',
+    action: function() {
+      var thisRoute = this;
+      Session.set('authToken', thisRoute.params._authToken);
       thisRoute.render('customer_dashboard');
     }
   });

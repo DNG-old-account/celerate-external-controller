@@ -206,8 +206,10 @@ if (Meteor.isClient) {
           console.log("generateAuthToken failed.");
         } else {
           var user_link = Meteor.settings.public.urls.customerPortal + result;
+          var user_link_fast_forward = Meteor.settings.public.urls.customerPortal + 'fast_forward/' + result + '?fastForward=20';
           console.log("setting user billing link " + user_link);
           Session.set("user_billing_link", user_link);
+          Session.set("user_billing_link_fast_forward", user_link_fast_forward);
         }
       }
     });
@@ -217,6 +219,9 @@ if (Meteor.isClient) {
     user_billing_link: function () {
       console.log("re-getting user billing link: " + Session.get("user_billing_link"));
       return Session.get("user_billing_link");
+    },
+    user_billing_link_fast_forward: function () {
+      return Session.get("user_billing_link_fast_forward");
     },
     site_link: function () {
       return Sites.findOne({'type.subscriber': this._id});
