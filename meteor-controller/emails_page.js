@@ -33,6 +33,13 @@ if (Meteor.isClient) {
       var seePastDue = Session.get('seePastDue');
       return seePastDue ? 'selected' : '';
     },
+    seeAutopay:  function() {
+      return Session.get('seeAutopay');
+    },
+    seeAutopayChecked: function() {
+      var seeAutopay = Session.get('seeAutopay');
+      return seeAutopay ? 'selected' : '';
+    },
     current_search_fields: function () {
       console.log('current search fields.');
       var current_search_fields = Session.get("subscriber_search_fields");
@@ -62,6 +69,8 @@ if (Meteor.isClient) {
       // var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'activation_date': 1, 'billing_info': 1};
       //
       var seeNeedsPayment = Session.get('seeNeedsPayment');
+      var seePastDue = Session.get('seePastDue');
+      var seeAutopay = Session.get('seeAutopay');
       var headerSort = GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers");
       Meteor.call('getEmailsList', query, headerSort, function (err, result) {
         if (err) {
@@ -77,9 +86,14 @@ if (Meteor.isClient) {
               });
             }
 
-            if (Session.get('seePastDue')) {
+            if (seePastDue) {
               result = _.filter(result, function(sub) {
                 return sub.billing_info.pastDue;
+              });
+            }
+            if (seeAutopay) {
+              result = _.filter(result, function(sub) {
+                return typeof sub.billing_info.autopay === 'object' && sub.billing_info.autopay.on;
               });
             }
             Session.set("subscriber_count", result.length);
@@ -171,6 +185,13 @@ if (Meteor.isClient) {
         Session.set('seePastDue', true);
       } else {
         Session.set('seePastDue', false);
+      }
+    },
+    'change #see-autopay': function (evt) {
+      if ($(evt.target).prop('checked')) {
+        Session.set('seeAutopay', true);
+      } else {
+        Session.set('seeAutopay', false);
       }
     },
     'change #see-needs-payment': function (evt) {
