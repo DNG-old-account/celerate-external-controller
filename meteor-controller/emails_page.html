@@ -112,9 +112,9 @@
   <td>{{city}}</td>
   <td>{{plan}}</td>
   <td>{{prior_email}}</td>
-  <td>{{#if billing_info.autopay.on}}Yes{{else}}No{{/if}}</td>
   <td>{{#if billing_info.installation.paid}}Yes{{else}}No{{/if}}</td>
   <td>{{#if billing_info.needsPayment}}Yes{{else}}No{{/if}}</td>
+  <td>{{#if billing_info.autopay.on}}Yes{{else}}No{{/if}}</td>
   <td>
     <input data-subscriber="{{_id._str}}" class="form-control email-sub" type="checkbox"/>
   </td>
