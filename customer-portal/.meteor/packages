@@ -4,7 +4,6 @@
 # but you can also edit it by hand.
 
 standard-app-packages
-insecure
 less
 mizzao:bootstrap-3
 accounts-google
@@ -21,4 +20,3 @@ mrt:moment
 mrt:moment-timezone
 iron:router@1.0.1
 deepwell:raven
-
