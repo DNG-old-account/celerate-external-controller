@@ -662,7 +662,7 @@ FREmails = {
              '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
     }
   },
-  billingReminder: {
+  finalBillingReminder: {
     slug: 'final-billing-reminder',
     label: 'Final Billing Reminder',
     from: 'Further Reach Billing <billing@furtherreach.net>',
