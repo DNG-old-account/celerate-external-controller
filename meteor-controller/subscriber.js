@@ -20,6 +20,9 @@ if (Meteor.isClient) {
     Session.set("search_tag_selection", "global");
 
     Session.set("recenter_map", true);
+
+    Session.set("subscriber_map", false);
+    Session.set("show_subscriber_map", false);
   });
 
   getSubscribers = function () {
@@ -74,6 +77,9 @@ if (Meteor.isClient) {
     current_search_fields: function () {
       var current_search_fields = Session.get("subscriber_search_fields");
       return current_search_fields;
+    },
+    show_subscriber_map: function() {
+      return Session.get("show_subscriber_map");
     },
     subscribers: getSubscribers,
     subscriber_count: function () {
@@ -145,9 +151,11 @@ if (Meteor.isClient) {
       console.log(evt);
       var show_map = evt.target.checked;
       if (show_map) {
+        Session.set("show_subscriber_map", true);
         $("#subscriber_map").slideDown();
       } else {
         $("#subscriber_map").slideUp();
+        Session.set("show_subscriber_map", false);
       }
     },
     'click .recenter_map': function (evt) {
