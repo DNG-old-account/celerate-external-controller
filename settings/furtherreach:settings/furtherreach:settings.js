@@ -694,6 +694,33 @@ FREmails = {
     }
   },
 
+  finalBillingReminder: {
+    slug: 'final-billing-reminder',
+    label: 'Final Billing Reminder',
+    from: 'Further Reach Billing <billing@furtherreach.net>',
+    subject: function(context) {
+      return 'Last Reminder - Your Further Reach bill is past due!';
+    },
+    body: function(context, userLink, accountNum) {
+      context.first_name = (typeof context.first_name === 'string') ? context.first_name : '';
+      context.last_name = (typeof context.last_name === 'string') ? context.last_name : '';
+      context.email = (typeof context.email === 'string') ? context.email : '';
+      context.plan = (typeof context.plan === 'string') ? context.plan : '';
+      return 'Dear ' + context.first_name + ' ' + context.last_name + 
+             '\n\nYour bill for your Further Reach account is past due! Please go to the customer portal link and make a payment as soon as possible:\n' + 
+             userLink + 
+             '\n\nNote, this is your last reminder! If payment is not made by ' + context.billingDate + ' then unfortunately ' + 
+             'we will have to disconnect your service and update the relevant collection agencies. ' +
+             'Further, a $15 reconnection fee will be applied to the bill should you decide to resume the service at a later stage.' +
+             '\n\nPlan: ' + (context.plan.slice(0, 1).toUpperCase() + context.plan.slice(1)) + '\n' + // TODO: This is just capitalizing the first letter - we should move this to helpers
+             'Account Number: ' + accountNum + '\n' + 
+             'User ID: ' + context.email + '\n' + 
+             'Due Date: ' + context.billingDate + '\n' + 
+             '\n\nThank you for choosing FurtherReach!' + 
+             '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
+    }
+  },
+
   emailProblems: {
     slug: 'payment-problems',
     label: 'Payment Problems',
@@ -722,6 +749,7 @@ FREmails = {
              '\n\nQuestions about your bill? Send us an email at billing@furtherreach.net\n\n';
     }
   },
+
   serviceProblem: {
     slug: 'service-problems',
     label: 'Service Problems',

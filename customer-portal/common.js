@@ -84,6 +84,9 @@ Handlebars.registerHelper('selected_if_empty', function(val) {
 });
 
 Handlebars.registerHelper("formatMoney", function(amount) {
+  if (typeof amount === 'string') {
+    return parseFloat(amount.replace(',', '')).formatMoney(2, '.', ',');
+  }
   return parseFloat(amount).formatMoney(2, '.', ',');
 });
 

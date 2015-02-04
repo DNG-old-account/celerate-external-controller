@@ -322,5 +322,32 @@ Meteor.methods({
       coupon: coupon,
       discount: discount
     }
+  },
+
+  getEmailsList: function(query, headerSort) {
+    var result = Subscribers.find(query, {sort: headerSort} ).fetch();
+
+    _.each(result, function(sub) {
+      var payments = FRMethods.calculatePayments(sub);
+
+      sub.billing_info = sub.billing_info || {};
+      sub.billing_info.needsPayment = false;
+
+      if (payments.dueToDate.required && payments.dueToDate.amount > 0) {
+        sub.billing_info.needsPayment = true;
+      }
+
+      sub.billing_info.pastDue = false;
+
+      if (typeof payments.dueToDate.payments === 'object' && payments.dueToDate.payments.length > 1) {
+        _.each(payments.dueToDate.payments, function(payment) {
+          var startOfMonth = moment().tz('America/Los_Angeles').startOf('month');
+          if (startOfMonth.add(-1, 'months').isAfter(moment(payment.endDate))) {
+            sub.billing_info.pastDue = true;
+          }
+        });
+      }
+    });
+    return result;
   }
 });

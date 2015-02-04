@@ -27,6 +27,8 @@
         <input id="see-needs-payment" {{seeNeedsPaymentChecked}} type="checkbox"/>
         <label for="see-past-due">See past due</label>
         <input id="see-past-due" {{seePastDueChecked}} type="checkbox"/>
+        <label for="see-autopay">See autopay</label>
+        <input id="see-autopay" {{seeAutopayChecked}} type="checkbox"/>
       </div>
     </div>
 
@@ -67,6 +69,7 @@
           <th>Email</th>
           <th>Install Paid</th>
           <th>Needs Payment</th>
+          <th>Autopay</th>
           <th>Send Email?<input type="checkbox" id="select-all-emails"></th>
         </tr>
       </thead>
@@ -111,6 +114,7 @@
   <td>{{prior_email}}</td>
   <td>{{#if billing_info.installation.paid}}Yes{{else}}No{{/if}}</td>
   <td>{{#if billing_info.needsPayment}}Yes{{else}}No{{/if}}</td>
+  <td>{{#if billing_info.autopay.on}}Yes{{else}}No{{/if}}</td>
   <td>
     <input data-subscriber="{{_id._str}}" class="form-control email-sub" type="checkbox"/>
   </td>
