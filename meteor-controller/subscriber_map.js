@@ -43,47 +43,49 @@ if (Meteor.isClient) {
     });
 
     Deps.autorun(function() {
-      console.log("Rendering map...");
-      for (var m in markers) {
-        markers[m].setMap(null);
-      }
-      markers = {};
-
-      var subscriber_to_color = function (subscriber) {
-        if (subscriber.archived == "true") return "_black";
-        if (subscriber.status == "new lead") return "_yellow";
-        if (subscriber.plan == "hold") return "_purple";
-        if (subscriber.status == "connected") return "_green";
-        if (subscriber.status == "no coverage") return ""; // red is default marker color
-        return "_purple";
-      };
-
-      var bounds = new google.maps.LatLngBounds();
-
-      getSubscribers().forEach(function (subscriber) {
-        try {
-        if ('lat' in subscriber && subscriber['lat'].trim().length > 0 && 'lng' in subscriber && subscriber['lng'].trim().length > 0) {
-          var name = (subscriber.first_name ? subscriber.first_name : "") + " " + (subscriber.last_name ? subscriber.last_name : "");
-          var latlng = new google.maps.LatLng(subscriber.lat, subscriber.lng);
-          bounds.extend(latlng);
-
-          markers[subscriber._id] = new google.maps.Marker({
-            position: latlng,
-            title: name,
-            icon: 'http://maps.google.com/mapfiles/marker' + subscriber_to_color(subscriber) + '.png',
-            map: map
-          });
-
-          google.maps.event.addListener(markers[subscriber._id], 'click', function() {
-            var bubble_body = '<iframe src="/subscriber_details/'+subscriber._id._str+'" height="400px" width="500px" frameborder="0"> </iframe>';
-            (new google.maps.InfoWindow({ content: bubble_body })).open(map, markers[subscriber._id]);
-          });
+      if (Session.get("subscriber_map")) {
+        console.log("Rendering map...");
+        for (var m in markers) {
+          markers[m].setMap(null);
         }
-      } catch (e) { console.log("failed to map subscriber " + JSON.stringify(subscriber)); console.log(e); }
-      });
+        markers = {};
 
-      if (Session.get("recenter_map")) {
-        map.fitBounds(bounds);
+        var subscriber_to_color = function (subscriber) {
+          if (subscriber.archived == "true") return "_black";
+          if (subscriber.status == "new lead") return "_yellow";
+          if (subscriber.plan == "hold") return "_purple";
+          if (subscriber.status == "connected") return "_green";
+          if (subscriber.status == "no coverage") return ""; // red is default marker color
+          return "_purple";
+        };
+
+        var bounds = new google.maps.LatLngBounds();
+
+        getSubscribers().forEach(function (subscriber) {
+          try {
+          if ('lat' in subscriber && subscriber['lat'].trim().length > 0 && 'lng' in subscriber && subscriber['lng'].trim().length > 0) {
+            var name = (subscriber.first_name ? subscriber.first_name : "") + " " + (subscriber.last_name ? subscriber.last_name : "");
+            var latlng = new google.maps.LatLng(subscriber.lat, subscriber.lng);
+            bounds.extend(latlng);
+
+            markers[subscriber._id] = new google.maps.Marker({
+              position: latlng,
+              title: name,
+              icon: 'http://maps.google.com/mapfiles/marker' + subscriber_to_color(subscriber) + '.png',
+              map: map
+            });
+
+            google.maps.event.addListener(markers[subscriber._id], 'click', function() {
+              var bubble_body = '<iframe src="/subscriber_details/'+subscriber._id._str+'" height="400px" width="500px" frameborder="0"> </iframe>';
+              (new google.maps.InfoWindow({ content: bubble_body })).open(map, markers[subscriber._id]);
+            });
+          }
+        } catch (e) { console.log("failed to map subscriber " + JSON.stringify(subscriber)); console.log(e); }
+        });
+
+        if (Session.get("recenter_map")) {
+          map.fitBounds(bounds);
+        }
       }
     });
   };
