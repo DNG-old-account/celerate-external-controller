@@ -26,18 +26,24 @@ if (Meteor.isClient) {
             return;
           }
 
-          // If sub is on autopay we have to change their email address in stripe
-          if (typeof thisSub.billing_info === 'object' &&
-              typeof thisSub.billing_info.autopay === 'object' &&
-              typeof thisSub.billing_info.autopay.customer === 'object') {
+          var billingInfo = FRMethods.getBillingInfo(thisSub._id);
 
-            Meteor.call('updateStripeEmail', thisSub._id, formelement.value, function(err, result) {
-              if (result) {
-              } else {
-                console.log(err);
-                bootbox.alert('Error trying to update stripe email address <br/> ' + JSON.stringify(err) ); 
-              }
-            });
+          // If sub is on autopay we have to change their email address in stripe
+          // if they don't have a billing contact with a valid email
+          if (billingInfo.contact.email === thisSub.prior_email) {
+
+            if (typeof thisSub.billing_info === 'object' &&
+                typeof thisSub.billing_info.autopay === 'object' &&
+                typeof thisSub.billing_info.autopay.customer === 'object') {
+
+              Meteor.call('updateStripeEmail', thisSub._id, formelement.value, function(err, result) {
+                if (result) {
+                } else {
+                  console.log(err);
+                  bootbox.alert('Error trying to update stripe email address <br/> ' + JSON.stringify(err) ); 
+                }
+              });
+            }
           }
         }
 
