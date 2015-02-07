@@ -29,9 +29,16 @@ var sendEmail = function (to, from, subject, text, tries, bcc) {
     console.log(e);
     if (tries < numTries) {
       tries++;
+      // Wait 2 min before attempting to send this email again 
+      // because this is async, there will potentially be a 
+      // large batch that will all fire in 2 min. 
+      // Which could mean that some end up failling again, but as long as
+      // the numTries is sufficiently large (probably around 1 for every 50 emails or so)
+      // then there won't be a problem
+      // TODO: better solution
       Meteor.setTimeout(function() {
         sendEmail(to, from, subject, text, tries, bcc);
-      }, 1000);
+      }, 120000); 
     } else {
       var errorSubject = 'Error Sending Email to: ' + to;
       Email.send({
