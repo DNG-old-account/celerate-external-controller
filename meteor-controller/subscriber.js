@@ -141,6 +141,21 @@ if (Meteor.isClient) {
         $('#subscriber_details_modal').modal({show:true})
       });
     },
+    'click #see_connected_users': function (evt) {
+      var current_search_fields = Session.get("subscriber_search_fields");
+      current_search_fields['status'] = 'connected';
+      Session.set("subscriber_search_fields", current_search_fields);
+    },
+    'click #see_new_leads': function (evt) {
+      var current_search_fields = Session.get("subscriber_search_fields");
+      current_search_fields['status'] = 'new lead';
+      Session.set("subscriber_search_fields", current_search_fields);
+    },
+    'click #see_no_coverage': function (evt) {
+      var current_search_fields = Session.get("subscriber_search_fields");
+      current_search_fields['status'] = 'no coverage';
+      Session.set("subscriber_search_fields", current_search_fields);
+    },
     'click #show_archived_subscribers': function (evt) {
       archived_subscribers_dep.changed();
     },
