@@ -65,13 +65,17 @@ if (Meteor.isClient) {
             if (typeof this.billing_info.plan_activity !== 'object') {
               Subscribers.update(this._id, {$set: {'billing_info.plan_activity': []}}); 
             }
-            var planChange = {
-              previousPlan: this.plan,
-              newPlan: formelement.value,
-              date: new Date()
+
+            if (this.plan != formelement.value) {
+              var planChange = {
+                previousPlan: this.plan,
+                newPlan: formelement.value,
+                date: new Date()
+              }
+              Subscribers.update(this._id, {$push: {'billing_info.plan_activity': planChange}}); 
+            } else {
+              planChanged = false;
             }
-            Subscribers.update(this._id, {$push: {'billing_info.plan_activity': planChange}}); 
-            
           }
 
           if (formelement.value === "hold") {
