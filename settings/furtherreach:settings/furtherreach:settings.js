@@ -218,6 +218,53 @@ FRMethods = {
     return re.test(email);
   },
 
+  getBillingInfo: function(subId) {
+    var sub = Subscribers.findOne(subId);
+    var hasBillingContact = false;
+    var contact;
+
+    if (typeof sub.contacts === 'object') {
+      _.each(sub.contacts, function(c) {
+
+        if (typeof c === 'object' &&
+            typeof c.type === 'string' &&
+            c.type === "billing" && 
+            typeof c.contact_id === 'object' &&
+            typeof c.contact_id._str === 'string') {
+
+          contact = Contacts.findOne(c.contact_id);
+
+          if (typeof contact === 'object' &&
+              typeof contact.email === 'string' &&  
+              FRMethods.isValidEmail(contact.email)) {
+
+            hasBillingContact = true;
+          } else {
+            contact = undefined;
+          }
+        }
+      });
+    }
+
+    if (!hasBillingContact) {
+      contact = {
+        first_name: sub.first_name || '',
+        last_name: sub.last_name || '',
+        street_address: sub.street_address || '',
+        city: sub.city || '',
+        state: sub.state || '',
+        zip_code: sub.zip_code || '',
+        email: sub.prior_email || ''
+      }
+    }
+
+    var billingDetails = sub.billing_info; 
+    return {
+      contact: contact,
+      billingDetails: billingDetails
+    }
+  },
+
   createBillingProperties: function(sub) {
     if (typeof sub.billing_info !== 'object') {
       // Create default billing info

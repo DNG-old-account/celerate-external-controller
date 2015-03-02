@@ -193,7 +193,37 @@ Meteor.methods({
 
     return true;
   },
-       
+
+   updateStripeEmail: function(subId, newEmail) {
+    var sub = Subscribers.findOne(subId);
+    var stripe = Meteor.npmRequire('stripe')(Meteor.settings.stripe.privateKey);
+    var stripeResp;
+
+    if (typeof sub.billing_info !== 'object' ||
+        typeof sub.billing_info.autopay !== 'object' || 
+        typeof sub.billing_info.autopay.customer !== 'object') {
+
+      throw new Meteor.Error("Subscriber missing stripe customer information", stripeResp);
+    }
+
+    stripeResp = Async.runSync(function(done) {
+      stripe.customers.update(sub.billing_info.autopay.customer.id, {
+        email: newEmail
+      }, function(err, result) {
+        done(err, result);
+      });
+    });
+
+    if (stripeResp.err || !stripeResp.result) {
+      console.log(stripeResp);
+      throw new Meteor.Error("Stripe couldn't update email", stripeResp);
+    }
+
+    var customer = stripeResp.result;
+    Subscribers.update(sub._id, {$set: {'billing_info.autopay.customer': customer }});
+    return customer;
+  },
+      
   autopayPlanChange: function(subId, planChange) {
     var sub = Subscribers.findOne(subId);
     var stripe = Meteor.npmRequire('stripe')(Meteor.settings.stripe.privateKey);

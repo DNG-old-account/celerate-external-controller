@@ -58,6 +58,10 @@ if (Meteor.isClient) {
         console.log(formelement);
         console.log(this);
 
+        var thisContact = Contacts.findOne(this._id);
+        var thisSub = Subscribers.findOne({'contacts': {$elemMatch: {"contact_id": this._id}}});
+        var billingInfo = FRMethods.getBillingInfo(thisSub._id);
+
         if (formelement.id === 'email') {
           if (typeof formelement.value !== 'string' || 
               formelement.value.trim() === '' ||
@@ -65,6 +69,24 @@ if (Meteor.isClient) {
 
             bootbox.alert('"' + formelement.value + '" is not a valid email address');
             return;
+          }
+
+          // If sub is on autopay we have to change their email address in stripe
+          if (typeof thisContact.email === 'string' && 
+              billingInfo.contact.email === thisContact.email) {
+
+            if (typeof thisSub.billing_info === 'object' &&
+                typeof thisSub.billing_info.autopay === 'object' &&
+                typeof thisSub.billing_info.autopay.customer === 'object') {
+
+              Meteor.call('updateStripeEmail', thisSub._id, formelement.value, function(err, result) {
+                if (result) {
+                } else {
+                  console.log(err);
+                  bootbox.alert('Error trying to update stripe email address <br/> ' + JSON.stringify(err) ); 
+                }
+              });
+            }
           }
         }
 

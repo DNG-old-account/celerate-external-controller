@@ -169,6 +169,11 @@ if (Meteor.isClient) {
       var typesOfCharges = [];
       var amount = Session.get('totalPayment');
 
+      if (typeof thisSub.terms !== "object" || !thisSub.terms.agreed) {
+        bootbox.alert('Please agree to the terms and conditions before making a payment.');
+        return false;
+      }
+
       var stripeConfig = {
           name: 'Further Reach',
           allowRememberMe: false,
@@ -333,6 +338,13 @@ if (Meteor.isClient) {
 
   Template.manage_autopay.events({ 
     'click .autopay-button.toggle-on': function(evt) {
+      evt.preventDefault();
+      var thisSub = Session.get('subscriber');
+
+      if (typeof thisSub.terms !== "object" || !thisSub.terms.agreed) {
+        bootbox.alert('Please agree to the terms and conditions before making a payment.');
+        return false;
+      }
       Session.set('autoPayOn', true);
     },
     'click .autopay-button.toggle-off': function(evt) {
@@ -355,6 +367,8 @@ if (Meteor.isClient) {
     },
     'click #submit-autopay-config': function(evt) {
       evt.preventDefault();
+      var thisSub = Session.get('subscriber');
+
       bootbox.confirm("Turning on autopay will automatically charge your card when monthly bill is due. <br><br>If you have not yet paid for installation, please do so below with the 'make a payment' button.", function(result) {
         if (result) {
           $('.autopay-details .has-error').removeClass('has-error');
