@@ -388,6 +388,7 @@ FRMethods = {
                 plan = sub.plan;
               }
             }
+
             result.monthlyPayments.push(calcAmount(first, last, plan));
           }
         }
@@ -421,8 +422,9 @@ FRMethods = {
           var monthlyPaymentAmount = Math.round10(parseFloat(monthlyPayment.plan.monthly), 2);
           
           var startOfBilling = moment(monthlyPayment.startDate).startOf('month');
-          var numberOfBillingDays = Math.abs(monthlyPayment.startDate.diff(monthlyPayment.endDate, 'days')) + 1;
+          var numberOfBillingDays = Math.round(Math.abs(monthlyPayment.startDate.diff(monthlyPayment.endDate, 'days', true))) + 1;
           var daysInMonth = startOfBilling.daysInMonth();
+
           monthlyPayment.amount = monthlyPaymentAmount * (numberOfBillingDays / daysInMonth);
           monthlyPayment.amount = Math.round10(monthlyPayment.amount, 2);
 

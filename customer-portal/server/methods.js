@@ -213,7 +213,7 @@ Meteor.methods({
         stripeResp = Async.runSync(function(done) {
           stripe.plans.create({
             id: planName,
-            amount: monthlyPayment.amount * 100,
+            amount: Math.round(monthlyPayment.amount * 100),
             currency: 'usd',
             interval: 'month',
             name: FRSettings.billing.plans[sub.plan].label,
