@@ -255,6 +255,7 @@ if (Meteor.isClient) {
     node_fields: function () {
       var type_options = ["client", "cpe", "ap", "base_station", "core", "other"];
       var status_options = ["operational", "failed", "undeployed"];
+      var device_ownership_options = ["provider", "customer"];
 
       var hardware_options = get_hardware_options().map(function(item, index, cursor) {
         return { value: item.name, label: (item.make + "/" + item.model + " (" + item.name + ")") };
@@ -273,6 +274,7 @@ if (Meteor.isClient) {
                { field: "type", label: "Type", value: this.type, options: type_options },
                { field: "site", label: "Site", value: this.site, options: true, options_custom_view: site_options },
                { field: "status", label: "Status", value: this.status, options: status_options },
+               { field: "device_ownership", label: "Device Ownership", value: this.device_ownership, options: device_ownership_options },
                { field: "mac", label: "MAC", value: this.mac },
                { field: "vendor_uid", label: "Vendor UID", value: this.vendor_uid },
                { field: "lat", label: "Lat", value:this.lat },
