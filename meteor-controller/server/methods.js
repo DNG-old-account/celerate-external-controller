@@ -52,9 +52,10 @@ var sendEmail = function (to, from, subject, text, tries, bcc) {
 };
 
 var getEmail = function(sub) {
+  var emailAddress;
   if (typeof sub.prior_email === 'string' &&
       FRMethods.isValidEmail(sub.prior_email)) {
-    return sub.prior_email
+    emailAddress = sub.prior_email
   } else {
     if (typeof sub.contacts === 'object') {
       _.each(sub.contacts, function(c) {
@@ -64,11 +65,18 @@ var getEmail = function(sub) {
               contactObj.email.trim() !== '' &&
               FRMethods.isValidEmail(contactObj.email)) {
 
-            return contactObj.email;
+            emailAddress = contactObj.email;
           }
         }
       });
     }
+  }
+  if (FRMethods.isValidEmail(emailAddress)) {
+    return emailAddress;
+  } else {
+    console.log("No valid email address for subscriber: ");
+    console.log(sub);
+    throw new Meteor.Error("No valid email address for subscriber: ", sub);
   }
 }
 
