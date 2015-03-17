@@ -23,3 +23,5 @@ percolatestudio:synced-cron
 
 
 npm-container
+meteorhacks:fast-render
+
