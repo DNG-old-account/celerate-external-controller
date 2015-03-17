@@ -18,8 +18,7 @@ Router.map(function() {
   this.route('hardwareDetails', {
     path: '/hardware_details/:_id',
     data: function() { return Hardware.findOne(new Meteor.Collection.ObjectID(this.params._id)); },
-    onBeforeAction: checkUser,
-    fastRender: true
+    onBeforeAction: checkUser
   });
 
   this.route('sitePage', {
@@ -30,8 +29,7 @@ Router.map(function() {
   this.route('siteDetails', {
     path: '/site_details/:_id', 
     data: function() { return Sites.findOne(new Meteor.Collection.ObjectID(this.params._id)); },
-    onBeforeAction: checkUser,
-    fastRender: true
+    onBeforeAction: checkUser
   });
 
   this.route('nodePage', {
@@ -52,8 +50,7 @@ Router.map(function() {
   this.route('nodeDetails', {
     path: '/node_details/:_id',
     data: function() { return Nodes.findOne(new Meteor.Collection.ObjectID(this.params._id)); },
-    onBeforeAction: checkUser,
-    fastRender: true
+    onBeforeAction: checkUser
   });
 
   this.route('emailsPage', {
@@ -70,7 +67,6 @@ Router.map(function() {
   this.route('subscriberDetails', {
     path: '/subscriber_details/:_id',
     data: function() { return Subscribers.findOne(new Meteor.Collection.ObjectID(this.params._id)); },
-    onBeforeAction: checkUser,
-    fastRender: true
+    onBeforeAction: checkUser
   });
 });
