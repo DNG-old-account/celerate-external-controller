@@ -12,8 +12,7 @@ Router.map(function() {
 
   this.route('hardwarePage', {
     path: '/hardware',
-    onBeforeAction: checkUser,
-    fastRender: true
+    onBeforeAction: checkUser
   });
   this.route('hardwareDetails', {
     path: '/hardware_details/:_id',
@@ -23,8 +22,7 @@ Router.map(function() {
 
   this.route('sitePage', {
     path: '/site',
-    onBeforeAction: checkUser,
-    fastRender: true
+    onBeforeAction: checkUser
   });
   this.route('siteDetails', {
     path: '/site_details/:_id', 
@@ -44,8 +42,7 @@ Router.map(function() {
         console.log(e);
       }
     },
-    onBeforeAction: checkUser,
-    fastRender: true
+    onBeforeAction: checkUser
   });
   this.route('nodeDetails', {
     path: '/node_details/:_id',
@@ -55,14 +52,12 @@ Router.map(function() {
 
   this.route('emailsPage', {
     path: '/emails_page',
-    onBeforeAction: checkUser,
-    fastRender: true
+    onBeforeAction: checkUser
   });
 
   this.route('subscriberPage', {
     path: '/subscriber',
-    onBeforeAction: checkUser,
-    fastRender: true
+    onBeforeAction: checkUser
   });
   this.route('subscriberDetails', {
     path: '/subscriber_details/:_id',
