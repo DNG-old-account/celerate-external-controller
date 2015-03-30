@@ -253,20 +253,14 @@ Meteor.methods({
       // Now we need to check to see if the user needs a "proration discount"  
       var activationDate = moment.tz(sub.activation_date, 'America/Los_Angeles');
       var startOfBilling = moment(startOfNextMonth).add(-1, 'months');
+      var endOfThisMonth = moment(startOfNextMonth).add(-1, 'days');
        
       if (activationDate.isAfter(startOfBilling)) {
-        var numberOfBillingDays = Math.round(Math.abs(activationDate.diff(startOfNextMonth, 'days', true)));
+        var numberOfBillingDays = Math.round(Math.abs(activationDate.diff(endOfThisMonth, 'days', true)));
         var daysInMonth = activationDate.daysInMonth();
 
         var properAmount = monthlyPayment.amount * (numberOfBillingDays / daysInMonth);
         var discount = Math.round10(monthlyPayment.amount - properAmount, 2);
-
-        console.log('startofnextmonth ' + startOfNextMonth.toISOString());
-        console.log('activationdate ' + activationDate.toISOString());
-        console.log('number of billing days = ' + numberOfBillingDays);
-        console.log('number of days in month = ' + daysInMonth);
-        console.log('properamount = ' + properAmount);
-        console.log('discount = ' + discount);
 
         // Add stripe "coupon" - amount in cents as always
         stripeResp = Async.runSync(function(done) {
