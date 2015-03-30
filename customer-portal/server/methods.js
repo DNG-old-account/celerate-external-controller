@@ -108,12 +108,15 @@ Meteor.methods({
       });
 
       if (typeof thisCustomer !== 'object') {
+        var customerBillingInfo = FRMethods.getBillingInfo(sub._id);
         // Create a customer
         stripeResp = Async.runSync(function(done) {
           stripe.customers.create({
             card: configObj.token,
-            description: 'Further Reach Autopay for ' + sub.first_name + ' ' + sub.last_name,
-            email: sub.prior_email,
+            description: 'Further Reach Autopay for ' + 
+                         customerBillingInfo.contact.first_name + ' ' + 
+                         customerBillingInfo.contact.last_name,
+            email: customerBillingInfo.contact.email,
           }, function(err, result) {
             done(err, result);
           });
@@ -240,12 +243,65 @@ Meteor.methods({
           done(err, result);
         });
       });
-      
+
       if (stripeResp.err || !stripeResp.result) {
         console.log(stripeResp);
         throw new Meteor.Error("Stripe couldn't create new subscription for customer", stripeResp);
       }
       var thisSubscription = stripeResp.result;
+
+      // Now we need to check to see if the user needs a "proration discount"  
+      var activationDate = moment.tz(sub.activation_date, 'America/Los_Angeles');
+      var startOfBilling = moment(startOfNextMonth).add(-1, 'months');
+       
+      if (activationDate.isAfter(startOfBilling)) {
+        var numberOfBillingDays = Math.round(Math.abs(activationDate.diff(startOfNextMonth, 'days', true)));
+        var daysInMonth = activationDate.daysInMonth();
+
+        var properAmount = monthlyPayment.amount * (numberOfBillingDays / daysInMonth);
+        var discount = Math.round10(monthlyPayment.amount - properAmount, 2);
+
+        console.log('startofnextmonth ' + startOfNextMonth.toISOString());
+        console.log('activationdate ' + activationDate.toISOString());
+        console.log('number of billing days = ' + numberOfBillingDays);
+        console.log('number of days in month = ' + daysInMonth);
+        console.log('properamount = ' + properAmount);
+        console.log('discount = ' + discount);
+
+        // Add stripe "coupon" - amount in cents as always
+        stripeResp = Async.runSync(function(done) {
+          stripe.coupons.create({
+            amount_off: discount * 100,
+            currency: 'usd',
+            duration: 'once',
+          }, 
+          function(err, result) {
+            done(err, result);
+          });
+        });
+
+        if (stripeResp.err || !stripeResp.result) {
+          console.log(stripeResp);
+          throw new Meteor.Error("Couldn't create the Stripe Coupon.", stripeResp);
+        }
+
+        var coupon = stripeResp.result;
+
+        // Apply stripe "coupon" to actual customer 
+        stripeResp = Async.runSync(function(done) {
+          stripe.customers.update(thisCustomer.id, {
+            coupon: coupon.id,
+          }, 
+          function(err, result) {
+            done(err, result);
+          });
+        });
+
+        if (stripeResp.err || !stripeResp.result) {
+          console.log(stripeResp);
+          throw new Meteor.Error("Couldn't apply coupon to customer", stripeResp);
+        }
+      }
 
       // Now we've ostensibly setup autopay for the customer - let's update the collection
       if (typeof sub.billing_info.autopay !== 'object') {
@@ -255,6 +311,7 @@ Meteor.methods({
       Subscribers.update(sub._id, {$set: {'billing_info.autopay.plan': myPlan }});
       Subscribers.update(sub._id, {$set: {'billing_info.autopay.customer': thisCustomer }});
       Subscribers.update(sub._id, {$set: {'billing_info.autopay.subscription': thisSubscription }});
+      Subscribers.update(sub._id, {$set: {'billing_info.autopay.proration': {on: true, discount: coupon }}});
     }
 
     sub = Subscribers.findOne(sub._id);

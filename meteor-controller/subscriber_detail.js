@@ -362,6 +362,12 @@ if (Meteor.isClient) {
       evt.preventDefault();
       var thisSub = Session.get('thisSub');
       Subscribers.update(thisSub._id, {$pull: {'billing_info.discounts': this}});
+
+      if (typeof thisSub.billing_info.autopay === 'object' &&
+          thisSub.billing_info.autopay.on === true) {
+
+        bootbox.alert('For now, you also have to manually go into stripe to remove the autopay discount <br/> '); 
+      }
     },
     'click #add-additional-hardware': function (evt) {
       evt.preventDefault();
