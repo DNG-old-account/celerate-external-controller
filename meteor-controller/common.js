@@ -30,6 +30,11 @@ Handlebars.registerHelper('urlencode', function(str) {
 });
 
 Handlebars.registerHelper('format_date', function(str) {
+  if (typeof str === 'undefined' || str === null ||
+      (typeof str === 'string' && str.trim() === '')) {
+    return '';
+  }
+
   try {
     return moment(str).format("MM-DD-YY");
   } catch (e) {
