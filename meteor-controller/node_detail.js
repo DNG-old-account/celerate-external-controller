@@ -253,7 +253,7 @@ if (Meteor.isClient) {
              ];
     },
     node_fields: function () {
-      var type_options = ["client", "cpe", "ap", "base_station", "core", "other"];
+      var type_options = ["cpe", "ap", "base_station", "core"];
       var status_options = ["operational", "failed", "undeployed"];
       var device_ownership_options = ["provider", "customer"];
 
@@ -273,14 +273,15 @@ if (Meteor.isClient) {
                { field: "hardware", label: "Hardware", value: this.hardware, options: true, options_custom_view: hardware_options },
                { field: "type", label: "Type", value: this.type, options: type_options },
                { field: "site", label: "Site", value: this.site, options: true, options_custom_view: site_options },
-               { field: "status", label: "Status", value: this.status, options: status_options },
-               { field: "device_ownership", label: "Device Ownership", value: this.device_ownership, options: device_ownership_options },
+               // { field: "status", label: "Status", value: this.status, options: status_options },
+               // { field: "device_ownership", label: "Device Ownership", value: this.device_ownership, options: device_ownership_options },
                { field: "mac", label: "MAC", value: this.mac },
-               { field: "vendor_uid", label: "Vendor UID", value: this.vendor_uid },
+               // { field: "vendor_uid", label: "Vendor UID", value: this.vendor_uid },
                { field: "lat", label: "Lat", value:this.lat },
                { field: "lng", label: "Lng", value:this.lng },
-               { field: "alt", label: "Altitude", value:this.alt },
+               { field: "height", label: "Height over ground", value:this.height },
                { field: "management_ip", label: "Management IP", value:this.management_ip },
+               { field: "speedtest", label: "Speedtest to AP Down,Up", value: this.speedtest },
                { field: "notes", label: "Notes", value:this.notes },
                { field: "ports", label: "Ports", value: this.ports, display_ports: true },
              ];
