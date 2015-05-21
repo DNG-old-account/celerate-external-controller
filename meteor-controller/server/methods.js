@@ -393,12 +393,14 @@ Meteor.methods({
         subscriptions: 0,
         installations: 0,
         equipmentSold: 0,
+        additionalLabor: 0,
         tax: {}, // Needs to be by jurisdiction
         totalChanges: {
           totalInvoice: 0,
           subscriptions: 0,
           installations: 0,
           equipmentSold: 0,
+          additionalLabor: 0,
           tax: {}, // Needs to be by jurisdiction
         }
       };
@@ -420,6 +422,9 @@ Meteor.methods({
 
           if (FRMethods.isNumber(subBilling.installation.totalInstallationAmount)) {
             result[monthName].installations += subBilling.installation.totalInstallationAmount;
+          }
+          if (FRMethods.isNumber(subBilling.installation.additionalLaborCost )) {
+            result[monthName].additionalLabor += subBilling.installation.additionalLaborCost;
           }
           if (typeof subBilling.installation.additional_equipment === 'object' &&
               subBilling.installation.additional_equipment.length > 0) {
@@ -451,6 +456,7 @@ Meteor.methods({
       monthlyResult.subscriptions = Math.round10(monthlyResult.subscriptions, 2);
       monthlyResult.installations = Math.round10(monthlyResult.installations, 2);
       monthlyResult.equipmentSold = Math.round10(monthlyResult.equipmentSold, 2);
+      monthlyResult.additionalLabor = Math.round10(monthlyResult.additionalLabor, 2);
       _.each(monthlyResult.tax, function(amount) {
         amount = Math.round10(amount, 10);
       });
