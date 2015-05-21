@@ -369,6 +369,97 @@ Meteor.methods({
     }
   },
 
+  getBillingData: function() {
+    var result = {};
+    var startOfBilling = moment.tz(FRSettings.billing.firstDayOfBilling, 'America/Los_Angeles')
+      .startOf('month')
+      .add(1, 'days');
+    var cursor = moment(startOfBilling);
+    var allSubs = Subscribers.find({}).fetch();
+    var subsBilling = []
+    _.each(allSubs, function(sub) {
+      if (sub.status === 'connected' || sub.status === 'disconnected') {
+        subsBilling.push({
+          sub: sub,
+          billing: FRMethods.calculatePayments(sub, 30)
+        });
+      }
+    });
+
+    while (cursor.isBefore(moment.tz())) {
+      var monthName = cursor.format('MMM');
+      result[monthName] = {
+        totalInvoice: 0,
+        subscriptions: 0,
+        installations: 0,
+        equipmentSold: 0,
+        tax: {}, // Needs to be by jurisdiction
+        totalChanges: {
+          totalInvoice: 0,
+          subscriptions: 0,
+          installations: 0,
+          equipmentSold: 0,
+          tax: {}, // Needs to be by jurisdiction
+        }
+      };
+
+      _.each(subsBilling, function(subBillingObj) {
+        var sub = subBillingObj.sub;
+        var subBilling = subBillingObj.billing;
+        _.each(subBilling.monthlyPayments, function(monthlyPayment) {
+          if (moment(monthlyPayment.startDate).isBefore(cursor) &&
+              moment(monthlyPayment.endDate).isAfter(cursor)) {
+
+            result[monthName].subscriptions += monthlyPayment.amount;
+          }
+        });
+
+        if (typeof sub.activation_date !== 'undefined' && 
+            moment(sub.activation_date).isValid() &&
+            cursor.isSame(moment(sub.activation_date), 'month')) {
+
+          if (FRMethods.isNumber(subBilling.installation.totalInstallationAmount)) {
+            result[monthName].installations += subBilling.installation.totalInstallationAmount;
+          }
+          if (typeof subBilling.installation.additional_equipment === 'object' &&
+              subBilling.installation.additional_equipment.length > 0) {
+            
+            _.each(subBilling.installation.additional_equipment, function(equipment) {
+              result[monthName].equipmentSold += equipment.hardwareObj.price;
+            });
+            var community;
+            if (typeof sub.community === 'string') {
+              community = sub.community;
+            } else if (typeof sub.city === 'string') {
+              community = sub.city;
+            } else {
+              community = 'unknown';
+            }
+
+            if (!FRMethods.isNumber(result[monthName].tax[community])) {
+              result[monthName].tax[community] = 0;
+            }
+            result[monthName].tax[community] += subBilling.installation.totalTax;
+          }
+        }
+      });
+
+      cursor.add(1, 'months');
+    }
+
+    _.each(result, function(monthlyResult) {
+      monthlyResult.subscriptions = Math.round10(monthlyResult.subscriptions, 2);
+      monthlyResult.installations = Math.round10(monthlyResult.installations, 2);
+      monthlyResult.equipmentSold = Math.round10(monthlyResult.equipmentSold, 2);
+      _.each(monthlyResult.tax, function(amount) {
+        amount = Math.round10(amount, 10);
+      });
+      monthlyResult.totalInvoice = Math.round10(monthlyResult.subscriptions + monthlyResult.installations, 2);
+
+    });
+    return result;
+  },
+
   getEmailsList: function(query, headerSort) {
     var result = Subscribers.find(query, {sort: headerSort} ).fetch();
 

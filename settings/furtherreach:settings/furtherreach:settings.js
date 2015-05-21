@@ -324,11 +324,11 @@ FRMethods = {
 
           if (typeof sub.billing_info.plan_activity === 'object' && _.size(sub.billing_info.plan_activity) > 0) {
             
-            var thisPeriodsActivity = _.filter(sub.billing_info.plan_activity, function(change) {;
+            var thisPeriodsActivity = _.filter(sub.billing_info.plan_activity, function(change) {
               var changeDate = moment(change.date).tz('America/Los_Angeles');
               return (changeDate.isAfter(first) && !changeDate.isSame(first, 'day') && 
                       changeDate.isBefore(last) && !changeDate.isSame(last, 'day'));
-          });
+            });
 
             thisPeriodsActivity = _.sortBy(thisPeriodsActivity, function(change) {
               return moment(change.date).unix();

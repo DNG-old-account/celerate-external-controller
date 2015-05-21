@@ -50,6 +50,11 @@ Router.map(function() {
     onBeforeAction: checkUser
   });
 
+  this.route('billingExport', {
+    path: '/billing_export',
+    onBeforeAction: checkUser
+  });
+
   this.route('emailsPage', {
     path: '/emails_page',
     onBeforeAction: checkUser

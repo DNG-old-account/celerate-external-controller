@@ -1,6 +1,8 @@
 accounts-base@1.2.0
 accounts-google@1.0.4
 accounts-oauth@1.1.5
+accounts-ui@1.1.5
+accounts-ui-unstyled@1.1.7
 autopublish@1.0.3
 autoupdate@1.2.1
 base64@1.0.3
@@ -19,7 +21,6 @@ fastclick@1.0.3
 furtherreach:settings@1.0.0
 geojson-utils@1.0.3
 google@1.1.5
-handlebars@1.0.3
 html-tools@1.0.4
 htmljs@1.0.4
 http@1.1.0
@@ -61,7 +62,6 @@ ordered-dict@1.0.3
 peerlibrary:aws-sdk@2.1.17_1
 peerlibrary:blocking@0.5.2
 percolatestudio:synced-cron@1.1.0
-rajit:accounts-ui-bootstrap-3@0.3.10
 random@1.0.3
 reactive-dict@1.1.0
 reactive-var@1.0.5
@@ -73,7 +73,6 @@ session@1.1.0
 spacebars@1.0.6
 spacebars-compiler@1.0.6
 standard-app-packages@1.0.5
-stylus@1.0.7
 templating@1.1.1
 tracker@1.0.7
 ui@1.0.6

@@ -1,0 +1,51 @@
+<template name="billingExport">
+<body>
+  {{> celerateNavbar}}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="main">
+        {{> billingData}}
+      </div>
+    </div>
+  </div>
+</body>
+</template>
+
+<template name="billingData">
+  <div class="billing-data-container row">
+    <div class="col-xs-12 json-dump">
+      <div class="{{loading}}">
+        {{> throbber}}
+      </div>
+      <div class="{{hasError}}">
+        {{errorMsg}}
+      </div>
+      <pre>
+        {{{json billingData}}}
+      </pre>
+    </div>
+  </div>
+</template>
+
+<template name="throbber">
+<div class="throbber-container">
+  <div id="floatingCirclesG">
+    <div class="f_circleG" id="frotateG_01">
+    </div>
+    <div class="f_circleG" id="frotateG_02">
+    </div>
+    <div class="f_circleG" id="frotateG_03">
+    </div>
+    <div class="f_circleG" id="frotateG_04">
+    </div>
+    <div class="f_circleG" id="frotateG_05">
+    </div>
+    <div class="f_circleG" id="frotateG_06">
+    </div>
+    <div class="f_circleG" id="frotateG_07">
+    </div>
+    <div class="f_circleG" id="frotateG_08">
+    </div>
+  </div> 
+</div>
+</template>
