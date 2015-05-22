@@ -103,8 +103,14 @@ if (Meteor.isClient) {
     if ("type" in site && "subscriber" in site.type) {
       // For subscriber sites, use the subscriber's address and city.
       subscriber = Subscribers.findOne(site.type["subscriber"]);
-      street_address = subscriber.street_address;
-      city = subscriber.city;
+      if (typeof subscriber === 'object') { 
+        if (typeof subscriber.street_address === 'string') {
+          street_address = subscriber.street_address;
+        }
+        if (typeof subscriber.city === 'string') {
+          city = subscriber.city;
+        }
+      }
     } else if ("street_address" in site && "city" in site) {
       // For all other site types, use the site-specific address, if it exists.
       street_address = site.street_address;

@@ -231,21 +231,46 @@ if (Meteor.isClient) {
         } else {
           var user_link = Meteor.settings.public.urls.customerPortal + result;
           var user_link_fast_forward = Meteor.settings.public.urls.customerPortal + 'fast_forward/' + result + '?fastForward=20';
-          console.log("setting user billing link " + user_link);
-          Session.set("user_billing_link", user_link);
-          Session.set("user_billing_link_fast_forward", user_link_fast_forward);
+          console.log('setting user billing link ' + user_link);
+          Session.set('user_billing_link', user_link);
+          Session.set('user_billing_link_fast_forward', user_link_fast_forward);
         }
       }
     });
   };
 
   Template.subscriberDetails.helpers({
+    subscriberData: function () {
+      var sub;
+      if (Session.get('selected_subscriber')) {
+        var selectedSubId = Session.get('selected_subscriber');
+        if (typeof selectedSubId === 'string') {
+          selectedSubId = new Meteor.Collection.ObjectID(selectedSubId);
+        }
+        Meteor.subscribe('subscriberData', selectedSubId);
+        sub = Subscribers.findOne(selectedSubId);
+      } else if (typeof this._id === 'object') {
+        Meteor.subscribe('subscriberData', this._id);
+        sub = Subscribers.findOne(this._id);
+      }
+      if (typeof sub === 'object' && typeof sub.billing_info !== 'object') {
+        FRMethods.createBillingProperties(sub);
+      }
+      return sub;
+    },
+    triggerUserBillingLink: function () {
+      if (typeof this._id === 'object' && 
+          typeof this._id._str === 'string') {
+        getUserBillingLink(this._id._str);
+      } else {
+        getUserBillingLink(Session.get('selected_subscriber'));
+      }
+    },
     user_billing_link: function () {
-      console.log("re-getting user billing link: " + Session.get("user_billing_link"));
-      return Session.get("user_billing_link");
+      return Session.get('user_billing_link');
     },
     user_billing_link_fast_forward: function () {
-      return Session.get("user_billing_link_fast_forward");
+      return Session.get('user_billing_link_fast_forward');
     },
     site_link: function () {
       return Sites.findOne({'type.subscriber': this._id});
@@ -257,8 +282,6 @@ if (Meteor.isClient) {
       return Nodes.find({ type: 'ap' });
     },
     basic_info_fields: function () {
-      // Set up the user billing link, since we know we have a subscriber id now.
-      getUserBillingLink(this._id._str);
 
       var subscriber_type_options = ["residential", "business", "non profit organization"];
       var status_options = ["connected", "new lead", "no coverage", "deferred", "not interested", "disconnected"];
@@ -427,9 +450,6 @@ if (Meteor.isClient) {
       };
     },
     billing_info: function () {
-      if (typeof this.billing_info !== 'object') {
-        FRMethods.createBillingProperties(this);
-      }
       return this.billing_info; 
     },
     communityTaxAmount: function() {

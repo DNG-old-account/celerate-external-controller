@@ -1,3 +1,8 @@
+if (Meteor.isServer) {
+  Meteor.publish("Subscribers", function () {
+    return Subscribers.find({});
+  });
+}
 if (Meteor.isClient) {
   var sort_fields = ["status_sort", "name_sort", "city_sort", "mapped_sort", "plan_sort", "signup_date_sort"];
   var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "city_sort": "city", "mapped_sort": "lat", "plan_sort": "plan", "signup_date_sort": "signup_date"};

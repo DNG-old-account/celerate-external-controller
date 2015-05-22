@@ -2,9 +2,15 @@ var checkUser = function () {
   if (!Meteor.user() || !Meteor.user().services.google || (Meteor.user().services.google.email.indexOf("denovogroup.org") == -1)) {
     this.render('homePage');
   } else {
-    this.next();
+    return true;
   }
 };
+
+Router.configure({
+  waitOn: function(){
+    return Meteor.subscribe('userData');
+  }
+});
 
 Router.onBeforeAction('loading');
 Router.map(function() {
@@ -12,22 +18,55 @@ Router.map(function() {
 
   this.route('hardwarePage', {
     path: '/hardware',
-    onBeforeAction: checkUser
+    onBeforeAction: function() {
+      if (checkUser()) {
+        if (Meteor.isClient) {
+          Meteor.subscribe('hardware');
+          this.next();
+        }
+      }
+    }
   });
+
   this.route('hardwareDetails', {
     path: '/hardware_details/:_id',
     data: function() { return Hardware.findOne(new Meteor.Collection.ObjectID(this.params._id)); },
-    onBeforeAction: checkUser
+    onBeforeAction: function() {
+      if (checkUser()) {
+        if (Meteor.isClient) {
+          Meteor.subscribe('hardware');
+          Session.set('selected_hardware', this.params._id);
+          this.next();
+        }
+      }
+    },
   });
 
   this.route('sitePage', {
     path: '/site',
-    onBeforeAction: checkUser
+    onBeforeAction: function() {
+      if (checkUser()) {
+        if (Meteor.isClient) {
+          Meteor.subscribe('sites');
+          this.next();
+        }
+      }
+    },
   });
   this.route('siteDetails', {
     path: '/site_details/:_id', 
-    data: function() { return Sites.findOne(new Meteor.Collection.ObjectID(this.params._id)); },
-    onBeforeAction: checkUser
+    data: function() { 
+      return Sites.findOne(new Meteor.Collection.ObjectID(this.params._id)); 
+    },
+    onBeforeAction: function() {
+      if (checkUser()) {
+        if (Meteor.isClient) {
+          Meteor.subscribe('sites');
+          this.next();
+        }
+      }
+    },
+
   });
 
   this.route('nodePage', {
@@ -42,31 +81,75 @@ Router.map(function() {
         console.log(e);
       }
     },
-    onBeforeAction: checkUser
+    onBeforeAction: function() {
+      if (checkUser()) {
+        if (Meteor.isClient) {
+          Meteor.subscribe('nodes');
+          this.next();
+        }
+      }
+    },
   });
   this.route('nodeDetails', {
     path: '/node_details/:_id',
-    data: function() { return Nodes.findOne(new Meteor.Collection.ObjectID(this.params._id)); },
-    onBeforeAction: checkUser
+    data: function() { 
+      return Nodes.findOne(new Meteor.Collection.ObjectID(this.params._id)); 
+    },
+    onBeforeAction: function() {
+      if (checkUser()) {
+        if (Meteor.isClient) {
+          Meteor.subscribe('nodes');
+          this.next();
+        }
+      }
+    },
   });
 
   this.route('billingExport', {
     path: '/billing_export',
-    onBeforeAction: checkUser
+    onBeforeAction: function() {
+      if (checkUser()) {
+        this.next();
+      }
+    }
   });
 
   this.route('emailsPage', {
     path: '/emails_page',
-    onBeforeAction: checkUser
+    onBeforeAction: function() {
+      if (checkUser()) {
+        if (Meteor.isClient) {
+          Meteor.subscribe('subscribersOverview');
+          this.next();
+        }
+      }
+    }
   });
 
   this.route('subscriberPage', {
     path: '/subscriber',
-    onBeforeAction: checkUser
+    onBeforeAction: function() {
+      if (checkUser()) {
+        if (Meteor.isClient) {
+          Meteor.subscribe('subscribersOverview');
+          this.next();
+        }
+      }
+    },
   });
   this.route('subscriberDetails', {
     path: '/subscriber_details/:_id',
-    data: function() { return Subscribers.findOne(new Meteor.Collection.ObjectID(this.params._id)); },
-    onBeforeAction: checkUser
+    onBeforeAction: function() {
+      if (checkUser()) {
+        if (Meteor.isClient) {
+          Meteor.subscribe('subscriberData', this.params._id);
+          Session.set('selected_subscriber', this.params._id);
+          this.next();
+        }
+      }
+    },
+    data: function() { 
+      return Subscribers.findOne(new Meteor.Collection.ObjectID(this.params._id)); 
+    },
   });
 });
