@@ -15,6 +15,7 @@ if (Meteor.isClient) {
 
   Template.siteOverview.helpers({
     sites: function () {
+      Meteor.subscribe('subscribersOverview');
       var query = {};
       if (Session.get("site_search_input") != null && !Session.equals("site_search_input", "")) {
         console.log("Searching for: ["+Session.get("site_search_input")+"]");
