@@ -24,7 +24,7 @@ var authenticate = function(short_token) {
     console.log(p);
   }
 
-  console.log("Got subscriber_id: " + subId);
+  // console.log("Got subscriber_id: " + subId);
   return subId;
 }
 
