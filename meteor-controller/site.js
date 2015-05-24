@@ -15,7 +15,7 @@ if (Meteor.isClient) {
 
   Template.siteOverview.helpers({
     sites: function () {
-      Meteor.subscribe('subscribersOverview');
+      Meteor.subscribe('subscribersFields', {'city': 1, 'street_address': 1});
       var query = {};
       if (Session.get("site_search_input") != null && !Session.equals("site_search_input", "")) {
         console.log("Searching for: ["+Session.get("site_search_input")+"]");
@@ -52,9 +52,7 @@ if (Meteor.isClient) {
       var newId = new Meteor.Collection.ObjectID();
       Sites.insert({ '_id': newId, 'name': "New site" });
       Session.set("selected_site", newId);
-      Tracker.afterFlush(function () {
-        $('#site_details_modal').modal({show:true})
-      });
+      showModal();
     },
     'click .type_header': function () {
       Session.set("type_sort", -1 * Session.get("type_sort"));
@@ -81,10 +79,7 @@ if (Meteor.isClient) {
       Session.set("selected_site", this._id);
       console.log("selected_site set to: " + Session.get("selected_site"))
       if ($(evt.target).hasClass('edit-row')) {
-        // Enable the modal for the node.
-        Tracker.afterFlush(function () {
-          $('#site_details_modal').modal({show:true})
-        });
+        showModal();
       }
     }
   });
@@ -123,7 +118,17 @@ if (Meteor.isClient) {
     return street_address + ", " + city;
   });
 
-  close_site_modal = function() {
+  var showModal = function() {
+    Tracker.afterFlush(function () {
+      $('#site_details_modal').modal({show:true})
+      $('#site_details_modal').off('hide.bs.modal');
+      $('#site_details_modal').on('hide.bs.modal', function() {
+        $('#site_details_modal .disabled-on-init select, #site_details_modal .disabled-on-init input').prop('disabled', true);
+      });
+    });
+  };
+
+  var close_site_modal = function() {
     $('#site_details_modal').modal('hide');
   };
 }

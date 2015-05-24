@@ -1,8 +1,4 @@
-if (Meteor.isServer) {
-  Meteor.publish("Subscribers", function () {
-    return Subscribers.find({});
-  });
-}
+
 if (Meteor.isClient) {
   var sort_fields = ["status_sort", "name_sort", "city_sort", "mapped_sort", "plan_sort", "signup_date_sort"];
   var sort_fields_to_label = {"status_sort": "status", "name_sort": "last_name", "city_sort": "city", "mapped_sort": "lat", "plan_sort": "plan", "signup_date_sort": "signup_date"};
@@ -65,7 +61,8 @@ if (Meteor.isClient) {
       query = {$and: subquery};
     }
 
-    var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'billing_info': 1, 'mobile': 1, 'landline': 1, 'signup_date': 1};
+    var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'mobile': 1, 'landline': 1, 'signup_date': 1};
+    Meteor.subscribe('subscribersFields', include_fields);
 
     var result = Subscribers.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")});
     Session.set("subscriber_count", result.count());
@@ -142,9 +139,7 @@ if (Meteor.isClient) {
       Session.set("selected_subscriber", newId);
       console.log("selected_subscriber set to: " + Session.get("selected_subscriber"));
       // Enable the modal for the subscriber.
-      Tracker.afterFlush(function () {
-        $('#subscriber_details_modal').modal({show:true})
-      });
+      showModal();
     },
     'click #see_connected_users': function (evt) {
       var current_search_fields = Session.get("subscriber_search_fields");
@@ -221,13 +216,23 @@ if (Meteor.isClient) {
       if ($(evt.target).hasClass('edit-row')) {
         // Enable the modal for the subscriber.
         Tracker.afterFlush(function () {
-          $('#subscriber_details_modal').modal({show:true})
+          showModal();
         });
       }
     }
   });
 
-  close_subscriber_modal = function() {
+  var showModal = function() {
+    Tracker.afterFlush(function () {
+      $('#subscriber_details_modal').modal({show:true})
+      $('#subscriber_details_modal').off('hide.bs.modal');
+      $('#subscriber_details_modal').on('hide.bs.modal', function() {
+        $('#subscriber_details_modal .disabled-on-init select, #subscriber_details_modal .disabled-on-init input').prop('disabled', true);
+      });
+    });
+  };
+
+  var close_subscriber_modal = function() {
     $('#subscriber_details_modal').modal('hide');
   };
 }

@@ -1,4 +1,5 @@
 <template name="nodeDetails">
+{{#with nodeData}}
 
 <button type="button" id="get_location_button" class="get_location_button btn btn-primary">Get Current Location</button>
 {{#with ..}}
@@ -122,4 +123,5 @@
 {{/if}}
 {{/each}}
 </form>
+{{/with}}
 </template>

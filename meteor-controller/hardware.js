@@ -54,9 +54,7 @@ if (Meteor.isClient) {
       var newId = new Meteor.Collection.ObjectID();
       Hardware.insert({ '_id': newId, 'name': "New Hardware" });
       Session.set("selected_hardware", newId);
-      Tracker.afterFlush(function () {
-        $('#hardware_details_modal').modal({show:true})
-      });
+      showModal();
     },
     'click .name_header': function () {
       Session.set("name_sort", -1 * Session.get("name_sort"));
@@ -84,15 +82,22 @@ if (Meteor.isClient) {
       Session.set("selected_hardware", this._id);
       console.log("selected_hardware set to: " + Session.get("selected_hardware"))
       if ($(evt.target).hasClass('edit-row')) {
-        // Enable the modal for the node.
-        Tracker.afterFlush(function () {
-          $('#hardware_details_modal').modal({show:true})
-        });
+        showModal();
       }
     }
   });
 
-  close_hardware_modal = function() {
+  var showModal = function() {
+    Tracker.afterFlush(function () {
+      $('#hardware_details_modal').modal({show:true})
+      $('#hardware_details_modal').off('hide.bs.modal');
+      $('#hardware_details_modal').on('hide.bs.modal', function() {
+        $('#hardware_details_modal select, #hardware_details_modal input').prop('disabled', true);
+      });
+    });
+  };
+
+  var close_hardware_modal = function() {
     $('#hardware_details_modal').modal('hide');
   };
 }

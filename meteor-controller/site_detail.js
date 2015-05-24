@@ -169,10 +169,39 @@ if (Meteor.isClient) {
     }
   });
 
+  var isSubscriberType  = function (site) {
+    return (typeof site === 'object' &&
+            typeof site.type === 'object' &&
+            typeof site.type.subscriber === 'object') 
+  };
+
   Template.siteDetails.helpers({
+    siteData: function() {
+      var site;
+      if (Session.get('selected_site')) {
+        var selectedSiteId = Session.get('selected_site');
+        if (typeof selectedSiteId === 'string') {
+          selectedSiteId = new Meteor.Collection.ObjectID(selectedSiteId);
+        }
+        Meteor.subscribe('siteData', selectedSiteId);
+        Meteor.subscribe('siteNodes', selectedSiteId);
+        site = Sites.findOne(selectedSiteId);
+      } else if (typeof this._id === 'object') {
+        Meteor.subscribe('siteData', this._id);
+        Meteor.subscribe('siteNodes', this._id);
+        site = Sites.findOne(this._id);
+      }
+      Session.set('pictureList', []);
+      if (isSubscriberType(this)) {
+        Meteor.subscribe('subscriberData', site.type.subscriber);
+      }
+      return site;
+    },
+
     nodes_in_site: function () {
       return Nodes.find({'site': this._id._str});
     },
+
     picturesList: function() {
       var thisSite = this;
       Meteor.call('getPictures', thisSite, function(err, result) {
@@ -182,7 +211,25 @@ if (Meteor.isClient) {
       });
 
       return Session.get('pictureList');
-    }
+    },
+
+    site_detail_subscriber_address: function() {
+      if (isSubscriberType(this)) {        
+        subscriber = Subscribers.findOne(this.type.subscriber);
+        if (typeof subscriber === 'object' && typeof subscriber.street_address === 'string') {
+          return subscriber.street_address;
+        }
+      }
+    },
+
+    site_detail_subscriber_city: function() {
+      if (isSubscriberType(this)) {
+        subscriber = Subscribers.findOne(this.type.subscriber);
+        if (typeof subscriber === 'object' && typeof subscriber.city === 'string') {
+          return subscriber.city;
+        }
+      }
+    },
   });
 
   Handlebars.registerHelper('site_type_deletable', function (key) {
@@ -192,7 +239,9 @@ if (Meteor.isClient) {
   Handlebars.registerHelper('new_type_options', function (site_obj) {
     var standard_types = ["relay", "core"];
 
-    var existing_types = site_obj.type ? site_obj.type : {};
+    var existing_types = (typeof site_obj === 'object' &&
+                          site_obj !== null &&
+                          typeof site_obj.type !== 'undefined') ? site_obj.type : {};
 
     // Only allow adding "storage" to a site that has no type tags.
     if (_.isEmpty(existing_types)) {
@@ -202,15 +251,4 @@ if (Meteor.isClient) {
 
     return _.filter(standard_types, function(t) { return !(t in existing_types); });
   });
-
-  Handlebars.registerHelper('site_detail_subscriber_address', function(subscriber_id) {
-    subscriber = Subscribers.findOne(subscriber_id);
-    return subscriber.street_address;
-  });
-
-  Handlebars.registerHelper('site_detail_city', function(subscriber_id) {
-    subscriber = Subscribers.findOne(subscriber_id);
-    return subscriber.city;
-  });
-
 }

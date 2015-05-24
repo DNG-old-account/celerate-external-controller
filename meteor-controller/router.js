@@ -53,6 +53,7 @@ Router.map(function() {
       }
     },
   });
+
   this.route('siteDetails', {
     path: '/site_details/:_id', 
     data: function() { 
@@ -66,7 +67,6 @@ Router.map(function() {
         }
       }
     },
-
   });
 
   this.route('nodePage', {
@@ -90,6 +90,7 @@ Router.map(function() {
       }
     },
   });
+
   this.route('nodeDetails', {
     path: '/node_details/:_id',
     data: function() { 
@@ -98,7 +99,7 @@ Router.map(function() {
     onBeforeAction: function() {
       if (checkUser()) {
         if (Meteor.isClient) {
-          Meteor.subscribe('nodes');
+          Meteor.subscribe('nodeData', this.params._id);
           this.next();
         }
       }
@@ -130,19 +131,21 @@ Router.map(function() {
     path: '/subscriber',
     onBeforeAction: function() {
       if (checkUser()) {
-        if (Meteor.isClient) {
-          Meteor.subscribe('subscribersOverview');
-          this.next();
-        }
+        Meteor.subscribe('contacts');
+        Meteor.subscribe('hardware');
+        this.next();
       }
     },
   });
+
   this.route('subscriberDetails', {
     path: '/subscriber_details/:_id',
     onBeforeAction: function() {
       if (checkUser()) {
         if (Meteor.isClient) {
           Meteor.subscribe('subscriberData', this.params._id);
+          Meteor.subscribe('contacts');
+          Meteor.subscribe('hardware');
           Session.set('selected_subscriber', this.params._id);
           this.next();
         }

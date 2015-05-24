@@ -125,7 +125,7 @@ if (Meteor.isClient) {
       Session.set("selected_node", newId);
       // Enable the modal for the subscriber.
       Tracker.afterFlush(function () {
-        $('#node_details_modal').modal({show:true})
+        showModal();
       });
     },
     'click .name_header': function () {
@@ -173,15 +173,23 @@ if (Meteor.isClient) {
       Session.set("selected_node", this._id);
       console.log("selected_node set to: " + Session.get("selected_node"))
       if ($(evt.target).hasClass('edit-row')) {
-        // Enable the modal for the node.
-        Tracker.afterFlush(function () {
-          $('#node_details_modal').modal({show:true})
-        });
+        showModal();
       }
     }
   });
 
-  close_node_modal = function() {
+  var showModal = function() {
+    // Enable the modal for the node.
+    Tracker.afterFlush(function () {
+      $('#node_details_modal').modal({show:true});
+      $('#node_details_modal').off('hide.bs.modal');
+      $('#node_details_modal').on('hide.bs.modal', function() {
+        $('#node_details_modal select, #node_details_modal input').prop('disabled', true);
+      });
+    });
+  };
+
+  var close_node_modal = function() {
     $('#node_details_modal').modal('hide');
   };
 }

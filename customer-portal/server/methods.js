@@ -10,8 +10,22 @@ var authenticate = function(short_token) {
     throw new Meteor.Error("invalid-auth-token", p.err);
   }
 
-  // console.log("Got subscriber_id: " + p.subscriber_id);
-  return p.subscriber_id;
+  var subId; 
+
+  if (p.subscriber_id !== 'string' &&
+      typeof p.subscriber_id === 'object' && 
+      typeof p.subscriber_id._str === 'string') {
+    subId = p.subscriber_id._str;
+  } else if (typeof p.subscriber_id === 'string') {
+    subId = p.subscriber_id;
+  } else {
+    throw new Meteor.Error("invalid-auth-token", p);
+    console.log('invalid auth token');
+    console.log(p);
+  }
+
+  console.log("Got subscriber_id: " + subId);
+  return subId;
 }
 
 Meteor.methods({

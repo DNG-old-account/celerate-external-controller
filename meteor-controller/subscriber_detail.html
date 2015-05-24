@@ -13,9 +13,7 @@
   {{else}}
   <button type="button" class="archive_subscriber_button btn btn-warning">Archive Subscriber</button>
   {{/if}}
-  {{#with ..}}
   <button type="button" class="delete_subscriber_button btn btn-danger">Delete Subscriber</button>
-  {{/with}}
   {{#if site_link}}
   <a href="/site_details/{{site_link._id._str}}" role="button" class="btn btn-success" target="_blank">Associated Site</a>
   {{/if}}
@@ -34,7 +32,7 @@
       <div class="tab-pane active" id="basic_info">
         <button type="button" id="get_location_button" class="get_location_button btn btn-info btn-sm">Get Current Location</button>
         {{#each basic_info_fields}}
-          <div class="form-group">
+          <div class="form-group disabled-on-init">
             <div class="container-fluid">
               <div class="col-xs-2"><label for="{{field}}" class="control-label">{{label}}</label></div>
               {{#if options}}
@@ -64,7 +62,7 @@
 
       <div class="tab-pane" id="scheduling">
         {{#each scheduling_fields}}
-          <div class="form-group">
+          <div class="form-group disabled-on-init">
             <div class="container-fluid">
               <div class="col-xs-2"><label for="{{field}}" class="control-label">{{label}}</label></div>
               {{#if options}}
@@ -134,7 +132,7 @@
     </div>
 
     <div class="row extra-equipment-form-container">
-      <div class="col-sm-6">
+      <div class="col-sm-5">
         <div class="form-group">
           <label for="billing-extra-equipment" class="col-sm-4 control-label">Extra Equipment:</label>
           <div class="col-sm-8">
@@ -166,7 +164,7 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-2">
+      <div class="col-sm-3">
         <button class="btn btn-warning" id="add-additional-hardware">Add Equipment</button>
       </div>
     </div>

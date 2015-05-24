@@ -52,6 +52,22 @@ if (Meteor.isClient) {
   });
 
   Template.hardwareDetails.helpers({
+    hardwareData: function() {
+      var hardware;
+      if (Session.get('selected_hardware')) {
+        var selectedHardwareId = Session.get('selected_hardware');
+        if (typeof selectedHardwareId === 'string') {
+          selectedHardwareId = new Meteor.Collection.ObjectID(selectedHardwareId);
+        }
+        Meteor.subscribe('hardwareData', selectedHardwareId);
+        hardware = Hardware.findOne(selectedHardwareId);
+      } else if (typeof this._id === 'object') {
+        Meteor.subscribe('hardwareData', this._id);
+        hardware = Hardware.findOne(this._id);
+      }
+      Meteor.subscribe('hardware');
+      return hardware;
+    },
     hardware_fields: function () {
       for (var p in this.ports) {
         this.ports[p].index = p;

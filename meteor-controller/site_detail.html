@@ -1,7 +1,6 @@
 <template name="siteDetails">
-{{#with ..}}
+{{#with siteData}}
 <button type="button" class="delete_site_button btn btn-danger">Delete Site</button>
-{{/with}}
 <hr>
 
 <ul class="nav nav-pills" role="tablist">
@@ -13,7 +12,7 @@
   <div class="tab-pane active" id="basic_info">
 
     <form class="form-horizontal" role="form">
-    <div class="form-group">
+    <div class="form-group disabled-on-init">
       <label for="name" class="col-sm-2 control-label">Name</label><div class="col-sm-8"><input class="form-control" id="name" type="text" value="{{name}}" disabled></div>
     </div>
 
@@ -50,20 +49,20 @@
     {{#if type.subscriber}}
     {{!-- Output unmodifiable address info for subscriber --}}
     <div class="form-group">
-      <label for="street_address" class="col-sm-2 control-label">Street Address</label><div class="col-sm-8"><p class="form-control-static">{{site_detail_subscriber_address type.subscriber}}</p></div>
+      <label for="street_address" class="col-sm-2 control-label">Street Address</label><div class="col-sm-8"><p class="form-control-static">{{site_detail_subscriber_address}}</p></div>
     </div>
     <div class="form-group">
-      <label for="city" class="col-sm-2 control-label">City</label><div class="col-sm-8"><p class="form-control-static">{{site_detail_city type.subscriber}}</p></div>
+      <label for="city" class="col-sm-2 control-label">City</label><div class="col-sm-8"><p class="form-control-static">{{site_detail_subscriber_city}}</p></div>
     </div>
     {{else}}
     {{!-- Output address fields for non-subscriber site--}}
-    <div class="form-group">
+    <div class="form-group disabled-on-init">
       <label for="street_address" class="col-sm-2 control-label">Street Address</label><div class="col-sm-8"><input class="form-control" id="street_address" type="text" value="{{street_address}}" disabled></div>
     </div>
-    <div class="form-group">
+    <div class="form-group disabled-on-init">
       <label for="city" class="col-sm-2 control-label">City</label><div class="col-sm-8"><input class="form-control" id="city" type="text" value="{{city}}" disabled></div>
     </div>
-    <div class="form-group">
+    <div class="form-group disabled-on-init">
       <label for="state" class="col-sm-2 control-label">State</label><div class="col-sm-8"><input class="form-control" id="state" type="text" value="{{state}}" disabled></div>
     </div>
     {{/if}}
@@ -106,4 +105,5 @@
   </div>
 
 </div>
+{{/with}}
 </template>

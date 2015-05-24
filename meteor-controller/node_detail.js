@@ -1,4 +1,7 @@
 if (Meteor.isClient) {
+  // Annoying fix for select2 on bootstrap modals
+  $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+
   // Node details functionality and events.
   Template.nodeDetails.events({
     'click': function (evt) {
@@ -10,28 +13,35 @@ if (Meteor.isClient) {
         evt.target.classList.add("text-gray");
         evt.target.nextElementSibling.classList.remove("text-gray");
 
-        var formelement = evt.target.parentElement.previousElementSibling.firstElementChild;
-        formelement.disabled = false;
-        
-        if (evt.target.parentElement.previousElementSibling.firstElementChild.nodeName === 'SELECT') {
+        var formElement = evt.target.parentElement.previousElementSibling.firstElementChild;
+        formElement.disabled = false;
+       
+        if (formElement.nodeName === 'SELECT') {
           // Try to remove a select2 that's already been instantiated
           try {
-            $('select.site-select').select2('destroy');
+            $(formElement).select2('destroy');
           } catch (e) {
           }
-          $('select.site-select').select2();
+          $(formElement).select2();
+          // We need to destroy the select if the modal is ever closing
+          $('.modal').on('hide.bs.modal', function() {
+            try {
+              $(formElement).select2('destroy');
+            } catch (e) {
+            }
+          });
         }
       } else if (evt.target.id == "save" && !evt.target.classList.contains("text-gray")) {
         // User clicked on save icon to save input.
-        var formelement = evt.target.parentElement.previousElementSibling.firstElementChild;
-        console.log(formelement);
+        var formElement = evt.target.parentElement.previousElementSibling.firstElementChild;
+        console.log(formElement);
         console.log(this);
  
         db_update = {};
-        db_update[formelement.id] = formelement.value;
+        db_update[formElement.id] = formElement.value;
         Nodes.update(this._id, {$set: db_update});
 
-        formelement.disabled = true;
+        formElement.disabled = true;
 
         // Toggle the icon visual state.
         evt.target.classList.add("text-gray");
@@ -181,6 +191,25 @@ if (Meteor.isClient) {
   };
 
   Template.nodeDetails.helpers({
+    nodeData: function() {
+      var node;
+      if (Session.get('selected_node')) {
+        var selectedNodeId = Session.get('selected_node');
+        if (typeof selectedNodeId === 'string') {
+          selectedNodeId = new Meteor.Collection.ObjectID(selectedNodeId);
+        }
+        Meteor.subscribe('nodeData', selectedNodeId);
+        node = Nodes.findOne(selectedNodeId);
+      } else if (typeof this._id === 'object') {
+        Meteor.subscribe('nodeData', this._id);
+        node = Nodes.findOne(this._id);
+      }
+      Meteor.subscribe('sites');
+      Meteor.subscribe('hardware');
+      return node;
+    },
+
+
     hardware_options: get_hardware_options,
     site_options: get_site_options,
     site_name: function () {
