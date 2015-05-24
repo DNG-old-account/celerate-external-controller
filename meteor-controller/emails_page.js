@@ -12,9 +12,19 @@ if (Meteor.isClient) {
     Session.set("selected_subscriber", null);
     Session.set("subscriber_search_input", "");
     Session.set("subscriber_search_fields", {});
+    Session.set('loading', true);
   });
 
   Template.subscribersEmailsList.helpers({
+    errorMsg: function() {
+      return Session.get('errorMsg');
+    },
+    hideTable: function() {
+      return (Session.get('loading')) ? 'hidden' : '';
+    },
+    loading: function() {
+      return (Session.get('loading')) ? '' : 'hidden';
+    },
     searchable_fields: function () {
       console.log('searchable fields');
       return [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "prior_email", "archived", "current_provider", "bts_to_use"];
@@ -72,6 +82,7 @@ if (Meteor.isClient) {
       var seePastDue = Session.get('seePastDue');
       var seeAutopay = Session.get('seeAutopay');
       var headerSort = GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers");
+      Session.set('loading', true);
       Meteor.call('getEmailsList', query, headerSort, function (err, result) {
         if (err) {
           console.log("getEmailsList call failed: " + err);
@@ -98,6 +109,7 @@ if (Meteor.isClient) {
             }
             Session.set("subscriber_count", result.length);
             Session.set('subscribersList', result);
+            Session.set('loading', false);
           }
         }
       });

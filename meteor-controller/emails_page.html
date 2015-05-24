@@ -57,7 +57,14 @@
       </div>
     </div>
   </div>
-  <div class="table_responsive">
+  <div class="{{loading}}">
+    {{> throbber}}
+  </div>
+
+  <div class="{{hasError}}">
+    {{errorMsg}}
+  </div>
+  <div class="table_responsive {{hideTable}}">
     <table class="table table-striped">
       <thead>
         <tr>
