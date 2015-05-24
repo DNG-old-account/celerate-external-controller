@@ -85,6 +85,7 @@ Router.map(function() {
       if (checkUser()) {
         if (Meteor.isClient) {
           Meteor.subscribe('nodes');
+          Meteor.subscribe('edges');
           this.next();
         }
       }
@@ -100,6 +101,7 @@ Router.map(function() {
       if (checkUser()) {
         if (Meteor.isClient) {
           Meteor.subscribe('nodeData', this.params._id);
+          Meteor.subscribe('edges');
           this.next();
         }
       }
