@@ -29,7 +29,7 @@
     </ul>
     <div class="tab-content">
 
-      <div class="tab-pane active" id="basic_info">
+      <div class="tab-pane {{tabDisplay "basic_info"}}" id="basic_info">
         <button type="button" id="get_location_button" class="get_location_button btn btn-info btn-sm">Get Current Location</button>
         {{#each basic_info_fields}}
           <div class="form-group disabled-on-init">
@@ -56,11 +56,11 @@
         {{/each}}
       </div>
 
-      <div class="tab-pane" id="billing_info">
+      <div class="tab-pane {{tabDisplay "billing_info"}}" id="billing_info">
         {{> subscriberBillingInfo }}
       </div>
 
-      <div class="tab-pane" id="scheduling">
+      <div class="tab-pane {{tabDisplay "scheduling"}}" id="scheduling">
         {{#each scheduling_fields}}
           <div class="form-group disabled-on-init">
             <div class="container-fluid">

@@ -5,6 +5,11 @@ if (Meteor.isClient) {
       var thisSub = this;
       console.log(evt);
 
+      if ($(evt.target).data('toggle') === 'tab') {
+        var thisTabId = $(evt.target).attr('href').slice(1);
+        Session.set('tabId', thisTabId);
+      }
+
       if (evt.target.id == "edit" && !evt.target.classList.contains("text-gray")) {
         // User clicked on pencil icon to begin editing.
         // Toggle the icon visual state.
@@ -283,6 +288,14 @@ if (Meteor.isClient) {
     },
     ap_options: function () {
       return Nodes.find({ type: 'ap' });
+    },
+    tabDisplay: function(tabName) {
+      console.log(tabName);
+      if (tabName === Session.get('tabId')) {
+        return 'active';
+      } else {
+        return '';
+      }
     },
     basic_info_fields: function () {
 

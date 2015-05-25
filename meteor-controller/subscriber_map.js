@@ -43,7 +43,7 @@ if (Meteor.isClient) {
     });
 
     Deps.autorun(function() {
-      if (Session.get("subscriber_map")) {
+      if (Session.get("subscriber_map") && !Session.get('infoWindowOpen')) {
         console.log("Rendering map...");
         for (var m in markers) {
           markers[m].setMap(null);
@@ -63,29 +63,55 @@ if (Meteor.isClient) {
 
         getSubscribers().forEach(function (subscriber) {
           try {
-          if ('lat' in subscriber && subscriber['lat'].trim().length > 0 && 'lng' in subscriber && subscriber['lng'].trim().length > 0) {
-            var name = (subscriber.first_name ? subscriber.first_name : "") + " " + (subscriber.last_name ? subscriber.last_name : "");
-            var latlng = new google.maps.LatLng(subscriber.lat, subscriber.lng);
-            bounds.extend(latlng);
+            if ('lat' in subscriber && subscriber['lat'].trim().length > 0 && 'lng' in subscriber && subscriber['lng'].trim().length > 0) {
+              var name = (subscriber.first_name ? subscriber.first_name : "") + " " + (subscriber.last_name ? subscriber.last_name : "");
+              var latlng = new google.maps.LatLng(subscriber.lat, subscriber.lng);
+              bounds.extend(latlng);
 
-            markers[subscriber._id] = new google.maps.Marker({
-              position: latlng,
-              title: name,
-              icon: 'http://maps.google.com/mapfiles/marker' + subscriber_to_color(subscriber) + '.png',
-              map: map
-            });
-
-            google.maps.event.addListener(markers[subscriber._id], 'click', function() {
-              var bubble_body = '<iframe src="/subscriber_details/'+subscriber._id._str+'" height="400px" width="500px" frameborder="0"> </iframe>';
-              (new google.maps.InfoWindow({ content: bubble_body })).open(map, markers[subscriber._id]);
-            });
-          }
-        } catch (e) { console.log("failed to map subscriber " + JSON.stringify(subscriber)); console.log(e); }
+              markers[subscriber._id] = new google.maps.Marker({
+                position: latlng,
+                title: name,
+                icon: 'http://maps.google.com/mapfiles/marker' + subscriber_to_color(subscriber) + '.png',
+                map: map
+              });
+            }
+          } catch (e) { console.log("failed to map subscriber " + JSON.stringify(subscriber)); console.log(e); }
         });
 
         if (Session.get("recenter_map")) {
           map.fitBounds(bounds);
         }
+      }
+    });
+
+    Deps.autorun(function() {
+      if (Session.get("subscriber_map") && !Session.get('infoWindowOpen')) {
+        var infoWindow = new google.maps.InfoWindow({ content: '<div class="subscriber-details-infowindow-container"></div>' });
+        getSubscribers().forEach(function (subscriber) {
+          try {
+            if ('lat' in subscriber && subscriber['lat'].trim().length > 0 && 'lng' in subscriber && subscriber['lng'].trim().length > 0) {
+
+              var marker = markers[subscriber._id];
+
+              google.maps.event.addListener(marker, 'click', function(evt) {
+                Session.set("selected_subscriber", subscriber._id)
+                Session.set('infoWindowOpen', true);
+                var subscriberObj = subscriber;
+                var testing = "123";
+                infoWindow.open(map, marker)
+                Meteor.setTimeout(function() {
+                  var subscriber = Subscribers.findOne(Session.get('selected_subscriber'));
+                  var domNode = $('.subscriber-details-infowindow-container')[0];
+                  Blaze.renderWithData(Template.subscriberDetails, subscriber, domNode);
+                  google.maps.event.addListenerOnce(infoWindow, 'closeclick', function(evt) {
+                    console.log(evt);
+                    Session.set('infoWindowOpen', false);
+                  });
+                }, 1);
+              });
+            }
+          } catch (e) { console.log("failed to map subscriber " + JSON.stringify(subscriber)); console.log(e); }
+        });
       }
     });
   };
