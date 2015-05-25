@@ -290,11 +290,15 @@ if (Meteor.isClient) {
       return Nodes.find({ type: 'ap' });
     },
     tabDisplay: function(tabName) {
-      console.log(tabName);
-      if (tabName === Session.get('tabId')) {
-        return 'active';
+      if (typeof Session.get('tabId') === 'string') {
+        if (tabName === Session.get('tabId')) {
+          return 'active';
+        } else {
+          return '';
+        }
       } else {
-        return '';
+        Session.set('tabId', tabName);
+        return 'active';
       }
     },
     basic_info_fields: function () {
