@@ -1,6 +1,7 @@
 <template name="subscriberDetails">
 {{triggerUserBillingLink}}
 {{#with subscriberData}}
+{{#if Template.subscriptionsReady}}
 <div class="subscriber-details-container">
   {{#if is_archived}}
   <div class="alert alert-warning" role="alert"><strong>Warning:</strong> This is an ARCHIVED Subscriber</div>
@@ -93,6 +94,7 @@
     </div>
   </form>
 </div>
+{{/if}}
 {{/with}}
 </template>
 

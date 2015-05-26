@@ -244,6 +244,17 @@ if (Meteor.isClient) {
     });
   };
 
+  Template.subscriberDetails.onCreated(function() {
+    if (Session.get('selected_subscriber')) {
+      var selectedSubId = Session.get('selected_subscriber');
+      if (typeof selectedSubId === 'string') {
+        selectedSubId = new Meteor.Collection.ObjectID(selectedSubId);
+      }
+      this.subscribe('subscriberData', selectedSubId);
+      this.subscribe('subscriberSite', selectedSubId);
+    } 
+  });
+
   Template.subscriberDetails.helpers({
     subscriberData: function () {
       var sub;
@@ -260,8 +271,10 @@ if (Meteor.isClient) {
         Meteor.subscribe('subscriberSite', this._id);
         sub = Subscribers.findOne(this._id);
       }
-      if (typeof sub === 'object' && typeof sub.billing_info !== 'object') {
-        FRMethods.createBillingProperties(sub);
+      if (Template.instance().subscriptionsReady()) {
+        if (typeof sub === 'object' && typeof sub.billing_info !== 'object') {
+          FRMethods.createBillingProperties(sub);
+        }
       }
       Meteor.subscribe('nodes');
       return sub;
