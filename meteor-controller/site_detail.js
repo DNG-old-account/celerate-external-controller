@@ -160,8 +160,8 @@ if (Meteor.isClient) {
         if (first_result) {
           bootbox.confirm("Are you REALLY REALLY sure you want to delete this site?", function(second_result) {
             if (second_result) {
-              window.parent.close_site_modal();
               setTimeout(function(){ Sites.remove(id); }, 1000);
+              $('.modal').modal('hide');
             }
           });
         }

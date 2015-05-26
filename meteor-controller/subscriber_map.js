@@ -86,7 +86,10 @@ if (Meteor.isClient) {
 
     Deps.autorun(function() {
       if (Session.get("subscriber_map") && !Session.get('infoWindowOpen')) {
-        var infoWindow = new google.maps.InfoWindow({ content: '<div class="subscriber-details-infowindow-container"></div>' });
+        var infoWindow = new google.maps.InfoWindow({ 
+          content: '<div class="subscriber-details-infowindow-container"></div>',
+        });
+
         getSubscribers().forEach(function (subscriber) {
           try {
             if ('lat' in subscriber && subscriber['lat'].trim().length > 0 && 'lng' in subscriber && subscriber['lng'].trim().length > 0) {
@@ -96,8 +99,6 @@ if (Meteor.isClient) {
               google.maps.event.addListener(marker, 'click', function(evt) {
                 Session.set("selected_subscriber", subscriber._id)
                 Session.set('infoWindowOpen', true);
-                var subscriberObj = subscriber;
-                var testing = "123";
                 infoWindow.open(map, marker)
                 Meteor.setTimeout(function() {
                   var subscriber = Subscribers.findOne(Session.get('selected_subscriber'));

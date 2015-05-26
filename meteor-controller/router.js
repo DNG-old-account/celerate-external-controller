@@ -135,6 +135,7 @@ Router.map(function() {
       if (checkUser()) {
         Meteor.subscribe('contacts');
         Meteor.subscribe('hardware');
+        Meteor.subscribe('sites');
         this.next();
       }
     },
@@ -148,6 +149,7 @@ Router.map(function() {
           Meteor.subscribe('subscriberData', this.params._id);
           Meteor.subscribe('contacts');
           Meteor.subscribe('hardware');
+          Meteor.subscribe('sites');
           Session.set('selected_subscriber', this.params._id);
           this.next();
         }

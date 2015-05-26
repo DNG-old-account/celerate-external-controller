@@ -169,8 +169,8 @@ if (Meteor.isClient) {
         if (first_result) {
           bootbox.confirm("Are you REALLY REALLY sure you want to delete this node?", function(second_result) {
             if (second_result) {
-              window.parent.close_node_modal();
               setTimeout(function(){ Nodes.remove(id); }, 1000);
+              $('.modal').modal('hide');
             }
           });
         }
