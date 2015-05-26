@@ -90,7 +90,22 @@
   {{/if}}
   <div class="table_responsive">
     <table class="table table-striped">
-      <thead><tr><th class="edit_column"></th><th class="mobile_column"></th><th class="landline_column"></th><th class="name_header" style="cursor:pointer;">Full Name</th><th class="status_header" style="cursor:pointer;">Status</th><th class="address_header">Street Address</th><th class="city_header" style="cursor:pointer;">City</th><th class="plan_header" style="cursor:pointer;">Plan</th><th class="signup_date_header" style="cursor:pointer;">Signup Date</th><th>Email</th><th class="mapped_header" style="cursor:pointer;"><span class="glyphicon-globe glyphicon" style="padding: 10px 0px 0px 0px; font-size: 18px;" title="Mapped?"></span></th></tr></thead>
+      <thead>
+        <tr>
+          <th class="edit_column"></th>
+          <th class="mobile_column"></th>
+          <th class="landline_column"></th>
+          <th class="name_header" style="cursor:pointer;">Full Name</th>
+          <th class="status_header" style="cursor:pointer;">Status</th>
+          <th class="address_header">Street Address</th>
+          <th class="city_header" style="cursor:pointer;">City</th>
+          <th class="plan_header" style="cursor:pointer;">Plan</th>
+          <th class="signup_date_header" style="cursor:pointer;">Signup Date</th>
+          <th class="activation_date_header" style="cursor:pointer;">Activation Date</th>
+          <th>Email</th>
+          <th class="mapped_header" style="cursor:pointer;"><span class="glyphicon-globe glyphicon" style="padding: 10px 0px 0px 0px; font-size: 18px;" title="Mapped?"></span></th>
+        </tr>
+      </thead>
       <tbody>
         {{#each subscribers}}
         {{> subscriber}}
@@ -112,6 +127,7 @@
   <td>{{city}}</td>
   <td>{{plan}}</td>
   <td>{{format_date signup_date}}</td>
+  <td>{{#if activation_date}}{{format_date activation_date}}{{/if}}</td>
   <td>{{prior_email}}</td>
   <td>{{#if lat}}<span class="glyphicon-globe glyphicon" style="padding: 10px 0px 0px 0px; font-size: 18px;" title="Mapped"></span>{{/if}}</td>
 </tr>
