@@ -62,7 +62,7 @@ if (Meteor.isClient) {
       query = {$and: subquery};
     }
 
-    var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'mobile': 1, 'landline': 1, 'signup_date': 1, 'activation_date': 1};
+    var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'business_name': 1, 'mobile': 1, 'landline': 1, 'signup_date': 1, 'activation_date': 1};
     Meteor.subscribe('subscribersFields', include_fields);
 
     var result = Subscribers.find(query, {fields: include_fields, sort: GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers")});
@@ -73,7 +73,7 @@ if (Meteor.isClient) {
   Template.subscriberOverview.helpers({
     searchable_fields: function () {
 
-      var searchableFields =  [ "last_name", "first_name", "city", "status", "street_address", "plan", "subscriber_type", "mobile", "landline", "prior_email", "archived", "current_provider", "bts_to_use" ];
+      var searchableFields =  [ "last_name", "first_name", "city", "status", "street_address", "plan", "business_name", "subscriber_type", "mobile", "landline", "prior_email", "archived", "current_provider", "bts_to_use" ];
       Session.set('searchableFields', searchableFields);
       return searchableFields;
     },

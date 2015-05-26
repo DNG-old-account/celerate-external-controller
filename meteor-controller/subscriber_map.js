@@ -65,6 +65,9 @@ if (Meteor.isClient) {
           try {
             if ('lat' in subscriber && subscriber['lat'].trim().length > 0 && 'lng' in subscriber && subscriber['lng'].trim().length > 0) {
               var name = (subscriber.first_name ? subscriber.first_name : "") + " " + (subscriber.last_name ? subscriber.last_name : "");
+              if (typeof subscriber.business_name === 'string' && subscriber.business_name.trim() !== '') {
+                name += ' | Business: ' + subscriber.business_name;
+              }
               var latlng = new google.maps.LatLng(subscriber.lat, subscriber.lng);
               bounds.extend(latlng);
 
