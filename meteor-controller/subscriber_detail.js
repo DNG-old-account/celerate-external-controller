@@ -83,7 +83,7 @@ if (Meteor.isClient) {
 
           // Check if has current plan
           if (typeof this.plan === 'string' && this.plan.trim() !== '') {
-            if (this.billing_info !== 'object') {
+            if (typeof this.billing_info !== 'object') {
               FRMethods.createBillingProperties(this);
             }
 
