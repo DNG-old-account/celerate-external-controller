@@ -263,14 +263,15 @@ if (Meteor.isClient) {
         if (typeof selectedSubId === 'string') {
           selectedSubId = new Meteor.Collection.ObjectID(selectedSubId);
         }
-        Meteor.subscribe('subscriberData', selectedSubId);
-        Meteor.subscribe('subscriberSite', selectedSubId);
+        Template.instance().subscribe('subscriberData', selectedSubId);
+        Template.instance().subscribe('subscriberSite', selectedSubId);
         sub = Subscribers.findOne(selectedSubId);
       } else if (typeof this._id === 'object') {
-        Meteor.subscribe('subscriberData', this._id);
-        Meteor.subscribe('subscriberSite', this._id);
+        Template.instance().subscribe('subscriberData', this._id);
+        Tempalte.instance().subscribe('subscriberSite', this._id);
         sub = Subscribers.findOne(this._id);
       }
+
       if (Template.instance().subscriptionsReady()) {
         if (typeof sub === 'object' && typeof sub.billing_info !== 'object') {
           FRMethods.createBillingProperties(sub);
