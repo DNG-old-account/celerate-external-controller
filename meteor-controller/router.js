@@ -150,7 +150,7 @@ Router.map(function() {
       if (checkUserServer(this.request, this.response)) { 
         this.response.writeHead(200, {
           'Access-Control-Allow-Origin': '*',
-          'Content-Type': 'application/json'
+          'Content-Type': 'Content-type: text/csv'
         });
         var billingCsv = Meteor.call('getBillingCsv');
         this.response.write(billingCsv);
