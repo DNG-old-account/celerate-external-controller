@@ -22,3 +22,6 @@ percolatestudio:synced-cron
 
 npm-container
 accounts-ui
+maxb:meteor-node-csv
+mrt:cookies
+thepumpinglemma:cookies

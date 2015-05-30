@@ -370,100 +370,177 @@ Meteor.methods({
   },
 
   getBillingData: function() {
-    var result = {};
+    var result = [];
     var startOfBilling = moment.tz(FRSettings.billing.firstDayOfBilling, 'America/Los_Angeles')
       .startOf('month')
       .add(1, 'days');
     var cursor = moment(startOfBilling);
-    var allSubs = Subscribers.find({}).fetch();
+    var allSubs = Subscribers.find({'$or': [{status: 'connected'}, {status: 'disconnected'}]}).fetch(); //TODO: remove limit
     var subsBilling = []
     _.each(allSubs, function(sub) {
       if (sub.status === 'connected' || sub.status === 'disconnected') {
         subsBilling.push({
           sub: sub,
+          accountId: FRMethods.generateSubscriberAccountId(sub._id._str),
           billing: FRMethods.calculatePayments(sub, 30)
         });
       }
     });
 
-    while (cursor.isBefore(moment.tz())) {
-      var monthName = cursor.format('MMM');
-      result[monthName] = {
-        totalInvoice: 0,
-        subscriptions: 0,
-        installations: 0,
-        equipmentSold: 0,
-        additionalLabor: 0,
-        tax: {}, // Needs to be by jurisdiction
-        totalChanges: {
-          totalInvoice: 0,
-          subscriptions: 0,
-          installations: 0,
-          equipmentSold: 0,
-          additionalLabor: 0,
-          tax: {}, // Needs to be by jurisdiction
-        }
+    var getMonthName = function(date) {
+      return moment(date).format('MMM');
+    };
+
+    _.each(subsBilling, function(subBillingObj) {
+      var sub = subBillingObj.sub;
+      var subBilling = subBillingObj.billing;
+      var baseRow = {
+        customer_id: subBillingObj.accountId,
+        subscriber_name: sub.first_name + ((typeof sub.last_name === 'string') ? (' ' + sub.last_name) : '')
       };
 
-      _.each(subsBilling, function(subBillingObj) {
-        var sub = subBillingObj.sub;
-        var subBilling = subBillingObj.billing;
-        _.each(subBilling.monthlyPayments, function(monthlyPayment) {
-          if (moment(monthlyPayment.startDate).isBefore(cursor) &&
-              moment(monthlyPayment.endDate).isAfter(cursor)) {
+      // First go through monthly payments 
+      _.each(subBilling.monthlyPayments, function(monthlyPayment) {
+        var invoice = _.extend({}, baseRow); 
+        invoice.billing_cycle = getMonthName(moment(monthlyPayment.startDate).add(1, 'days'));
+        invoice.invoice_date = moment(monthlyPayment.endDate).format('MM-DD-YYYY');
+        invoice.invoice_amount = monthlyPayment.amount;
+        // invoice.service_plan = monthlyPayment.plan; TODO: we don't have a plan attribute here 
+        invoice.description = "Monthly Subscription";
+        result.push(invoice);
+      });
 
-            result[monthName].subscriptions += monthlyPayment.amount;
+      _.each(sub.billing_info.monthly_payments, function(monthlyPayment) {
+        var charge = _.extend({}, baseRow); 
+        if (typeof monthlyPayment.charge === 'object' && typeof monthlyPayment.charge.id !== 'undefined') {
+          charge.stripe_id = monthlyPayment.charge.id; 
+          charge.billing_cycle = getMonthName(moment(monthlyPayment.startDate).add(1, 'days'));
+          charge.date_of_payment = moment(monthlyPayment.charge.created * 1000).format('MM-DD-YYYY');
+          charge.total_amount_paid = monthlyPayment.amount;
+          // invoice.service_plan = monthlyPayment.plan; TODO: we don't have a plan attribute here 
+          charge.description = "Monthly Subscription";
+          result.push(charge);
+        } else if (monthlyPayment.amount !== 0) {
+          console.log('MONTHLY PAYMENT WITHOUT CHARGE:');
+          console.log(sub);
+          console.log(monthlyPayment);
+        }
+      });
+
+      // Now do installation 
+      if (typeof sub.activation_date !== 'undefined' && 
+          moment(sub.activation_date).isValid()) {
+
+        var installationDue = !subBilling.installation.paid;
+        // Check if paid in installments
+        var installments = false;
+        var installationCharged = false;
+        _.each(sub.billing_info.charges, function(charge) {
+          if (charge.description.match(/installment/i)) {
+            installments = true;
+            installationCharged = true;
+          } else if (charge.description.match(/installation/i)) {
+            installationPaidDate = moment(charge.created * 1000);
+            installationChargeId = charge.id;
+            installationCharged = true;
           }
         });
 
-        if (typeof sub.activation_date !== 'undefined' && 
-            moment(sub.activation_date).isValid() &&
-            cursor.isSame(moment(sub.activation_date), 'month')) {
+        var installationPaid = !installationDue && installationCharged;
 
-          if (FRMethods.isNumber(subBilling.installation.totalInstallationAmount)) {
-            result[monthName].installations += subBilling.installation.totalInstallationAmount;
-          }
-          if (FRMethods.isNumber(subBilling.installation.additionalLaborCost )) {
-            result[monthName].additionalLabor += subBilling.installation.additionalLaborCost;
-          }
-          if (typeof subBilling.installation.additional_equipment === 'object' &&
-              subBilling.installation.additional_equipment.length > 0) {
-            
-            _.each(subBilling.installation.additional_equipment, function(equipment) {
-              result[monthName].equipmentSold += equipment.hardwareObj.price;
-            });
-            var community;
-            if (typeof sub.community === 'string') {
-              community = sub.community;
-            } else if (typeof sub.city === 'string') {
-              community = sub.city;
-            } else {
-              community = 'unknown';
-            }
+        var baseInstallationInvoice = _.extend({
+          billing_cycle: getMonthName(moment(sub.activation_date)),
+          invoice_date: moment(sub.activation_date).format('MM-DD-YYYY'),
+        }, baseRow);
 
-            if (!FRMethods.isNumber(result[monthName].tax[community])) {
-              result[monthName].tax[community] = 0;
-            }
-            result[monthName].tax[community] += subBilling.installation.totalTax;
+        var standardInstallationInvoice = _.extend({}, baseInstallationInvoice);
+        standardInstallationInvoice.invoice_amount = parseFloat(sub.billing_info.installation.standard_installation);
+        standardInstallationInvoice.description = "Standard Installation";
+        result.push(standardInstallationInvoice);
+
+        if (installationPaid && !installments) {
+          var standardInstallationCharge = _.extend({}, standardInstallationInvoice);
+          standardInstallationCharge.date_of_payment = installationPaidDate.format('MM-DD-YYYY');
+          standardInstallationCharge.total_amount_paid = standardInstallationCharge.invoice_amount;
+          standardInstallationCharge.stripeId = installationChargeId;
+          result.push(standardInstallationCharge);
+        }
+        
+        if (FRMethods.isNumber(subBilling.installation.additionalLaborCost )) {
+          var laborInvoice = _.extend({}, baseInstallationInvoice);
+          laborInvoice.invoice_amount = subBilling.installation.additionalLaborCost;
+          laborInvoice.description = "Additional Hours for Installation";
+          laborInvoice.additional_hours_amount = sub.billing_info.installation.additional_labor;
+          result.push(laborInvoice);
+
+          if (installationPaid && !installments) {
+            var laborCharge = _.extend({}, laborInvoice);
+            laborCharge.date_of_payment = installationPaidDate.format('MM-DD-YYYY');
+            laborCharge.total_amount_paid = laborCharge.invoice_amount;
+            laborCharge.stripeId = installationChargeId;
+            result.push(laborCharge);
           }
         }
-      });
+        if (typeof subBilling.installation.additional_equipment === 'object' &&
+            subBilling.installation.additional_equipment.length > 0) {
 
-      cursor.add(1, 'months');
+          var community;
+          if (typeof sub.community === 'string') {
+            community = sub.community;
+          } else if (typeof sub.city === 'string') {
+            community = sub.city;
+          } else {
+            community = 'unknown';
+          }
+
+          _.each(subBilling.installation.additional_equipment, function(equipment) {
+            var equipmentInvoice = _.extend({}, baseInstallationInvoice);
+            equipmentInvoice.invoice_amount = equipment.hardwareObj.price + equipment.hardwareObj.taxCost; 
+            equipmentInvoice.description = 'Additional Equipment';
+            equipmentInvoice.equipment_description = equipment.hardwareObj.make + ' ' + equipment.hardwareObj.model;
+            equipmentInvoice.additional_equipment_sold_amount = equipment.hardwareObj.price + equipment.hardwareObj.taxCost;
+            equipmentInvoice.additional_equipment_tax_amount = equipment.hardwareObj.taxCost;
+            equipmentInvoice.additional_equipment_tax_rate = equipment.hardwareObj.tax;
+            equipmentInvoice.tax_jurisdiction = community;
+            result.push(equipmentInvoice);
+
+            if (installationPaid && !installments) {
+              var equipmentCharge = _.extend({}, equipmentInvoice);
+              equipmentCharge.date_of_payment = installationPaidDate.format('MM-DD-YYYY');
+              equipmentCharge.total_amount_paid = equipmentCharge.invoice_amount;
+              equipmentCharge.stripeId = installationChargeId;
+              result.push(equipmentCharge);
+            }
+          });
+        }
+      }
+    });
+      
+    return result;
+  },
+
+  getBillingCsv: function() {
+
+    columns = ['customer_id', 'subscriber_name', 'stripe_id', 'billing_cycle', 'invoice_date', 
+               'invoice_amount', 'date_of_payment', 'total_amount_paid', 'description', 'additional_hours_amount',
+               'equipment_description', 'additional_equipment_sold_amount', 'additional_equipment_tax_amount', 
+               'additional_equipment_tax_rate', 'tax_jurisdiction'];
+
+    billingData = Meteor.call('getBillingData');
+
+    billingCsv = Async.runSync(function(done) {
+      CSV.stringify(billingData, {header: true, columns: columns}, function(err, result) {
+        done(err, result);
+      });
+    });
+
+    if (billingCsv.err || !billingCsv.result) {
+      console.log(billingCsv);
+      throw new Meteor.Error("Error creating csv", billingCsv);
     }
 
-    _.each(result, function(monthlyResult) {
-      monthlyResult.subscriptions = Math.round10(monthlyResult.subscriptions, 2);
-      monthlyResult.installations = Math.round10(monthlyResult.installations, 2);
-      monthlyResult.equipmentSold = Math.round10(monthlyResult.equipmentSold, 2);
-      monthlyResult.additionalLabor = Math.round10(monthlyResult.additionalLabor, 2);
-      _.each(monthlyResult.tax, function(amount) {
-        amount = Math.round10(amount, 10);
-      });
-      monthlyResult.totalInvoice = Math.round10(monthlyResult.subscriptions + monthlyResult.installations, 2);
+    return billingCsv.result;
 
-    });
-    return result;
   },
 
   getEmailsList: function(query, headerSort) {

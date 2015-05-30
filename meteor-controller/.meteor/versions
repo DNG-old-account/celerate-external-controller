@@ -40,6 +40,7 @@ less@1.0.14
 livedata@1.0.13
 localstorage@1.0.3
 logging@1.0.7
+maxb:meteor-node-csv@0.3.7
 meteor@1.1.6
 meteor-platform@1.2.2
 meteorhacks:async@1.0.0
@@ -51,6 +52,7 @@ mizzao:timesync@0.3.1
 mizzao:user-status@0.6.4
 mobile-status-bar@1.0.3
 mongo@1.1.0
+mrt:cookies@0.3.0
 mrt:moment@2.8.1
 mrt:moment-timezone@0.2.1
 npm-container@1.0.0
@@ -73,6 +75,7 @@ spacebars@1.0.6
 spacebars-compiler@1.0.6
 standard-app-packages@1.0.5
 templating@1.1.1
+thepumpinglemma:cookies@1.0.0
 tracker@1.0.7
 ui@1.0.6
 underscore@1.0.3

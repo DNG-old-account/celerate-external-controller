@@ -6,6 +6,32 @@ var checkUser = function () {
   }
 };
 
+if (Meteor.isClient) {
+  Tracker.autorun(function() {
+    //Update the cookie whenever they log in or out
+    Cookie.set("meteor_user_id", Meteor.userId());
+    Cookie.set("meteor_token", localStorage.getItem("Meteor.loginToken"));
+  });
+}
+
+var checkUserServer = function (request, response) {
+  //Check the values in the cookies
+  var cookies = new Cookies( request ),
+      userId = cookies.get("meteor_user_id") || "",
+      token = cookies.get("meteor_token") || "";
+
+  //Check a valid user with this token exists
+  var user = Meteor.users.findOne({
+    _id: userId,
+      'services.resume.loginTokens.hashedToken' : Accounts._hashLoginToken(token)
+  });
+
+  if (!user || !user.services.google || (user.services.google.email.indexOf("denovogroup.org") == -1)) {
+    return false;
+  }
+  return true;
+};
+
 Router.configure({
   waitOn: function(){
     return Meteor.subscribe('userData');
@@ -113,6 +139,23 @@ Router.map(function() {
     onBeforeAction: function() {
       if (checkUser()) {
         this.next();
+      }
+    }
+  });
+
+  this.route('billingExportCsv', {
+    where: 'server',
+    path: '/billing_export_csv',
+    action: function() {
+      if (checkUserServer(this.request, this.response)) { 
+        this.response.writeHead(200, {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        });
+        var billingCsv = Meteor.call('getBillingCsv');
+        this.response.write(billingCsv);
+      } else {
+        this.response.end("Not allowed");
       }
     }
   });
