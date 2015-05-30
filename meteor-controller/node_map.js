@@ -9,6 +9,7 @@ if (Meteor.isClient) {
     markers = {};
     links = {};
     linkinfo = {};
+    Session.set('infoWindowOpen', false);
     if (!Session.get("node_map")) {
       google.maps.visualRefresh=true;
       var mapOptions = {

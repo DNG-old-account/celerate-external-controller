@@ -7,6 +7,7 @@ if (Meteor.isClient) {
   Template.subscriberMap.rendered = function() {
     map = null;
     markers = {};
+    Session.set('infoWindowOpen', false);
     if (!Session.get("subscriber_map")) {
       google.maps.visualRefresh=true;
       var mapOptions = {
