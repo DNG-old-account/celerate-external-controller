@@ -2,7 +2,11 @@ if (Meteor.isClient) {
   var sort_fields = ["mapped_sort", "name_sort", "hardware_sort", "mac_sort"];
   var sort_fields_to_label = {"mapped_sort": "lat", "name_sort": "name", "hardware_sort": "hardware", "mac_sort": "mac"};
 
-  Meteor.startup(function() {
+  Template.nodeOverview.onCreated(function() {
+    if ($('script[src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry"]').length === 0) {
+      $.getScript('https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry', function() {
+      });
+    }
     Session.set("primary_sort_field_nodes", "name_sort");
     Session.set("mapped_sort", -1);
     Session.set("name_sort", 1);

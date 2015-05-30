@@ -3,7 +3,7 @@ if (Meteor.isClient) {
   var sort_fields = ["type_sort", "name_sort", "pictures_sort"];
   var sort_fields_to_label = {"type_sort": "type", "name_sort": "name", "pictures_sort": "pictures"};
 
-  Meteor.startup(function() {
+  Template.siteOverview.onCreated(function() {
     Session.set("primary_sort_field_sites", "name_sort");
     Session.set("type_sort", 1);
     Session.set("name_sort", 1);

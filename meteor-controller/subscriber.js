@@ -7,6 +7,10 @@ if (Meteor.isClient) {
   var non_archived_subscribers_dep = new Tracker.Dependency;
 
   Template.subscriberOverview.onCreated(function() {
+    if ($('script[src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry"]').length === 0) {
+      $.getScript('https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry', function() {
+      });
+    }
     Meteor.subscribe('subscribersFields', include_fields);
     Session.set("primary_sort_field_subscribers", "status_sort");
     Session.set("status_sort", -1);

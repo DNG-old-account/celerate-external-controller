@@ -3,7 +3,7 @@ if (Meteor.isClient) {
   var sort_fields = ["name_sort", "make_sort", "model_sort"];
   var sort_fields_to_label = {"name_sort": "name", "make_sort": "make", "model_sort": "model"};
 
-  Meteor.startup(function() {
+  Template.hardwareOverview.onCreated(function() {
     Session.set("primary_sort_field_hardware", "name_sort");
     Session.set("name_sort", 1);
     Session.set("make_sort", 1);
