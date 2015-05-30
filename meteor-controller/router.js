@@ -51,7 +51,8 @@ Router.map(function() {
           this.next();
         }
       }
-    }
+    },
+    fastRender: true
   });
 
   this.route('hardwareDetails', {
@@ -78,6 +79,7 @@ Router.map(function() {
         }
       }
     },
+    fastRender: true
   });
 
   this.route('siteDetails', {
@@ -116,6 +118,7 @@ Router.map(function() {
         }
       }
     },
+    fastRender: true
   });
 
   this.route('nodeDetails', {
@@ -140,7 +143,8 @@ Router.map(function() {
       if (checkUser()) {
         this.next();
       }
-    }
+    },
+    fastRender: true
   });
 
   this.route('billingExportCsv', {
@@ -169,7 +173,8 @@ Router.map(function() {
           this.next();
         }
       }
-    }
+    },
+    fastRender: true
   });
 
   this.route('subscriberPage', {
@@ -182,6 +187,7 @@ Router.map(function() {
         this.next();
       }
     },
+    fastRender: true
   });
 
   this.route('subscriberDetails', {
