@@ -76,9 +76,14 @@ if (Meteor.isClient) {
 
   Template.site.events({
     'click': function (evt) {
+      var alreadyClicked = false;
+      if (Session.equals('selected_site', this._id)) {
+        alreadyClicked = true;
+      }
+
       Session.set("selected_site", this._id);
       console.log("selected_site set to: " + Session.get("selected_site"))
-      if ($(evt.target).hasClass('edit-row')) {
+      if (alreadyClicked || $(evt.target).hasClass('edit-row')) {
         showModal();
       }
     }

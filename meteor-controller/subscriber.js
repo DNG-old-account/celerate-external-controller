@@ -216,9 +216,14 @@ if (Meteor.isClient) {
 
   Template.subscriber.events({
     'click': function (evt) {
+      var alreadyClicked = false;
+      if (Session.equals('selected_subscriber', this._id)) {
+        alreadyClicked = true;
+      }
+
       Session.set("selected_subscriber", this._id);
       console.log("selected_subscriber set to: " + Session.get("selected_subscriber"));
-      if ($(evt.target).hasClass('edit-row')) {
+      if (alreadyClicked || $(evt.target).hasClass('edit-row')) {
         // Enable the modal for the subscriber.
         Tracker.afterFlush(function () {
           showModal();

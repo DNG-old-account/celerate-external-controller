@@ -79,9 +79,14 @@ if (Meteor.isClient) {
 
   Template.hardware.events({
     'click': function (evt) {
+      var alreadyClicked = false;
+      if (Session.equals('selected_hardware', this._id)) {
+        alreadyClicked = true;
+      }
+
       Session.set("selected_hardware", this._id);
       console.log("selected_hardware set to: " + Session.get("selected_hardware"))
-      if ($(evt.target).hasClass('edit-row')) {
+      if (alreadyClicked || $(evt.target).hasClass('edit-row')) {
         showModal();
       }
     }
