@@ -78,6 +78,13 @@ if (Meteor.isClient) {
 
             }
           });
+
+        } else if (formelement.id == "status" && formelement.value == "disconnected") {
+          Tracker.afterFlush(function() {
+            $('#plan').val('disconnected');
+            $('#plan').parent().parent().find('#save').removeClass('text-gray');
+            $('#plan').parent().parent().find('#save').trigger('click');
+          });
         } else if (formelement.id === 'plan') {
           var planChanged = true;
 
