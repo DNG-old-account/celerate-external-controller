@@ -405,26 +405,30 @@ Meteor.methods({
         invoice.billing_cycle = getMonthName(moment(monthlyPayment.startDate).add(1, 'days'));
         invoice.invoice_date = moment(monthlyPayment.endDate).format('MM-DD-YYYY');
         invoice.invoice_amount = monthlyPayment.amount;
-        // invoice.service_plan = monthlyPayment.plan; TODO: we don't have a plan attribute here 
-        invoice.description = "Monthly Subscription";
-        result.push(invoice);
-      });
-
-      _.each(sub.billing_info.monthly_payments, function(monthlyPayment) {
-        var charge = _.extend({}, baseRow); 
-        if (typeof monthlyPayment.charge === 'object' && typeof monthlyPayment.charge.id !== 'undefined') {
-          charge.stripe_id = monthlyPayment.charge.id; 
-          charge.billing_cycle = getMonthName(moment(monthlyPayment.startDate).add(1, 'days'));
-          charge.date_of_payment = moment(monthlyPayment.charge.created * 1000).format('MM-DD-YYYY');
-          charge.total_amount_paid = monthlyPayment.amount;
-          // invoice.service_plan = monthlyPayment.plan; TODO: we don't have a plan attribute here 
-          charge.description = "Monthly Subscription";
-          result.push(charge);
-        } else if (monthlyPayment.amount !== 0) {
-          console.log('MONTHLY PAYMENT WITHOUT CHARGE:');
-          console.log(sub);
-          console.log(monthlyPayment);
+        invoice.service_plan = '';
+        if (typeof monthlyPayment.plan.label === 'string') {
+          invoice.service_plan = monthlyPayment.plan.label + ' ';
+        } 
+        if (typeof monthlyPayment.plan.type === 'string') {
+          invoice.service_plan += monthlyPayment.plan.type; 
         }
+        invoice.description = "Monthly Subscription";
+
+        // Search through billing_info.monthly_payments (which have charge info) for a matching payment
+        _.each(sub.billing_info.monthly_payments, function(monthlyCharges) {
+          if (typeof monthlyCharges.charge === 'object' && typeof monthlyCharges.charge.id !== 'undefined') {
+
+            if (moment(monthlyCharges.start_date).isSame(moment(monthlyPayment.startDate), 'day') && 
+                moment(monthlyCharges.end_date).isSame(moment(monthlyPayment.endDate), 'day')) { 
+
+              invoice.stripe_id = monthlyCharges.charge.id; 
+              invoice.date_of_payment = moment(monthlyCharges.charge.created * 1000).format('MM-DD-YYYY');
+              invoice.total_amount_paid = monthlyCharges.amount;
+            }
+          }
+        });
+
+        result.push(invoice);
       });
 
       // Now do installation 
@@ -456,7 +460,10 @@ Meteor.methods({
         var standardInstallationInvoice = _.extend({}, baseInstallationInvoice);
         standardInstallationInvoice.invoice_amount = parseFloat(sub.billing_info.installation.standard_installation);
         standardInstallationInvoice.description = "Standard Installation";
-        result.push(standardInstallationInvoice);
+
+        if (!installationPaid) {
+          result.push(standardInstallationInvoice);
+        }
 
         if (installationPaid && !installments) {
           var standardInstallationCharge = _.extend({}, standardInstallationInvoice);
@@ -522,7 +529,7 @@ Meteor.methods({
   getBillingCsv: function() {
 
     columns = ['customer_id', 'subscriber_name', 'stripe_id', 'billing_cycle', 'invoice_date', 
-               'invoice_amount', 'date_of_payment', 'total_amount_paid', 'description', 'additional_hours_amount',
+               'invoice_amount', 'date_of_payment', 'total_amount_paid', 'description', 'service_plan', 'additional_hours_amount',
                'equipment_description', 'additional_equipment_sold_amount', 'additional_equipment_tax_amount', 
                'additional_equipment_tax_rate', 'tax_jurisdiction'];
 
