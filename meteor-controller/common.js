@@ -16,6 +16,16 @@ GenerateHeaderSort = function(sort_fields, sort_fields_to_label, primary_sort_fi
   return sort_spec;
 };
 
+// Generates a field subquery (to be used in a MongoDB query) that can handle either regex search or exact match.
+// Exact match field query inputs are ones that begin with an "=" character.
+GenerateFieldQuery = function(query_input) {
+  if (query_input.length <= 0 || query_input.charAt(0) !== '=') {
+    return { '$regex': query_input, '$options': 'i' };
+  }
+
+  return query_input.substr(1);
+};
+
 Handlebars.registerHelper('toupper', function(obj) {
   console.log(obj.toUpperCase());
   return obj.toUpperCase();

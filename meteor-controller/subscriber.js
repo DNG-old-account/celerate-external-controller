@@ -52,14 +52,15 @@ if (Meteor.isClient) {
           for (f in searchableFields) {
             var field = searchableFields[f];
             var field_query = {};
-            field_query[field] = { '$regex': query_input, '$options': 'i' };
+
+            field_query[field] = GenerateFieldQuery(query_input);
             global_query.push(field_query);
           }
 
           subquery.push({$or: global_query});
         } else {
           var field_query = {};
-          field_query[s] = { '$regex': query_input, '$options': 'i' };
+          field_query[s] = GenerateFieldQuery(query_input);
           subquery.push(field_query);
         }
       }
@@ -148,17 +149,17 @@ if (Meteor.isClient) {
     },
     'click #see_connected_users': function (evt) {
       var current_search_fields = Session.get("subscriber_search_fields");
-      current_search_fields['status'] = 'connected';
+      current_search_fields['status'] = '=connected';
       Session.set("subscriber_search_fields", current_search_fields);
     },
     'click #see_new_leads': function (evt) {
       var current_search_fields = Session.get("subscriber_search_fields");
-      current_search_fields['status'] = 'new lead';
+      current_search_fields['status'] = '=new lead';
       Session.set("subscriber_search_fields", current_search_fields);
     },
     'click #see_no_coverage': function (evt) {
       var current_search_fields = Session.get("subscriber_search_fields");
-      current_search_fields['status'] = 'no coverage';
+      current_search_fields['status'] = '=no coverage';
       Session.set("subscriber_search_fields", current_search_fields);
     },
     'click #show_archived_subscribers': function (evt) {
