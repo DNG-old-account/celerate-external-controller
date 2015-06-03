@@ -169,6 +169,7 @@ Router.map(function() {
     onBeforeAction: function() {
       if (checkUser()) {
         if (Meteor.isClient) {
+          Meteor.subscribe('contacts');
           Meteor.subscribe('subscribersOverview');
           this.next();
         }
