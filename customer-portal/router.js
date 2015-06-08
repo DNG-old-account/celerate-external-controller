@@ -183,6 +183,23 @@ Router.map(function() {
 
           var charge = stripeResp.result;
 
+          if (typeof requiredPayments.discounts === 'object') {
+            _.each(requiredPayments.discounts, function(discount) {
+              if (discount.toBeUsed) {
+                var updatedDiscount = _.extend({}, discount);
+                delete updatedDiscount.leftover;
+                delete updatedDiscount.toBeUsed;
+
+                updatedDiscount.used = true;
+                updatedDiscount.dateUsed = new Date();
+                updatedDiscount._id = new Meteor.Collection.ObjectID();
+
+                Subscribers.update(thisSub._id, {$pull: {'billing_info.discounts': {'_id': discount._id}}});
+                Subscribers.update(thisSub._id, {$push: {'billing_info.discounts': updatedDiscount }});
+              }
+            });
+          }
+
           if (requiredPayments.dueToDate.amount === totalPaid) {
 
             charge.description = 'Monthly payment for the period ' + moment(chargeStart).format('MM/DD/YYYY') + ' to ' + moment(chargeEnd).format('MM/DD/YYYY') + '.'

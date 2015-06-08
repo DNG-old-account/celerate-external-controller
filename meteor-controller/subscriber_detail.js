@@ -407,9 +407,7 @@ if (Meteor.isClient) {
 
         Meteor.call('discountAutopay', thisSub._id, discount, function(err, result) {
           if (result) {
-            result.discount.used = true;
             result.discount.stripeCoupon = result.coupon;
-            result.discount.dateUsed = new Date();
             result.discount.notes += " - Applied to Autopay."
             Subscribers.update(thisSub._id, {$push: {'billing_info.discounts': result.discount }});
           } else {
