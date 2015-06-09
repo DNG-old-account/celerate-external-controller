@@ -164,7 +164,9 @@ Router.map(function() {
         var sub = Subscribers.findOne({'billing_info.autopay.customer.id': sEvent.customer});
         var totalPaid = sEvent.total / 100; // stripe does cents
 
-        var requiredPayments = FRMethods.calculatePayments(sub);
+        var calcTotalPaymentObj = FRMethods.calcTotalPayment(sub, 0, true);
+        var totalPayment = Math.round(calcTotalPaymentObj.total * 100);
+        var requiredPayments = calcTotalPaymentObj.requiredPayments;
         var chargeStart = requiredPayments.dueToDate.startDate;
         var chargeEnd = requiredPayments.dueToDate.endDate;
 
@@ -200,7 +202,7 @@ Router.map(function() {
             });
           }
 
-          if (requiredPayments.dueToDate.amount === totalPaid) {
+          if (requiredPayments.dueToDate.amount === totalPaid || totalPaid === totalPayment) {
 
             charge.description = 'Monthly payment for the period ' + moment(chargeStart).format('MM/DD/YYYY') + ' to ' + moment(chargeEnd).format('MM/DD/YYYY') + '.'
 

@@ -489,7 +489,7 @@ FRMethods = {
               newTotal = total - discount.amount;
               if (newTotal > 0) {
                 discount.leftover = 0;
-                payment.amount = newTotal;
+                total = newTotal;
               } else {
                 discount.leftover = Math.abs(newTotal);
                 total = 0;
