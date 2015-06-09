@@ -162,7 +162,7 @@ Router.map(function() {
       if (sEvent.object === 'invoice' &&
           sEvent.paid === true) {
         var sub = Subscribers.findOne({'billing_info.autopay.customer.id': sEvent.customer});
-        var totalPaid = sEvent.total / 100; // stripe does cents
+        var totalPaid = sEvent.total; // stripe does cents
 
         var calcTotalPaymentObj = FRMethods.calcTotalPayment(sub, 0, true);
         var totalPayment = Math.round(calcTotalPaymentObj.total * 100);
@@ -196,13 +196,13 @@ Router.map(function() {
                 updatedDiscount.dateUsed = new Date();
                 updatedDiscount._id = new Meteor.Collection.ObjectID();
 
-                Subscribers.update(thisSub._id, {$pull: {'billing_info.discounts': {'_id': discount._id}}});
-                Subscribers.update(thisSub._id, {$push: {'billing_info.discounts': updatedDiscount }});
+                Subscribers.update(sub._id, {$pull: {'billing_info.discounts': {'_id': discount._id}}});
+                Subscribers.update(sub._id, {$push: {'billing_info.discounts': updatedDiscount }});
               }
             });
           }
 
-          if (requiredPayments.dueToDate.amount === totalPaid || totalPaid === totalPayment) {
+          if (Math.round(requiredPayments.dueToDate.amount * 100) === totalPaid || totalPaid === totalPayment) {
 
             charge.description = 'Monthly payment for the period ' + moment(chargeStart).format('MM/DD/YYYY') + ' to ' + moment(chargeEnd).format('MM/DD/YYYY') + '.'
 
