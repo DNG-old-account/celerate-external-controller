@@ -319,7 +319,7 @@ FRMethods = {
           var hasChange = false;
 
           if (first.isBefore(activationDate) || first.isSame(activationDate, 'day')) {
-            first = moment(activationDate);
+            first = moment(activationDate).startOf('day');
           }         
 
           if (typeof sub.billing_info.plan_activity === 'object' && _.size(sub.billing_info.plan_activity) > 0) {
