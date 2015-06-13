@@ -237,7 +237,7 @@ if (Meteor.isClient) {
     }
   });
 
-  var showModal = function() {
+  showModal = function() {
     Tracker.afterFlush(function () {
       $('#subscriber_details_modal').modal({show:true})
       $('#subscriber_details_modal').off('hide.bs.modal');

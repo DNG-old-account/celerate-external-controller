@@ -7,7 +7,6 @@ if (Meteor.isClient) {
   Template.subscriberMap.rendered = function() {
     map = null;
     markers = {};
-    Session.set('infoWindowOpen', false);
     if (!Session.get("subscriber_map")) {
       google.maps.visualRefresh=true;
       var mapOptions = {
@@ -44,7 +43,7 @@ if (Meteor.isClient) {
     });
 
     Deps.autorun(function() {
-      if (Session.get("subscriber_map") && !Session.get('infoWindowOpen')) {
+      if (Session.get("subscriber_map")) {
         console.log("Rendering map...");
         for (var m in markers) {
           markers[m].setMap(null);
@@ -89,11 +88,7 @@ if (Meteor.isClient) {
     });
 
     Deps.autorun(function() {
-      if (Session.get("subscriber_map") && !Session.get('infoWindowOpen')) {
-        var infoWindow = new google.maps.InfoWindow({ 
-          content: '<div class="subscriber-details-infowindow-container"></div>',
-        });
-
+      if (Session.get("subscriber_map")) {
         getSubscribers().forEach(function (subscriber) {
           try {
             if ('lat' in subscriber && subscriber['lat'].trim().length > 0 && 'lng' in subscriber && subscriber['lng'].trim().length > 0) {
@@ -102,17 +97,7 @@ if (Meteor.isClient) {
 
               google.maps.event.addListener(marker, 'click', function(evt) {
                 Session.set("selected_subscriber", subscriber._id)
-                Session.set('infoWindowOpen', true);
-                infoWindow.open(map, marker)
-                Meteor.setTimeout(function() {
-                  var subscriber = Subscribers.findOne(Session.get('selected_subscriber'));
-                  var domNode = $('.subscriber-details-infowindow-container')[0];
-                  Blaze.renderWithData(Template.subscriberDetails, subscriber, domNode);
-                  google.maps.event.addListenerOnce(infoWindow, 'closeclick', function(evt) {
-                    console.log(evt);
-                    Session.set('infoWindowOpen', false);
-                  });
-                }, 1);
+                showModal();
               });
             }
           } catch (e) { console.log("failed to map subscriber " + JSON.stringify(subscriber)); console.log(e); }
