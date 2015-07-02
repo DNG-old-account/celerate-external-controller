@@ -1,6 +1,6 @@
-var checkUser = function () {
+var checkUser = function (thisRouter) {
   if (!Meteor.user() || !Meteor.user().services.google || (Meteor.user().services.google.email.indexOf("denovogroup.org") == -1)) {
-    this.render('homePage');
+    thisRouter.render('homePage');
   } else {
     return true;
   }
@@ -45,7 +45,7 @@ Router.map(function() {
   this.route('hardwarePage', {
     path: '/hardware',
     onBeforeAction: function() {
-      if (checkUser()) {
+      if (checkUser(this)) {
         if (Meteor.isClient) {
           Meteor.subscribe('hardware');
           this.next();
@@ -59,7 +59,7 @@ Router.map(function() {
     path: '/hardware_details/:_id',
     data: function() { return Hardware.findOne(new Meteor.Collection.ObjectID(this.params._id)); },
     onBeforeAction: function() {
-      if (checkUser()) {
+      if (checkUser(this)) {
         if (Meteor.isClient) {
           Meteor.subscribe('hardware');
           Session.set('selected_hardware', this.params._id);
@@ -72,7 +72,7 @@ Router.map(function() {
   this.route('sitePage', {
     path: '/site',
     onBeforeAction: function() {
-      if (checkUser()) {
+      if (checkUser(this)) {
         if (Meteor.isClient) {
           Meteor.subscribe('sites');
           this.next();
@@ -88,7 +88,7 @@ Router.map(function() {
       return Sites.findOne(new Meteor.Collection.ObjectID(this.params._id)); 
     },
     onBeforeAction: function() {
-      if (checkUser()) {
+      if (checkUser(this)) {
         if (Meteor.isClient) {
           Meteor.subscribe('sites');
           this.next();
@@ -110,7 +110,7 @@ Router.map(function() {
       }
     },
     onBeforeAction: function() {
-      if (checkUser()) {
+      if (checkUser(this)) {
         if (Meteor.isClient) {
           Meteor.subscribe('nodes');
           Meteor.subscribe('edges');
@@ -127,7 +127,7 @@ Router.map(function() {
       return Nodes.findOne(new Meteor.Collection.ObjectID(this.params._id)); 
     },
     onBeforeAction: function() {
-      if (checkUser()) {
+      if (checkUser(this)) {
         if (Meteor.isClient) {
           Meteor.subscribe('nodeData', this.params._id);
           Meteor.subscribe('edges');
@@ -140,7 +140,7 @@ Router.map(function() {
   this.route('billingExport', {
     path: '/billing_export',
     onBeforeAction: function() {
-      if (checkUser()) {
+      if (checkUser(this)) {
         this.next();
       }
     },
@@ -167,7 +167,7 @@ Router.map(function() {
   this.route('emailsPage', {
     path: '/emails_page',
     onBeforeAction: function() {
-      if (checkUser()) {
+      if (checkUser(this)) {
         if (Meteor.isClient) {
           Meteor.subscribe('contacts');
           Meteor.subscribe('subscribersOverview');
@@ -181,7 +181,7 @@ Router.map(function() {
   this.route('subscriberPage', {
     path: '/subscriber',
     onBeforeAction: function() {
-      if (checkUser()) {
+      if (checkUser(this)) {
         Meteor.subscribe('contacts');
         Meteor.subscribe('hardware');
         Meteor.subscribe('sites');
@@ -194,7 +194,7 @@ Router.map(function() {
   this.route('subscriberDetails', {
     path: '/subscriber_details/:_id',
     onBeforeAction: function() {
-      if (checkUser()) {
+      if (checkUser(this)) {
         if (Meteor.isClient) {
           Meteor.subscribe('subscriberData', this.params._id);
           Meteor.subscribe('contacts');
