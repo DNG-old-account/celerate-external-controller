@@ -162,6 +162,14 @@ Router.map(function() {
       if (sEvent.object === 'invoice' &&
           sEvent.paid === true) {
         var sub = Subscribers.findOne({'billing_info.autopay.customer.id': sEvent.customer});
+        if (typeof sub !== 'object') {
+          console.log('Sub not found in webhook event. sEvent:');
+          console.log(sEvent);
+          var response = this.response;
+          response.write('500');
+          response.end();
+          return false;
+        }
         var totalPaid = sEvent.total; // stripe does cents
 
         var calcTotalPaymentObj = FRMethods.calcTotalPayment(sub, 0, true);
