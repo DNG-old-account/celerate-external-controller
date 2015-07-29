@@ -2,7 +2,8 @@
 FRSettings = {
   email: {
     retries: 3,
-    notificationEmails: 'support@furtherreach.net, max@denovogroup.org, barath@denovogroup.org'
+    notificationEmails: 'support@furtherreach.net, max@denovogroup.org, barath@denovogroup.org',
+    defaultSender: 'Further Reach Support <support@furtherreach.net>',
   },
   billing: {
     installmentNum: 6,
