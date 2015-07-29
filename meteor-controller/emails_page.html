@@ -100,8 +100,15 @@
             <option value="{{key}}">{{value.label}}</option>
             {{/each}}
           </select>
-          <h3>Subject: {{emailContents.subject}}</h3>
-          <textarea disabled class="email-contents">{{emailContents.body}}</textarea>
+          {{#if emailContents.custom}}
+            <label for="custom-email-subject">Subject:</label>
+            <input type="text" id="custom-email-subject">
+            <label for="custom-email-from">From:</label>
+            <input type="text" id="custom-email-from" value="{{emailContents.from}}">
+          {{else}}
+            <h3>Subject: {{emailContents.subject}}</h3>
+          {{/if}}
+          <textarea {{disabledPropertyIfNone emailContents.custom }} class="email-contents">{{emailContents.body}}</textarea>
         </div>
         <div class="modal-footer">
           <button class="btn" data-dismiss="modal" id='send_emails'>OK</button>

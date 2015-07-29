@@ -10,8 +10,12 @@ if (Meteor.isClient) {
     Session.set("mapped_sort", 1);
 
     Session.set("selected_subscriber", null);
-    Session.set("subscriber_search_input", "");
-    Session.set("subscriber_search_fields", {});
+    Session.set("subscriber_search_input", '');
+
+    var current_search_fields = {
+      'status': 'connected'
+    };
+    Session.set("subscriber_search_fields", current_search_fields);
     Session.set('loading', true);
   });
 
@@ -24,6 +28,9 @@ if (Meteor.isClient) {
     },
     loading: function() {
       return (Session.get('loading')) ? '' : 'hidden';
+    },
+    disabledPropertyIfNone: function(value) {
+      return value ? '' : 'disabled';
     },
     searchable_fields: function () {
       console.log('searchable fields');
@@ -120,7 +127,15 @@ if (Meteor.isClient) {
       return Session.get("subscriber_count");
     },
     emailChoices: function() {
-      return FREmails;
+      var emails = EJSON.clone(FREmails);
+
+      emails.customEmail = {
+        label: 'Custom Email',
+        body: '',
+        from: FRSettings.email.defaultSender
+      };
+
+      return emails;
     },
     emailContents: function() {
       return Session.get('emailContents') || '';
@@ -136,9 +151,22 @@ if (Meteor.isClient) {
     var accountId = '0000000';
     var userLink = 'https://customerportal.furtherreach.net';
     var emailObj = FREmails[emailKey];
-    var body = emailObj.body(sub, userLink, accountId); 
-    var subject = emailObj.subject(sub);
-    Session.set('emailContents', {subject: subject, body: body});
+    var email;
+    if (emailKey === 'customEmail') {
+      email = {
+        body: '',
+        subject: '',
+        custom: true,
+        from: FRSettings.email.defaultSender
+      }
+    } else {
+      email = {
+        body: emailObj.body(sub, userLink, accountId),
+        subject: emailObj.subject(sub),
+      }
+    }
+
+    Session.set('emailContents', email);
     $('#subscriber_email').modal('show');
   };
 
@@ -286,8 +314,17 @@ if (Meteor.isClient) {
         }
       });
 
+      var customEmail; 
+      if (emailKey === 'customEmail') {
+        customEmail = {
+          body: $('textarea.email-contents').val(),
+          subject: $('input#custom-email-subject').val(),
+          from: $('input#custom-email-from').val(),
+        };
+      }
+
       var sendEmails = function(subs) {
-        Meteor.call('sendEmails', subs, emailKey, function(err, result) {
+        Meteor.call('sendEmails', subs, emailKey, customEmail, function(err, result) {
           if (!err) {
             console.log(result);
           } else {

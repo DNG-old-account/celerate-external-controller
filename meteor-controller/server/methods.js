@@ -129,7 +129,7 @@ Meteor.methods({
     return signedUrl;
   },
 
-  sendEmails: function(subscribers, emailKey) {
+  sendEmails: function(subscribers, emailKey, customEmail) {
 
     // Let other method calls from the same client start running,
     // without waiting for the email sending to complete.
@@ -142,7 +142,6 @@ Meteor.methods({
 
       var authToken = Meteor.call('generateAuthToken', subId);
       var userLink = Meteor.settings.public.urls.customerPortal + authToken;
-      var subject = emailObj.subject(sub);
       var accountId = FRMethods.generateSubscriberAccountId(subId);
 
       sub.email = getEmail(sub);
@@ -152,9 +151,24 @@ Meteor.methods({
 
       sub.billingDate = billingDate;
 
-      var body = emailObj.body(sub, userLink, accountId); 
+      var body;
+      var subject;
+      var from;
+      if (typeof customEmail === 'object') {
+        var context = EJSON.clone(sub);
+        context.user_link = userLink;
+        context.account_id = accountId;
+        body = _.template(customEmail.body)(context);
+        subject = customEmail.subject;
+        from = (typeof customEmail.from === 'string') ? customEmail.from : FRSettings.defaultSender;
+      } else {
+        body = emailObj.body(sub, userLink, accountId); 
+        subject = emailObj.subject(sub);
+        from = emailObj.from;
+      }
 
-      sendEmail(sub.email, emailObj.from, subject, body);
+      console.log(sub.email);
+      sendEmail(sub.email, from, subject, body);
       
     });
     return true;
