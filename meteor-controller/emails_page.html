@@ -100,8 +100,36 @@
             <option value="{{key}}">{{value.label}}</option>
             {{/each}}
           </select>
-          <h3>Subject: {{emailContents.subject}}</h3>
-          <textarea disabled class="email-contents">{{emailContents.body}}</textarea>
+          {{#if emailContents.custom}}
+            <div class="custom-emails-container">
+              <label for="custom-email-subject">Subject:</label>
+              <input type="text" id="custom-email-subject">
+              <label for="custom-email-from">From:</label>
+              <input type="text" id="custom-email-from" value="{{emailContents.from}}">
+              <div class="custom-emails-explanation">
+                <p>
+                  Make sure to set the `from` input to an allowable address. The smtp server will fail (silently or loudly) if you try to send from an address that is not allowed. 
+                </p>
+                <p>
+                  You can enter plain text and <a href="http://underscorejs.org/#template">UnderscoreJS</a> templates into
+                the email body. eg.
+                </p>
+                <pre>
+Hello &lt;%= first_name %&gt; &lt;%= last_name %&gt;,
+
+We wanted to let you know about a service outage. 
+
+You can visit your account page here: &lt;%= user_link %&gt;  
+                </pre>
+                <p>
+                  All of the subscribers information should be available as well as `user_link` and `account_id`. BE CAREFUL, some subscribers have properties set where others do not. If you attempt to reference an unset variable, you will just get an empty string, BUT if you attempt to reference the property of an unset variable, the server will error on attempting to compile the template
+                </p>
+              </div>
+            </div>
+          {{else}}
+            <h3>Subject: {{emailContents.subject}}</h3>
+          {{/if}}
+          <textarea {{disabledPropertyIfNone emailContents.custom }} class="email-contents">{{emailContents.body}}</textarea>
         </div>
         <div class="modal-footer">
           <button class="btn" data-dismiss="modal" id='send_emails'>OK</button>
