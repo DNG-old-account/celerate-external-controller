@@ -13,7 +13,7 @@ if (Meteor.isClient) {
     Session.set("subscriber_search_input", '');
 
     var current_search_fields = {
-      'status': 'connected'
+      'status': '=connected'
     };
     Session.set("subscriber_search_fields", current_search_fields);
     Session.set('loading', true);
