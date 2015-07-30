@@ -17,7 +17,68 @@ if (Meteor.isClient) {
     };
     Session.set("subscriber_search_fields", current_search_fields);
     Session.set('loading', true);
+    Tracker.autorun(getSubscribers);
   });
+
+  function getSubscribers(computation) {
+    var subquery = [];
+    if (Session.get("subscriber_search_fields") != null) {
+      var current_search_fields = Session.get("subscriber_search_fields");
+      if (Session.get("subscriber_search_input").length > 0) {
+        var search_field = $("#search_tag").val().trim();
+        current_search_fields[search_field] = Session.get("subscriber_search_input");
+      }
+
+      for (s in current_search_fields) {
+        var field_query = {};
+        field_query[s] = { '$regex': current_search_fields[s], '$options': 'i' };
+        subquery.push(field_query);
+      }
+
+    }
+    query = {};
+    if (subquery.length > 0) {
+      query = {$and: subquery};
+    }
+
+    // var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'activation_date': 1, 'billing_info': 1};
+    //
+    var seeNeedsPayment = Session.get('seeNeedsPayment');
+    var seePastDue = Session.get('seePastDue');
+    var seeAutopay = Session.get('seeAutopay');
+    var headerSort = GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers");
+    Session.set('loading', true);
+    Meteor.call('getEmailsList', query, headerSort, function (err, result) {
+      if (err) {
+        console.log("getEmailsList call failed: " + err);
+      } else {
+        if (!result) {
+          console.log("getEmailsList call failed");
+
+        } else {
+          if (seeNeedsPayment) {
+            result = _.filter(result, function(sub) {
+            return sub.billing_info.needsPayment;
+            });
+          }
+
+          if (seePastDue) {
+            result = _.filter(result, function(sub) {
+              return sub.billing_info.pastDue;
+            });
+          }
+          if (seeAutopay) {
+            result = _.filter(result, function(sub) {
+              return typeof sub.billing_info.autopay === 'object' && sub.billing_info.autopay.on;
+            });
+          }
+          Session.set("subscriber_count", result.length);
+          Session.set('subscribersList', result);
+          Session.set('loading', false);
+        }
+      }
+    });
+  };
 
   Template.subscribersEmailsList.helpers({
     errorMsg: function() {
@@ -63,64 +124,6 @@ if (Meteor.isClient) {
       return current_search_fields;
     },
     subscribers: function () {
-      var subquery = [];
-      if (Session.get("subscriber_search_fields") != null) {
-        var current_search_fields = Session.get("subscriber_search_fields");
-        if (Session.get("subscriber_search_input").length > 0) {
-          var search_field = $("#search_tag").val().trim();
-          current_search_fields[search_field] = Session.get("subscriber_search_input");
-        }
-
-        for (s in current_search_fields) {
-          var field_query = {};
-          field_query[s] = { '$regex': current_search_fields[s], '$options': 'i' };
-          subquery.push(field_query);
-        }
-
-      }
-      query = {};
-      if (subquery.length > 0) {
-        query = {$and: subquery};
-      }
-
-      // var include_fields = {'first_name': 1, 'last_name': 1, 'status': 1, 'street_address': 1, 'city': 1, 'lat': 1, 'lng': 1, 'prior_email': 1, 'archived': 1, 'plan': 1, 'activation_date': 1, 'billing_info': 1};
-      //
-      var seeNeedsPayment = Session.get('seeNeedsPayment');
-      var seePastDue = Session.get('seePastDue');
-      var seeAutopay = Session.get('seeAutopay');
-      var headerSort = GenerateHeaderSort(sort_fields, sort_fields_to_label, "primary_sort_field_subscribers");
-      Session.set('loading', true);
-      Meteor.call('getEmailsList', query, headerSort, function (err, result) {
-        if (err) {
-          console.log("getEmailsList call failed: " + err);
-        } else {
-          if (!result) {
-            console.log("getEmailsList call failed");
-
-          } else {
-            if (seeNeedsPayment) {
-              result = _.filter(result, function(sub) {
-              return sub.billing_info.needsPayment;
-              });
-            }
-
-            if (seePastDue) {
-              result = _.filter(result, function(sub) {
-                return sub.billing_info.pastDue;
-              });
-            }
-            if (seeAutopay) {
-              result = _.filter(result, function(sub) {
-                return typeof sub.billing_info.autopay === 'object' && sub.billing_info.autopay.on;
-              });
-            }
-            Session.set("subscriber_count", result.length);
-            Session.set('subscribersList', result);
-            Session.set('loading', false);
-          }
-        }
-      });
-       
       return Session.get('subscribersList');
     },
     subscriber_count: function () {
