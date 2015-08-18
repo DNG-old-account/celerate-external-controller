@@ -154,7 +154,8 @@ Router.map(function() {
       if (checkUserServer(this.request, this.response)) { 
         this.response.writeHead(200, {
           'Access-Control-Allow-Origin': '*',
-          'Content-Type': 'Content-type: text/csv'
+          'Content-Type': 'Content-type: text/csv',
+          'Content-Disposition': 'attachment;filename=billing_export.csv'
         });
         var billingCsv = Meteor.call('getBillingCsv');
         this.response.write(billingCsv);
