@@ -15,7 +15,7 @@ if (Meteor.isClient) {
 
         var formElement = evt.target.parentElement.previousElementSibling.firstElementChild;
         formElement.disabled = false;
-       
+
         if (formElement.nodeName === 'SELECT') {
           // Try to remove a select2 that's already been instantiated
           try {
@@ -36,11 +36,24 @@ if (Meteor.isClient) {
         var formElement = evt.target.parentElement.previousElementSibling.firstElementChild;
         console.log(formElement);
         console.log(this);
- 
-        db_update = {};
-        db_update[formElement.id] = formElement.value;
-        Nodes.update(this._id, {$set: db_update});
 
+        db_update = {};
+
+        if(formElement.id == 'gps'){
+          var gps_coordinates = formElement.value.split(",");
+          if(gps_coordinates.length == 2){
+            db_update['lat'] = gps_coordinates[0];
+            db_update['lng'] = gps_coordinates[1];
+          }else{
+            db_update['lat'] = "";
+            db_update['lng'] = "";
+          }
+        }
+        else{
+          db_update[formElement.id] == formElement.value;
+        }
+
+        Nodes.update(this._id, {$set: db_update});
         formElement.disabled = true;
 
         // Toggle the icon visual state.
@@ -71,7 +84,7 @@ if (Meteor.isClient) {
         if (node) {
           Session.set('selectedNodeEdge' + edge._id._str, node);
         }
-        $('select#remote_node').on("change", function (e) { 
+        $('select#remote_node').on("change", function (e) {
           var node = Nodes.findOne(new Meteor.Collection.ObjectID($(this).val()));
           Session.set('selectedNodeEdge' + edge._id._str, node);
         });
@@ -141,7 +154,7 @@ if (Meteor.isClient) {
               }
             });
           }
-        }); 
+        });
       }
     },
     'click .get_location_button': function (evt) {
@@ -174,7 +187,7 @@ if (Meteor.isClient) {
             }
           });
         }
-      }); 
+      });
     },
     'click .add_edge_button': function (evt) {
       var newId = new Meteor.Collection.ObjectID();
@@ -298,6 +311,11 @@ if (Meteor.isClient) {
         return { value: item._id._str, label: (item.name + " " + type_str) };
       });
 
+      var gps_coordinates;
+      if(this.lat && this.lng){
+        gps_coordinates = this.lat + ',' + this.lng;
+      }
+
       return [ { field: "name", label: "Name", value: this.name },
                { field: "hardware", label: "Hardware", value: this.hardware, options: true, options_custom_view: hardware_options },
                { field: "type", label: "Type", value: this.type, options: type_options },
@@ -306,8 +324,9 @@ if (Meteor.isClient) {
                // { field: "device_ownership", label: "Device Ownership", value: this.device_ownership, options: device_ownership_options },
                { field: "mac", label: "MAC", value: this.mac },
                // { field: "vendor_uid", label: "Vendor UID", value: this.vendor_uid },
-               { field: "lat", label: "Lat", value:this.lat },
-               { field: "lng", label: "Lng", value:this.lng },
+              //  { field: "lat", label: "Lat", value:this.lat },
+              //  { field: "lng", label: "Lng", value:this.lng },
+               { field: "gps", label: "Gps coordinates", value:gps_coordinates},
                { field: "height", label: "Height over ground", value:this.height },
                { field: "management_ip", label: "Management IP", value:this.management_ip },
                { field: "speedtest", label: "Speedtest to AP Down,Up", value: this.speedtest },
