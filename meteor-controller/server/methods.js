@@ -300,7 +300,6 @@ Meteor.methods({
       myPlan = stripeResp.result;
     }
 
-
     stripeResp = Async.runSync(function(done) {
       stripe.customers.updateSubscription(sub.billing_info.autopay.customer.id, sub.billing_info.autopay.subscription.id, {
         plan: myPlan.id,
@@ -438,13 +437,15 @@ Meteor.methods({
         var installments = false;
         var installationCharged = false;
         _.each(sub.billing_info.charges, function(charge) {
-          if (charge.description.match(/installment/i)) {
-            installments = true;
-            installationCharged = true;
-          } else if (charge.description.match(/installation/i)) {
-            installationPaidDate = moment(charge.created * 1000);
-            installationChargeId = charge.id;
-            installationCharged = true;
+          if (typeof charge.description === 'string') {
+            if (charge.description.match(/installment/i)) {
+              installments = true;
+              installationCharged = true;
+            } else if (charge.description.match(/installation/i)) {
+              installationPaidDate = moment(charge.created * 1000);
+              installationChargeId = charge.id;
+              installationCharged = true;
+            }
           }
         });
 
