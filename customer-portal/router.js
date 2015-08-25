@@ -225,6 +225,11 @@ Router.map(function() {
             Subscribers.update(sub._id, {$push: {'billing_info.charges': charge}});
           }
         }
+      } else if (sEvent.object === 'subscription') {
+
+        console.log('Subscription cancelled: ');
+        console.log(sEvent);
+        console.log(sEvent.object);
       }
 
       var response = this.response;
