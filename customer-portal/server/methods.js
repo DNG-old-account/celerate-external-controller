@@ -54,6 +54,25 @@ Meteor.methods({
     var totalPayment = Math.round(calcTotalPaymentObj.total * 100);
     var requiredPayments = calcTotalPaymentObj.requiredPayments;
 
+    var cancelSubscription = function(customerId, subscriptionId) {
+      var stripeResp = Async.runSync(function(done) {
+        stripe.customers.cancelSubscription(
+          customerId,
+          subscriptionId, 
+          function(err, result) {
+            done(err, result);
+          }
+        );
+      });
+
+      if (stripeResp.err || !stripeResp.result) {
+        console.log(stripeResp);
+        throw new Meteor.Error("Couldn't cancel the Stripe Subscription.", stripeResp);
+      }
+
+      return stripeResp.result;
+    }
+
     if (!turnOn) {
       if (typeof sub.billing_info.autopay !== 'object') {
         Subscribers.update(sub._id, {$set: {'billing_info.autopay': {} }});
@@ -64,22 +83,7 @@ Meteor.methods({
           typeof sub.billing_info.autopay.subscription === 'object') {
  
         // Cancel subscription
-        var stripeResp = Async.runSync(function(done) {
-          stripe.customers.cancelSubscription(
-            sub.billing_info.autopay.customer.id,
-            sub.billing_info.autopay.subscription.id, 
-            function(err, result) {
-              done(err, result);
-            }
-          );
-        });
-
-        if (stripeResp.err || !stripeResp.result) {
-          console.log(stripeResp);
-          throw new Meteor.Error("Couldn't cancel the Stripe Subscription.", stripeResp);
-        }
-
-        var thisCancellation = stripeResp.result;
+        var thisCancellation = cancelSubscription(sub.billing_info.autopay.customer.id, sub.billing_info.autopay.subscription.id);
         Subscribers.update(sub._id, {$set: {'billing_info.autopay.cancellation': thisCancellation }});
         sub = Subscribers.findOne(sub._id);
       }
@@ -265,21 +269,35 @@ Meteor.methods({
       var thisSubscription = stripeResp.result;
 
       // Now we need to check to see if the user needs a "proration discount"  
-      var activationDate = moment.tz(sub.activation_date, 'America/Los_Angeles');
-      var startOfBilling = moment(startOfNextMonth).add(-1, 'months');
-      var endOfThisMonth = moment(startOfNextMonth).add(-1, 'days');
-       
-      if (activationDate.isAfter(startOfBilling)) {
-        var numberOfBillingDays = Math.round(Math.abs(activationDate.diff(endOfThisMonth, 'days', true)));
-        var daysInMonth = activationDate.daysInMonth();
+      // This should apply if the customer has either activated their account
+      // or changed plans in the month that autopay will apply to
 
-        var properAmount = monthlyPayment.amount * (numberOfBillingDays / daysInMonth);
-        var discount = Math.round10(monthlyPayment.amount - properAmount, 2);
+      // Momentjs rounds down, so we add 1 to compensate because we want rounding up
+      var daysToAdd = Math.abs(moment().diff(startOfNextMonth, 'days')) + 1; 
+      var futureRequiredPayments = FRMethods.calculatePayments(sub, daysToAdd); 
+       
+      console.log('days to add = ' + daysToAdd);
+      console.log('startOfNextMonth = ' + startOfNextMonth.toISOString());
+      console.log(JSON.stringify(futureRequiredPayments));
+      if (futureRequiredPayments.dueToDate.required &&
+          futureRequiredPayments.dueToDate.amount !== monthlyPayment.amount) {
+
+        if (futureRequiredPayments.dueToDate.amount > monthlyPayment.amount) {
+          console.log('There was an error pro-rating. The current month\'s amount exceedes the subscriber\'s plan amount');
+          console.log('This month\'s required payments:');
+          console.log(JSON.stringify(futureRequiredPayments));
+          console.log('Normal required payments');
+          console.log(JSON.stringify(requiredPayments));
+          cancelSubscription(thisCustomer.id, thisSubscription.id);
+          throw new Meteor.Error('There was an error pro-rating. The current month\'s amount exceedes the subscriber\'s plan amount', requiredPayments);
+        }
+
+        var discountAmount = Math.round10(monthlyPayment.amount - futureRequiredPayments.dueToDate.amount, 2);
 
         // Add stripe "coupon" - amount in cents as always
         stripeResp = Async.runSync(function(done) {
           stripe.coupons.create({
-            amount_off: discount * 100,
+            amount_off: discountAmount * 100,
             currency: 'usd',
             duration: 'once',
           }, 
@@ -290,6 +308,7 @@ Meteor.methods({
 
         if (stripeResp.err || !stripeResp.result) {
           console.log(stripeResp);
+          cancelSubscription(thisCustomer.id, thisSubscription.id);
           throw new Meteor.Error("Couldn't create the Stripe Coupon.", stripeResp);
         }
 
@@ -307,6 +326,7 @@ Meteor.methods({
 
         if (stripeResp.err || !stripeResp.result) {
           console.log(stripeResp);
+          cancelSubscription(thisCustomer.id, thisSubscription.id);
           throw new Meteor.Error("Couldn't apply coupon to customer", stripeResp);
         }
       }
