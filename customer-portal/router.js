@@ -127,6 +127,7 @@ Router.map(function() {
   });
 
   this.route('/stripe/webhooks', { where: 'server' })
+    // TODO: all the functionality here should be moved to a separate methods section/file
     .post(function () {
       var request = this.request;
       var eventJson = request.body;
@@ -210,12 +211,12 @@ Router.map(function() {
             });
           }
 
-          if (Math.round(requiredPayments.dueToDate.amount * 100) === totalPaid || totalPaid === totalPayment) {
+          if (totalPaid === Math.round(requiredPayments.dueToDate.amount * 100) || totalPaid === totalPayment) {
 
             charge.description = 'Monthly payment for the period ' + moment(chargeStart).format('MM/DD/YYYY') + ' to ' + moment(chargeEnd).format('MM/DD/YYYY') + '.'
 
             var monthlyPayment = {
-              amount: totalPaid,
+              amount: Math.round10(totalPaid / 100, 2),
               start_date: chargeStart,
               end_date: chargeEnd,
               charge: charge
