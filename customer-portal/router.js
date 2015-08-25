@@ -225,11 +225,21 @@ Router.map(function() {
             Subscribers.update(sub._id, {$push: {'billing_info.charges': charge}});
           }
         }
-      } else if (sEvent.object === 'subscription') {
+      } else if (sEvent.object === 'subscription' && 
+                 typeof sEvent.status === 'string' &&
+                 sEvent.status === 'canceled') {
 
         console.log('Subscription cancelled: ');
         console.log(sEvent);
-        console.log(sEvent.object);
+
+        if (typeof sub.billing_info.autopay !== 'object') {
+          Subscribers.update(sub._id, {$set: {'billing_info.autopay': {} }});
+        } 
+
+        Subscribers.update(sub._id, {$set: {'billing_info.autopay.cancellation': sEvent }});
+        Subscribers.update(sub._id, {$set: {'billing_info.autopay.on': false }});
+        sub = Subscribers.findOne(sub._id);
+
       }
 
       var response = this.response;
