@@ -53,26 +53,10 @@ var sendEmail = function (to, from, subject, text, tries, bcc) {
 
 var getEmail = function(sub) {
   var emailAddress;
-  if (typeof sub.prior_email === 'string' &&
-      FRMethods.isValidEmail(sub.prior_email)) {
-    emailAddress = sub.prior_email
-  } else {
-    if (typeof sub.contacts === 'object') {
-      _.each(sub.contacts, function(c) {
-        if (c.type === 'billing') {
-          contactObj = Contacts.findOne(c.contact_id);
-          if (typeof contactObj.email === 'string' &&
-              contactObj.email.trim() !== '' &&
-              FRMethods.isValidEmail(contactObj.email)) {
-
-            emailAddress = contactObj.email;
-          }
-        }
-      });
-    }
-  }
-  if (FRMethods.isValidEmail(emailAddress)) {
-    return emailAddress;
+  var contactInfo = FRMethods.getBillingInfo(sub._id).contact;
+  
+  if (FRMethods.isValidEmail(contactInfo.email)) {
+    return contactInfo.email;
   } else {
     console.log("No valid email address for subscriber: ");
     console.log(sub);
@@ -216,7 +200,7 @@ Meteor.methods({
     return true;
   },
 
-   updateStripeEmail: function(subId, newEmail) {
+  updateStripeEmail: function(subId, newEmail) {
     var sub = Subscribers.findOne(subId);
     var stripe = Meteor.npmRequire('stripe')(Meteor.settings.stripe.privateKey);
     var stripeResp;
