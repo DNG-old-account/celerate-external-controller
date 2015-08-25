@@ -53,6 +53,9 @@ if (Meteor.isClient) {
             charge.dateCreatedString = dateString;
             charge.dollarAmount = (charge.amount / 100).formatMoney(2, '.', ',');
           });
+          billingInfo.charges = _.sortBy(billingInfo.charges, function(charge) {
+            return (-1 * moment(charge.created).unix());
+          });
         }
         Session.set('paymentInfo', result.billing_info);
       } else {
