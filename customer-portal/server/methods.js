@@ -297,7 +297,7 @@ Meteor.methods({
         // Add stripe "coupon" - amount in cents as always
         stripeResp = Async.runSync(function(done) {
           stripe.coupons.create({
-            amount_off: discountAmount * 100,
+            amount_off: Math.round(discountAmount * 100),
             currency: 'usd',
             duration: 'once',
           }, 
@@ -441,7 +441,7 @@ Meteor.methods({
 
         _.each(stripeConfig.monthlyCharges, function(charge) {
           var monthlyPayment = {
-            amount: parseFloat(charge.amount),
+            amount: Math.round10(parseFloat(charge.amount), 2),
             start_date: charge.startDate,
             end_date: charge.endDate,
             charge: result.result

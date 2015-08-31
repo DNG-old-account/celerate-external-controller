@@ -300,12 +300,17 @@ Meteor.methods({
       myPlan = stripeResp.result;
     }
 
+    var stripeParams = {
+      plan: myPlan.id,
+      prorate: true,
+    };
+
+    if (moment.unix(sub.billing_info.autopay.subscription.trial_end).isAfter(moment())) {
+      stripeParams.trial_end = sub.billing_info.autopay.subscription.trial_end;
+    }
+
     stripeResp = Async.runSync(function(done) {
-      stripe.customers.updateSubscription(sub.billing_info.autopay.customer.id, sub.billing_info.autopay.subscription.id, {
-        plan: myPlan.id,
-        prorate: true,
-        trial_end: sub.billing_info.autopay.subscription.trial_end
-      }, 
+      stripe.customers.updateSubscription(sub.billing_info.autopay.customer.id, sub.billing_info.autopay.subscription.id, stripeParams, 
       function(err, result) {
         done(err, result);
       });
@@ -329,7 +334,7 @@ Meteor.methods({
     // Add stripe "coupon" - amount in cents as always
     stripeResp = Async.runSync(function(done) {
       stripe.coupons.create({
-        amount_off: parseInt(discount.amount * 100, 10),
+        amount_off: Math.round(discount.amount * 100),
         currency: 'usd',
         duration: 'once',
       }, 
